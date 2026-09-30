@@ -12,6 +12,7 @@ class Element {
   replaceChildren(...items) { this.children=items; }
   add(item) { this.children.push(item); }
   focus() {}
+  scrollIntoView() {}
   click() { if(this.tag==='a') download=this.href; }
 }
 const elements={};
@@ -50,14 +51,25 @@ async function waitFor(check){for(let i=0;i<200;i++){if(check())return;await new
   elements.apikey.value='test-only-provider-key';elements.model.value='mock-test-only';
   await elements.modelrun.onclick();
   assert.equal(elements.decision.textContent,'変更なし');
-  assert.match(elements.resultcase.textContent,/DEMO-HOLD.*実モデル経由/);
+  assert.match(elements.resultcase.textContent,/DEMO-HOLD.*モデルAPI経由/);
   await elements.export.onclick();
   assert.ok(download);
   const report=await (await fetch(download)).json();
-  assert.equal(report.latest_run_in_this_page.source,'live_model');
-  assert.equal(report.latest_run_in_this_page.model_metadata.model,'mock-test-only');
-  assert.ok(report.history.some(row=>row.raw_sha256===report.latest_run_in_this_page.gate.raw_sha256));
+  assert.equal(report.schema,'m-anchor-app-observation/v2');
+  assert.equal(report.history.length,4);
+  assert.equal(report.history[0].execution.source,'live_model');
+  assert.equal(report.history[0].execution.model_metadata.model,'mock-test-only');
+  assert.equal(report.history[3].execution.source,'fixed_demo');
+  const firstButton=elements.history.children[0].children[1].children[3].children[5].children[0];
+  await firstButton.onclick();
+  assert.equal(elements.decision.textContent,'拒否');
+  assert.match(elements.recordinfo.textContent,/履歴 #1/);
+  assert.match(elements.rawproposal.textContent,/DEMO-HOLD/);
+  assert.match(elements.readback.textContent,/一致を確認/);
+  await elements.export.onclick();
+  const reopenedReport=await (await fetch(download)).json();
+  assert.deepEqual(reopenedReport.history,report.history,'Viewing an old record must not replace export history');
   const serialized=JSON.stringify(report);
   for(const secret of [...Object.values(sessionKeys),'test-only-provider-key','ui-test-ticket'])assert.ok(!serialized.includes(secret));
-  console.log('PASS: auto-connect, explicit case selection, reject, commit, no-op, mocked model path, export linkage, secret exclusion');
+  console.log('PASS: auto-connect, explicit case selection, reject, commit, no-op, mocked model path, persisted export, past-record details, secret exclusion');
 })().catch(error=>{console.error(error);process.exitCode=1});

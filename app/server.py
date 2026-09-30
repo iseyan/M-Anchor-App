@@ -15,10 +15,11 @@ from urllib.parse import urlsplit, unquote
 from gate import Store, GateError, canonical_json, _validate_authority
 from client import AnchorClient
 from model_bridge import run_model, ModelError
+from records import ExecutionTickets, history, utc_now
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '0.3'
+APP_VERSION = '0.4'
 
 
 class LaunchTicket:
@@ -57,6 +58,7 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
     database = directory / 'state.sqlite3'
     model_lock = threading.Lock()
     ticket = LaunchTicket(launch_ticket)
+    execution_tickets = ExecutionTickets()
     # Fail before listening if the core or trusted store cannot be verified.
     with Store(database) as store:
         store.authority_snapshot()
@@ -111,26 +113,27 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                     if path == '/admin/cases':
                         self.reply(200, store.authority_snapshot())
                     elif path == '/admin/history':
-                        rows = store.connection.execute('SELECT id,decision_json FROM audit ORDER BY id DESC LIMIT 100').fetchall()
-                        self.reply(200, [{'id': row[0], **json.loads(row[1])} for row in rows])
+                        self.reply(200, history(store.connection, limit=100))
+                    elif path.startswith('/admin/history/') and path.split('/')[-1].isdigit():
+                        entries = history(store.connection, audit_id=int(path.split('/')[-1]), details=True)
+                        self.reply(200 if entries else 404, entries[0] if entries else {'error':'unknown_history'})
                     elif path == '/admin/info':
                         self.reply(200, {'app_version': APP_VERSION, 'data_label': directory.name})
                     elif path == '/admin/report':
                         # SQLite backup gives an internally consistent, immutable copy.
-                        # The original Gate owns its transactions and stays unchanged.
                         with Store(':memory:') as frozen:
                             store.connection.backup(frozen.connection)
                             authority = frozen.authority_snapshot()
-                            rows = frozen.connection.execute('SELECT id,decision_json FROM audit ORDER BY id DESC LIMIT 100').fetchall()
+                            entries = history(frozen.connection, details=True)
                         self.reply(200, {
-                            'schema': 'm-anchor-app-observation/v1', 'app_version': APP_VERSION,
+                            'schema': 'm-anchor-app-observation/v2', 'app_version': APP_VERSION,
                             'generated_at_utc': datetime.now(timezone.utc).isoformat(),
                             'data_label': directory.name,
                             'scope': 'Local case records; not evidence-truth verification or external tool control.',
                             'authority': authority,
-                            'history_limit': 100,
-                            'history': [{'id': row[0], **json.loads(row[1])} for row in rows],
-                            'history_source_note': 'Audit entries alone do not identify whether a proposal came from a model or a fixed demo.',
+                            'history_limit': None, 'history_count': len(entries), 'history_complete': True,
+                            'history': entries,
+                            'history_source_note': 'Execution metadata identifies the server route, not signed provenance. Null means not recorded. received_at_utc is server receipt time, not commit time. Readback is a later observation; null means not recorded or interrupted.',
                         })
                     elif path.startswith('/v1/cases/') and len(path.split('/')) == 4:
                         case_id = unquote(path.split('/')[3])
@@ -153,14 +156,16 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                 return
             path = urlsplit(self.path).path
             model_job = path == '/admin/model-run'
+            demo_job = path == '/admin/demo-run'
             session_job = path == '/launch-session'
+            parts = path.split('/')
+            manual_job = (len(parts) == 5 and parts[:3] == ['', 'admin', 'cases'] and parts[4] == 'proposals')
             if session_job and self.headers.get('Origin') != f'http://127.0.0.1:{self.server.server_port}':
                 self.reply(403, {'error': 'invalid_origin'})
                 return
-            if not session_job and not self.authorized('admin' if model_job else 'agent'):
+            if not session_job and not self.authorized('admin' if model_job or demo_job or manual_job else 'agent'):
                 return
-            parts = path.split('/')
-            if not (model_job or session_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
+            if not (model_job or session_job or demo_job or manual_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
                 self.reply(404, {'error': 'unknown_route'})
                 return
             if self.headers.get('Transfer-Encoding'):
@@ -200,7 +205,13 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                         job = json.loads(raw.decode('utf-8'))
                         client = AnchorClient(credentials['agent_token'],
                             f'http://127.0.0.1:{self.server.server_port}')
-                        result = run_model(job, client)
+                        def submit_model(case_id, proposal_raw, metadata):
+                            token = execution_tickets.issue(case_id, proposal_raw, metadata)
+                            try:
+                                return client.propose(case_id, proposal_raw, execution_ticket=token)
+                            finally:
+                                execution_tickets.discard(token)
+                        result = run_model(job, client, submit=submit_model)
                         self.reply(200, result)
                     except ModelError as exc:
                         self.reply(502, {'error':exc.code,'decision':'undetermined'})
@@ -209,17 +220,56 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                     finally:
                         model_lock.release()
                     return
+                source, metadata = ('manual' if manual_job else 'agent_api'), None
+                if demo_job:
+                    try:
+                        job = json.loads(raw)
+                        if not isinstance(job, dict) or set(job) != {'case_id'} or job['case_id'] not in ('DEMO-HOLD','DEMO-UPDATE'):
+                            raise ValueError()
+                        case_id = job['case_id']
+                    except (ValueError, UnicodeError, TypeError):
+                        self.reply(400, {'error':'invalid_demo_request'})
+                        return
+                    with Store(database) as store:
+                        state = store.snapshot(case_id)
+                    raw = json.dumps({'case_id':case_id, 'referenced_version':state['version'],
+                        'referenced_hash':state['state_hash'], 'retained_candidates':['h_B'],
+                        'cause_status':'resolved', 'evidence_used':['e_B'] if case_id == 'DEMO-UPDATE' else [],
+                        'proposed_version_advance':state['candidates'] != ['h_B'],
+                        'future_bypass_authorized':False}, ensure_ascii=False, indent=2).encode('utf-8')
+                    source = 'fixed_demo'
+                else:
+                    case_id = unquote(parts[3])
+                supplied_ticket = self.headers.get('X-Execution-Ticket')
+                if supplied_ticket is not None:
+                    try:
+                        if manual_job or demo_job:
+                            raise ValueError()
+                        metadata = execution_tickets.consume(supplied_ticket, case_id, raw)
+                        source = 'live_model'
+                    except ValueError:
+                        self.reply(403, {'error':'invalid_execution_ticket'})
+                        return
+                execution = {'source':source, 'received_at_utc':utc_now(),
+                    'app_version':APP_VERSION, 'submitted_case_id':case_id, 'model_metadata':metadata}
                 with Store(database) as store:
-                    decision = store.apply(raw, expected_case_id=unquote(parts[3]))
+                    decision = store.apply(raw, expected_case_id=case_id, execution=execution)
                 # Independent readback, rather than trusting only apply's return.
+                readback = {'status':'not_applicable', 'checked_at_utc':utc_now()}
                 if decision['after'] is not None:
                     with Store(database) as store:
                         persisted = store.snapshot(decision['case_id'])
-                    if persisted != decision['after']:
-                        self.reply(503, {'decision': 'undetermined', 'error': 'readback_mismatch'})
-                        return
-                self.reply(200, {**decision, 'state_changed': decision['decision'] == 'commit',
-                    'readback_verified': decision['after'] is not None})
+                    readback = {'status':'matched' if persisted == decision['after'] else 'mismatch',
+                        'checked_at_utc':utc_now()}
+                with Store(database) as store:
+                    store.connection.execute('UPDATE executions SET readback_json=? WHERE audit_id=?',
+                        (canonical_json(readback), decision['audit_id']))
+                if readback['status'] == 'mismatch':
+                    self.reply(503, {'decision': 'undetermined', 'error': 'readback_mismatch', 'audit_id':decision['audit_id']})
+                    return
+                result = {**decision, 'state_changed': decision['decision'] == 'commit',
+                    'readback_verified': readback['status'] == 'matched'}
+                self.reply(200, {'proposal_text':raw.decode('utf-8'), 'gate':result} if demo_job else result)
             except (GateError, sqlite3.Error, TimeoutError):
                 self.reply(503, {'decision': 'undetermined', 'error': 'store_or_request_unavailable'})
 

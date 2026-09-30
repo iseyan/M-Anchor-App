@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import sqlite3
+from datetime import datetime
 import concurrent.futures
 import json
 from pathlib import Path
@@ -12,6 +16,7 @@ from launcher import prepare_data, open_when_ready
 from client import AnchorClient
 from gate import Store
 from model_bridge import run_model, fetch_proposal, ModelError
+from records import ExecutionTickets
 
 class AppTest(unittest.TestCase):
     def setUp(self):
@@ -146,8 +151,8 @@ class AppTest(unittest.TestCase):
 
     def test_model_endpoint_admin_only_and_orchestration(self):
         job=self.model_job()
-        def mocked_run(job,client):
-            return run_model(job,client,lambda *args:(json.dumps(self.proposal()),{}))
+        def mocked_run(job,client,**kwargs):
+            return run_model(job,client,lambda *args:(json.dumps(self.proposal()),{}),**kwargs)
         request=Request(self.url+'/admin/model-run',data=json.dumps(job).encode(),headers={
             'Authorization':'Bearer '+self.keys['agent_token'],'Content-Type':'application/json'})
         with self.assertRaises(HTTPError) as exc:urlopen(request)
@@ -178,6 +183,130 @@ class AppTest(unittest.TestCase):
             text,metadata=fetch_proposal('test-only-secret','test-model',{'state':{}},'message')
         self.assertEqual(text,'{\n"x": 1}')
         self.assertEqual(metadata['output_tokens'],2)
+
+    def admin(self, path, value=None, raw=None, role='admin'):
+        if value is not None:
+            raw = json.dumps(value).encode()
+        with urlopen(Request(self.url + path, data=raw, headers={
+                'Authorization':'Bearer '+self.keys[role+'_token'],
+                'Content-Type':'application/json'})) as response:
+            return json.load(response)
+
+    def test_record_sources_details_and_admin_boundary(self):
+        fixed = self.admin('/admin/demo-run', {'case_id':'DEMO-HOLD'})
+        manual = self.admin('/admin/cases/DEMO-HOLD/proposals', raw=fixed['proposal_text'].encode())
+        agent = self.client.propose('DEMO-HOLD', fixed['proposal_text'].encode())
+        ids = [fixed['gate']['audit_id'], manual['audit_id'], agent['audit_id']]
+        self.assertEqual(len(set(ids)), 3)  # Identical proposals are separate executions.
+        for audit_id, source in zip(ids, ['fixed_demo','manual','agent_api']):
+            row = self.admin('/admin/history/'+str(audit_id))
+            self.assertEqual(row['execution']['source'],source)
+            self.assertIsNotNone(datetime.fromisoformat(row['execution']['received_at_utc']).tzinfo)
+            self.assertEqual(row['readback']['status'],'matched')
+            self.assertEqual(row['proposal_text'],fixed['proposal_text'])
+            self.assertEqual(hashlib.sha256(base64.b64decode(row['proposal_base64'])).hexdigest(),row['raw_sha256'])
+        for path, value in [('/admin/demo-run',{'case_id':'DEMO-HOLD'}),
+                            ('/admin/cases/DEMO-HOLD/proposals',{}),
+                            ('/admin/history/'+str(ids[0]),None)]:
+            with self.assertRaises(HTTPError) as error:
+                self.admin(path,value,role='agent')
+            self.assertEqual(error.exception.code,401)
+
+    def test_model_metadata_and_raw_proposal_survive_server_restart(self):
+        raw = json.dumps(self.proposal('DEMO-UPDATE',['e_B']), indent=2)+'\n'
+        metadata = {'model':'offline-mock-only','response_id':'mock-response',
+                    'input_tokens':12,'output_tokens':23,'api_key':'must-not-persist'}
+        def mocked(job,client,**kwargs):
+            return run_model(job,client,lambda *args:(raw,metadata),**kwargs)
+        with patch('server.run_model',side_effect=mocked):
+            result = self.admin('/admin/model-run',self.model_job('DEMO-UPDATE'))
+        self.admin('/admin/demo-run',{'case_id':'DEMO-HOLD'})
+        self.server.shutdown(); self.server.server_close(); self.thread.join()
+        self.server = make_server(self.data,0)
+        self.thread = threading.Thread(target=self.server.serve_forever,daemon=True)
+        self.thread.start()
+        self.url = f'http://127.0.0.1:{self.server.server_port}'
+        report = self.admin('/admin/report')
+        row = next(x for x in report['history'] if x['id']==result['gate']['audit_id'])
+        self.assertEqual(row['execution']['source'],'live_model')
+        self.assertEqual(row['execution']['model_metadata'],{k:v for k,v in metadata.items() if k!='api_key'})
+        self.assertEqual(row['proposal_text'],raw)
+        self.assertEqual(row['after']['version'],2)
+        self.assertEqual(row['readback']['status'],'matched')
+        for secret in [*self.keys.values(),self.model_job()['api_key'],'must-not-persist']:
+            self.assertNotIn(secret,json.dumps(report))
+
+    def test_record_failure_rolls_back_state_and_audit(self):
+        raw = json.dumps(self.proposal('DEMO-UPDATE',['e_B'])).encode()
+        with Store(self.data/'state.sqlite3') as store:
+            before = store.snapshot('DEMO-UPDATE')
+            store.connection.execute("CREATE TRIGGER fail_record BEFORE INSERT ON executions BEGIN SELECT RAISE(ABORT,'test'); END")
+            with self.assertRaises(sqlite3.IntegrityError):
+                store.apply(raw,execution={'source':'test'})
+            self.assertEqual(store.snapshot('DEMO-UPDATE'),before)
+            self.assertEqual(store.connection.execute('SELECT COUNT(*) FROM audit').fetchone()[0],0)
+            self.assertEqual(store.connection.execute('SELECT COUNT(*) FROM executions').fetchone()[0],0)
+
+    def test_v03_schema_upgrade_preserves_legacy_without_fabricating_metadata(self):
+        raw = json.dumps(self.proposal()).encode()
+        with Store(self.data/'state.sqlite3') as store:
+            store.apply(raw)
+            original = tuple(store.connection.execute('SELECT * FROM audit').fetchone())
+            authority = store.authority_snapshot()
+            store.connection.execute('DROP TABLE executions')
+        report = self.admin('/admin/report')  # Existing schema receives only the new table.
+        self.assertIsNone(report['history'][0]['execution'])
+        self.assertIsNone(report['history'][0]['readback'])
+        self.assertEqual(report['history'][0]['proposal_text'],raw.decode())
+        self.assertEqual(report['authority'],authority)
+        with Store(self.data/'state.sqlite3') as store:
+            self.assertEqual(tuple(store.connection.execute('SELECT * FROM audit').fetchone()),original)
+        self.admin('/admin/demo-run',{'case_id':'DEMO-HOLD'})
+        self.assertEqual(len(self.admin('/admin/report')['history']),2)
+
+    def test_export_all_rows_beyond_display_limit_and_invalid_utf8(self):
+        with Store(self.data/'state.sqlite3') as store:
+            for _ in range(102):
+                store.apply(b'not json')
+        self.client.propose('DEMO-HOLD',b'\xff\x00')
+        report = self.admin('/admin/report')
+        self.assertEqual(report['schema'],'m-anchor-app-observation/v2')
+        self.assertTrue(report['history_complete'])
+        self.assertEqual(report['history_count'],103)
+        self.assertEqual(len(self.admin('/admin/history')),100)
+        row = report['history'][0]
+        self.assertIsNone(row['proposal_text'])
+        self.assertEqual(base64.b64decode(row['proposal_base64']),b'\xff\x00')
+        self.assertEqual(row['readback']['status'],'not_applicable')
+
+    def test_agent_cannot_claim_model_source_or_submit_fake_execution_ticket(self):
+        raw = json.dumps(self.proposal()).encode()
+        headers = {'Authorization':'Bearer '+self.keys['agent_token'],
+                   'Content-Type':'application/json','X-Proposal-Source':'live_model'}
+        with urlopen(Request(self.url+'/v1/cases/DEMO-HOLD/proposals',data=raw,headers=headers)) as response:
+            result = json.load(response)
+        self.assertEqual(self.admin('/admin/history/'+str(result['audit_id']))['execution']['source'],'agent_api')
+        headers['X-Execution-Ticket']='invented'
+        with self.assertRaises(HTTPError) as error:
+            urlopen(Request(self.url+'/v1/cases/DEMO-HOLD/proposals',data=raw,headers=headers))
+        self.assertEqual(error.exception.code,403)
+        self.assertEqual(len(self.admin('/admin/history')),1)
+
+    def test_interrupted_readback_is_not_reported_as_verified(self):
+        with Store(self.data/'state.sqlite3') as store:
+            store.apply(json.dumps(self.proposal()).encode(),execution={'source':'agent_api'})
+        self.assertIsNone(self.admin('/admin/report')['history'][0]['readback'])
+
+    def test_concurrent_repeated_proposals_have_distinct_linked_records(self):
+        raw=json.dumps(self.proposal('DEMO-UPDATE',['e_B'])).encode()
+        with concurrent.futures.ThreadPoolExecutor(2) as pool:
+            results=list(pool.map(lambda _:self.client.propose('DEMO-UPDATE',raw),range(2)))
+        rows=self.admin('/admin/report')['history']
+        self.assertEqual({x['audit_id'] for x in results},{x['id'] for x in rows})
+        self.assertEqual(sorted(x['decision'] for x in rows),['commit','reject'])
+        for row in rows:
+            self.assertEqual(row['proposal_text'],raw.decode())
+            self.assertEqual(row['execution']['submitted_case_id'],'DEMO-UPDATE')
 
     def exchange_ticket(self, token, origin=True):
         headers = {'Content-Type':'application/json', 'X-Launch-Ticket':token}
@@ -231,6 +360,19 @@ class AppTest(unittest.TestCase):
 
 
 class LauncherTest(unittest.TestCase):
+    def test_execution_ticket_bound_to_bytes_case_and_single_use(self):
+        tickets=ExecutionTickets()
+        for case,raw in [('OTHER',b'a'),('CASE',b'b')]:
+            token=tickets.issue('CASE',b'a',{'model':'mock'})
+            with self.assertRaises(ValueError):tickets.consume(token,case,raw)
+        token=tickets.issue('CASE',b'a',{'model':'mock','api_key':'secret'})
+        self.assertEqual(tickets.consume(token,'CASE',b'a'),{'model':'mock'})
+        with self.assertRaises(ValueError):tickets.consume(token,'CASE',b'a')
+        token=tickets.issue('CASE',b'a',{})
+        with patch('records.time.monotonic',return_value=float('inf')):
+            with self.assertRaises(ValueError):tickets.consume(token,'CASE',b'a')
+
+
     def test_expired_or_disabled_ticket_cannot_authenticate(self):
         self.assertFalse(LaunchTicket().consume(''))
         self.assertFalse(LaunchTicket('ticket',lifetime=-1).consume('ticket'))

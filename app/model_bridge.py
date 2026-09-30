@@ -101,7 +101,7 @@ def fetch_proposal(api_key, model, context, message):
     return text, {'response_id':result.get('id'),'model':result.get('model',model),
         'input_tokens':usage.get('input_tokens'),'output_tokens':usage.get('output_tokens')}
 
-def run_model(job, client: AnchorClient, provider=fetch_proposal):
+def run_model(job, client: AnchorClient, provider=fetch_proposal, *, submit=None):
     validate_job(job)
     try:
         context = client.state(job['case_id'])
@@ -110,7 +110,9 @@ def run_model(job, client: AnchorClient, provider=fetch_proposal):
     text, metadata = provider(job['api_key'],job['model'],context,job['message'])
     # No parse/rewrite/repair, stripping of fences, or replacement of reference fields.
     try:
-        decision = client.propose(job['case_id'],text.encode('utf-8'))
+        raw = text.encode('utf-8')
+        decision = (submit(job['case_id'], raw, metadata) if submit is not None
+                    else client.propose(job['case_id'], raw))
     except (HTTPError,URLError,TimeoutError,ValueError):
         # The request may already have committed. Do not retry automatically.
         raise ModelError('gate_result_undetermined') from None

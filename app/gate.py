@@ -249,6 +249,10 @@ class Store:
                 id INTEGER PRIMARY KEY AUTOINCREMENT, raw BLOB NOT NULL,
                 raw_sha256 TEXT NOT NULL, decision_json TEXT NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS executions (
+                audit_id INTEGER PRIMARY KEY REFERENCES audit(id),
+                execution_json TEXT NOT NULL, readback_json TEXT
+            );
         """)
 
     def close(self):
@@ -325,11 +329,14 @@ class Store:
             self.connection.rollback()
             raise
 
-    def apply(self, raw: bytes, *, expected_case_id: str | None = None) -> dict:
+    def apply(self, raw: bytes, *, expected_case_id: str | None = None,
+              execution: dict | None = None) -> dict:
         if not isinstance(raw, bytes):
             raise TypeError("apply requires exact raw proposal bytes")
         if expected_case_id is not None:
             _text(expected_case_id, "expected_case_id")
+        # Application observations are not proposal authority or gate inputs.
+        execution_json = canonical_json(execution) if execution is not None else None
         decision = {
             "decision": "reject", "reason": "invalid_json", "case_id": None,
             "before": None, "after": None, "raw_sha256": hashlib.sha256(raw).hexdigest(),
@@ -351,9 +358,12 @@ class Store:
                     decision.update(reason="case_mismatch", expected_case_id=expected_case_id)
                 else:
                     self._evaluate(proposal, decision)
-            self.connection.execute("INSERT INTO audit (raw,raw_sha256,decision_json) VALUES (?,?,?)", (raw, decision["raw_sha256"], canonical_json(decision)))
+            audit_id = self.connection.execute("INSERT INTO audit (raw,raw_sha256,decision_json) VALUES (?,?,?)", (raw, decision["raw_sha256"], canonical_json(decision))).lastrowid
+            if execution_json is not None:
+                self.connection.execute("INSERT INTO executions (audit_id,execution_json) VALUES (?,?)",
+                    (audit_id, execution_json))
             self.connection.commit()
-            return decision
+            return {**decision, "audit_id": audit_id}
         except BaseException:
             self.connection.rollback()
             raise

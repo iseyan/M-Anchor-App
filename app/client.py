@@ -8,17 +8,21 @@ class AnchorClient:
         self.base_url = base_url.rstrip('/')
         self.agent_token = agent_token
 
-    def _request(self, path, raw=None):
+    def _request(self, path, raw=None, *, execution_ticket=None):
         if raw is not None and not isinstance(raw, bytes):
             raise TypeError('Supply exact UTF-8 proposal bytes')
-        request = Request(self.base_url + path, data=raw, headers={
+        headers = {
             'Authorization': 'Bearer ' + self.agent_token,
-            'Content-Type': 'application/json'})
+            'Content-Type': 'application/json'}
+        if execution_ticket is not None:
+            headers['X-Execution-Ticket'] = execution_ticket
+        request = Request(self.base_url + path, data=raw, headers=headers)
         with urlopen(request, timeout=20) as response:
             return json.load(response)
 
     def state(self, case_id):
         return self._request('/v1/cases/' + quote(case_id, safe=''))
 
-    def propose(self, case_id, raw):
-        return self._request('/v1/cases/' + quote(case_id, safe='') + '/proposals', raw)
+    def propose(self, case_id, raw, *, execution_ticket=None):
+        return self._request('/v1/cases/' + quote(case_id, safe='') + '/proposals', raw,
+            execution_ticket=execution_ticket)

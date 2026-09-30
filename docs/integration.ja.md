@@ -27,8 +27,11 @@ context = client.state('DEMO-HOLD')
 | `GET /v1/cases/{id}` | agent_token | 状態と当該案件の認可済み証拠・解釈を取得 |
 | `POST /v1/cases/{id}/proposals` | agent_token | 生JSONの更新案を提出 |
 | `GET /admin/cases` | admin_token | 全案件と証拠設定を取得 |
+| `POST /admin/demo-run` | admin_token | 指定デモの固定案をサーバーで生成してGateへ提出 |
+| `POST /admin/cases/{id}/proposals` | admin_token | 手動編集した生JSONを同じGateへ提出 |
+| `GET /admin/history/{id}` | admin_token | 提案原文と実行情報を含む一件の詳細 |
 | `GET /admin/history` | admin_token | 最新100件の判定履歴を取得 |
-| `GET /admin/report` | admin_token | 一貫したDBスナップショットから確認記録を取得 |
+| `GET /admin/report` | admin_token | 一貫したDBスナップショットから全件の確認記録（v2）を取得 |
 | `GET /admin/info` | admin_token | 版とデータの表示名を取得 |
 | `POST /admin/model-run` | admin_token | 1回のモデル生成とクライアント経由の提案提出 |
 
@@ -63,4 +66,28 @@ HTTP 200は検査結果を受信したことを意味する。保存可否は `d
 
 `/admin/report` はSQLiteのbackup機能でメモリ内に一貫したコピーを作り、そこから正本・証拠設定・履歴を読む。原ストアの更新は行わない。現行方式はDB全体をメモリへ複製するため、小規模なローカルデモを想定する。
 
-ブラウザのJSON出力では、さらにそのページの直近の実行情報を付ける。これは第三者への説明や再現の補助となる観察記録であり、署名された監査証明ではない。`observed_at_utc` はブラウザで結果を受け取った時刻で、commit時刻ではない。DBの履歴には現在、モデルID・生成元・commit時刻を恒久保存していない。
+v0.4の出力schemaは `m-anchor-app-observation/v2`。`history` の各項目には従来の判定に加えて次を含む。
+
+| 項目 | 内容 |
+| --- | --- |
+| id | DB内で一意の履歴番号。提出応答のaudit_idと対応 |
+| execution.source | live_model / fixed_demo / manual / agent_api |
+| execution.received_at_utc | サーバーがGateへ渡す直前の時刻。commit完了時刻ではない |
+| execution.app_version | 受け付けたアプリの版 |
+| execution.submitted_case_id | 提出先案件。提案が不正でも提出先は残る |
+| execution.model_metadata | 提供元のmodel、response_id、input_tokens、output_tokens。該当しなければnull |
+| proposal_text | UTF-8として読める原文。不正なUTF-8ならnull |
+| proposal_base64 | 提案の生バイト。復号後のSHA256がraw_sha256と対応 |
+| readback | status（matched / mismatch / not_applicable）とchecked_at_utc |
+
+`execution` がnullなら実行情報は未記録。旧履歴の日時やモデルIDを推測しない。`readback` がnullなら未記録、または保存後の再読込記録までに処理が中断した状態で、一致確認済みとは扱わない。`matched` は記載の時刻に観察した一致を意味する。
+
+正本の更新、従来のauditへの判定・生バイト、追加のexecutionsへの実行情報は、一つのSQLiteトランザクションに保存する。実行情報を保存できなければ、正本と判定の保存も取り消す。独立した再読込結果はその後の観察として別に追記する。
+
+モデル経路では、サーバー内の生成処理が返した情報のうち四項目だけを採用する。ランダムな一回限りのチケットを使い、提案の生バイトのSHA256と提出先案件に結び付け、専用Pythonクライアントで通常のGate APIへ提出する。チケットはメモリ内で60秒間有効。APIの呼出元が `source=live_model` と自己申告しても、モデル経路としては記録しない。
+
+固定デモは管理用APIが決まった提案を生成し、手動提出も管理用APIを通る。どちらもGateの規則を迂回できない。外部の専用Pythonクライアントによる通常の提出はagent_apiとなり、AI生成か人の入力かまでは識別しない。
+
+これらはサーバーの処理経路を示す説明記録であり、モデル提供元による電子署名や、改ざん不能な証明ではない。テストでモデル応答を置き換えた場合も同じ処理経路を通るので、模擬実行であることを検証資料とモデルIDに明示する。モデルの依頼文とキー入力欄は実行記録に保存しないが、提出された原文そのものは保存する。
+
+JSON出力は全件をメモリに載せる小規模デモ向けの方式。画面上の100件制限で古い記録を切り捨てない。大量データ向けの分割出力や保持期限は未実装である。

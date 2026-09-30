@@ -11,7 +11,7 @@ from server import ROOT, init_data, make_server
 from model_bridge import run_model
 
 
-def fake_run(job, client):
+def fake_run(job, client, **kwargs):
     def provider(key, model, context, message):
         state=context['state']
         proposal={
@@ -21,7 +21,7 @@ def fake_run(job, client):
             'proposed_version_advance':False,'future_bypass_authorized':False,
         }
         return json.dumps(proposal), {'model':'mock-test-only','response_id':'mock-only'}
-    return run_model(job,client,provider)
+    return run_model(job,client,provider,**kwargs)
 
 
 with tempfile.TemporaryDirectory() as directory:
