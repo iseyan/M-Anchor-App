@@ -13,7 +13,20 @@
 
 ## 実行結果
 
-実装後のローカル検証とGitHub Actionsの結果を、この節へ記録する。ワークフローの設定だけをもって実行成功とは扱わない。
+ローカルのLinux/Python 3.12で、アプリ34件・配布処理3件、UIロジック、ソースチェックサムが通過した。元の[検証JSON](observations/ci-v0.5-local/ci-report.json)と[アプリ試験ログ](observations/ci-v0.5-local/app-tests.log)、[配布処理ログ](observations/ci-v0.5-local/release-tests.log)、[UIログ](observations/ci-v0.5-local/ui-logic.log)を保存した。
+
+初回はチェックサム一覧の更新より先に検証を開始し、一覧と変更済みファイルの不一致を検出して失敗した。[初回結果](observations/ci-v0.5-local/initial-ci-report.json)と[失敗ログ](observations/ci-v0.5-local/initial-checksum-failure.log)も残す。一覧を更新した後、全検査が通過した。
+
+GitHub Actionsの[初回実行 #1](https://github.com/iseyan/M-Anchor-App/actions/runs/36743819362)も成功した。対象ソースは `6a986b396fd1cba895e959ddc9982db9054b379b`。GitHub APIから取得した[結果と成果物の記録](observations/2026-10-01-ci-v0.5.json)を保存した。
+
+| 実行環境・処理 | 結果 |
+| --- | --- |
+| Linux / Python 3.10 | アプリ34件・配布処理3件、UI、チェックサムを通過 |
+| Linux / Python 3.13 | 同上 |
+| Windows / Python 3.13 | 同上 |
+| 配布ジョブ | ZIPの作成・内容照合・Artifactsへの保存が成功 |
+
+CIの結果はランナー上の確認である。利用者のWindows端末のブラウザ描画、実モデルの応答、あらゆる入力への安全性まで検証したものではない。GitHub上のZIPのバイト列は確認者が別途ダウンロードして再照合したものではなく、アップロード前のジョブ内で照合している。記録追加後の実行は、Actionsの一覧から確認できる。
 
 [Actionsの実行一覧](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml)
 

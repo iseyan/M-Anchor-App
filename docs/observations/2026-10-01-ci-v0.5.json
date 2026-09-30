@@ -1,0 +1,303 @@
+{
+  "schema": "m-anchor-app-github-ci-receipt/v1",
+  "checked_at_utc": "2026-09-30T16:24:44.955Z",
+  "run": {
+    "id": 36743819362,
+    "html_url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36743819362",
+    "head_sha": "6a986b396fd1cba895e959ddc9982db9054b379b",
+    "status": "completed",
+    "conclusion": "success",
+    "event": "push",
+    "run_number": 1,
+    "run_attempt": 1,
+    "created_at": "2026-09-30T16:23:18Z",
+    "updated_at": "2026-09-30T16:24:21Z"
+  },
+  "jobs": [
+    {
+      "id": 109984795233,
+      "name": "Verify windows-latest / Python 3.13",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-30T16:23:22Z",
+      "completed_at": "2026-09-30T16:24:09Z",
+      "runner_name": "GitHub Actions 1000000221",
+      "labels": [
+        "windows-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 109984795604,
+      "name": "Verify ubuntu-latest / Python 3.10",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-30T16:23:22Z",
+      "completed_at": "2026-09-30T16:23:52Z",
+      "runner_name": "GitHub Actions 1000000223",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 109984795725,
+      "name": "Verify ubuntu-latest / Python 3.13",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-30T16:23:23Z",
+      "completed_at": "2026-09-30T16:23:55Z",
+      "runner_name": "GitHub Actions 1000000222",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 109985143133,
+      "name": "Build verified source ZIP",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-09-30T16:24:12Z",
+      "completed_at": "2026-09-30T16:24:20Z",
+      "runner_name": "GitHub Actions 1000000224",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and verify ZIP",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save package",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11112190967,
+      "name": "m-anchor-app-package-1",
+      "size_in_bytes": 87108,
+      "expired": false,
+      "digest": "sha256:3a0e17a92a5c1d9dcce87936fb2458dd378f030d2b9acd6395f89355ba9e150c",
+      "created_at": "2026-09-30T16:24:17Z",
+      "expires_at": "2026-10-14T16:24:16Z"
+    },
+    {
+      "id": 11111781549,
+      "name": "verification-ubuntu-latest-py3.13",
+      "size_in_bytes": 2735,
+      "expired": false,
+      "digest": "sha256:6be3832a25175b5b5948a35081833030809a632e3c5a19e799df1a796ef14428",
+      "created_at": "2026-09-30T16:23:52Z",
+      "expires_at": "2026-10-14T16:23:51Z"
+    },
+    {
+      "id": 11111676789,
+      "name": "verification-windows-latest-py3.13",
+      "size_in_bytes": 2799,
+      "expired": false,
+      "digest": "sha256:6c9b1104dea8935b9b6a75ccfb947a3f69d0953b5a0834e7d1ee8040d3c787f4",
+      "created_at": "2026-09-30T16:24:04Z",
+      "expires_at": "2026-10-14T16:24:04Z"
+    },
+    {
+      "id": 11111576894,
+      "name": "verification-ubuntu-latest-py3.10",
+      "size_in_bytes": 2561,
+      "expired": false,
+      "digest": "sha256:906ee4f83edc30989ec1750c7e86ff77f284c2f159fd75b0a1b9ae86ccd70e5b",
+      "created_at": "2026-09-30T16:23:49Z",
+      "expires_at": "2026-10-14T16:23:48Z"
+    }
+  ],
+  "scope": "GitHub API status observations. Artifact ZIP bytes were not independently downloaded; package workflow verifies ZIP bytes before upload. UI tests use a DOM substitute; model provider is mocked."
+}

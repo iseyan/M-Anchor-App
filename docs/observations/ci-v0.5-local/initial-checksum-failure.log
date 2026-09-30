@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/workspace/scratch/0c85fa394924/m-anchor-app/scripts/build_release.py", line 31, in release_files
+    raise ValueError('Checksum mismatch: ' + name)
+ValueError: Checksum mismatch: .gitignore
