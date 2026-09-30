@@ -40,9 +40,20 @@ Packaging tests use a small synthetic fixture version; actual V1 packaging separ
 
 ## Hosted checks / GitHub Actions
 
-The existing workflow will verify Linux/Python 3.10 and 3.13, Windows/Python 3.13, and package successful source. Results will be recorded here after the implementation commit runs.
+[Run #5](https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008) succeeded for source commit `8c5f7c86fe78067c43b01b3c05e3ef28a11fa470`. All three verification environments and the packaging job completed successfully. The [API receipt](observations/2026-10-01-ci-v1.json) records jobs and artifacts.
 
-既存のワークフローでLinux/Python 3.10・3.13、Windows/Python 3.13を検証し、成功したソースを梱包します。実装コミットの実行後に結果を追記します。
+[実行 #5](https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008)はコミット `8c5f7c86fe78067c43b01b3c05e3ef28a11fa470` で成功しました。三つの検証環境と配布ジョブがすべて成功し、[API受領記録](observations/2026-10-01-ci-v1.json)に結果と成果物を保存しました。
+
+| Environment / 環境 | Result / 結果 |
+| --- | --- |
+| Linux / Python 3.10 | 40 app tests, 3 packaging tests, UI logic and checksums passed / 40件・3件・UI・チェックサム通過 |
+| Linux / Python 3.13 | Same checks passed / 同上 |
+| Windows / Python 3.13 | Same checks passed / 同上 |
+| Packaging / 配布 | ZIP built, verified and uploaded / ZIP作成・照合・保存に成功 |
+
+The ZIP is verified inside the packaging job before upload. The reviewer did not independently download the uploaded artifact. A later documentation commit triggers another run, shown in Actions.
+
+ZIPは配布ジョブ内でアップロード前に照合しています。確認者がアップロード後の成果物を独立してダウンロードしたものではありません。記録追加後のコミットも別の実行を起こし、Actionsで確認できます。
 
 [Actions runs / 実行一覧](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml)
 

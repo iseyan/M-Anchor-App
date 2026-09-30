@@ -1,0 +1,289 @@
+{
+  "schema": "m-anchor-app-ci-receipt/v1",
+  "observed_at_utc": "2026-09-30T23:33:39.676Z",
+  "app_version": "1.0.0",
+  "repository": "iseyan/M-Anchor-App",
+  "source_commit": "8c5f7c86fe78067c43b01b3c05e3ef28a11fa470",
+  "run": {
+    "id": 36791415008,
+    "url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-09-30T23:30:13Z",
+    "updated_at": "2026-09-30T23:32:24Z"
+  },
+  "jobs": [
+    {
+      "id": 110144932899,
+      "name": "Verify ubuntu-latest / Python 3.13",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008/job/110144932899",
+      "started_at": "2026-09-30T23:30:16Z",
+      "completed_at": "2026-09-30T23:30:50Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 110144933156,
+      "name": "Verify windows-latest / Python 3.13",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008/job/110144933156",
+      "started_at": "2026-09-30T23:30:16Z",
+      "completed_at": "2026-09-30T23:32:13Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 110144933248,
+      "name": "Verify ubuntu-latest / Python 3.10",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008/job/110144933248",
+      "started_at": "2026-09-30T23:30:16Z",
+      "completed_at": "2026-09-30T23:30:59Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run offline checks",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save verification records",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    },
+    {
+      "id": 110145489300,
+      "name": "Build verified source ZIP",
+      "status": "completed",
+      "conclusion": "success",
+      "url": "https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008/job/110145489300",
+      "started_at": "2026-09-30T23:32:16Z",
+      "completed_at": "2026-09-30T23:32:24Z",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Build and verify ZIP",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Save package",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "id": 11131828851,
+      "name": "verification-ubuntu-latest-py3.13",
+      "size_in_bytes": 2902,
+      "expired": false,
+      "created_at": "2026-09-30T23:30:47Z",
+      "expires_at": "2026-10-14T23:30:46Z"
+    },
+    {
+      "id": 11131654549,
+      "name": "verification-windows-latest-py3.13",
+      "size_in_bytes": 2973,
+      "expired": false,
+      "created_at": "2026-09-30T23:32:09Z",
+      "expires_at": "2026-10-14T23:32:09Z"
+    },
+    {
+      "id": 11131554897,
+      "name": "m-anchor-app-package-5",
+      "size_in_bytes": 143526,
+      "expired": false,
+      "created_at": "2026-09-30T23:32:21Z",
+      "expires_at": "2026-10-14T23:32:20Z"
+    },
+    {
+      "id": 11131539775,
+      "name": "verification-ubuntu-latest-py3.10",
+      "size_in_bytes": 2700,
+      "expired": false,
+      "created_at": "2026-09-30T23:30:56Z",
+      "expires_at": "2026-10-14T23:30:55Z"
+    }
+  ],
+  "scope": {
+    "en": "40 application tests, 3 packaging tests, UI logic and source checksums in each verification environment. Model outputs are mocked. The archive is checked within the packaging job before upload; it was not independently downloaded by this reviewer.",
+    "ja": "各検証環境でアプリ40件・配布3件・UI・ソースチェックサムを確認。モデル応答は模擬。ZIPは配布ジョブ内でアップロード前に照合し、確認者はアップロード後のZIPを独立してダウンロードしていない。"
+  }
+}

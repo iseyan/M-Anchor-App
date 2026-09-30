@@ -73,6 +73,8 @@ The missing link in prior explanation records was the input that produced a prop
 
 The screen shows input, proposal, gate decision, and independent readback. A transport or generation failure is left unverified, not scored as a blocked attack. No attack classifier or universal jailbreak claim is added. Gate rules, formal core, provider request implementation, and client bytes are retained from v0.5.1. See [V1 guide](v1-guide.md) and [validation](validation-v1.md).
 
+V1 passed Linux/Python 3.10 and 3.13, Windows/Python 3.13, and packaging in [Actions run #5](https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008). Each verification environment passed 40 application tests, 3 packaging tests, UI logic, and source checksums. The [validation record](validation-v1.md) links the original API receipt and local logs.
+
 ## Remaining work
 
 - Verify the current bilingual layout on the user's Windows browser and distinguish normal restart from a fresh demo.

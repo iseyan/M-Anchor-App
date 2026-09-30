@@ -99,6 +99,8 @@ v0.5.1のコードは[Actions実行 #3](https://github.com/iseyan/M-Anchor-App/a
 
 画面は入力・提案・Gate判定・独立した再読込を示す。通信や生成の失敗は未確認として残し、攻撃阻止の成功に数えない。攻撃検出器や万能なジェイルブレイク防止の主張は追加しない。Gate規則・形式核・提供元への要求処理・クライアントはv0.5.1と同じバイト列を保持する。[V1手順](v1-guide.md)と[検証記録](validation-v1.md)を参照。
 
+V1は[Actions実行 #5](https://github.com/iseyan/M-Anchor-App/actions/runs/36791415008)でLinux/Python 3.10・3.13、Windows/Python 3.13と配布がすべて成功した。各環境でアプリ40件・配布3件・UI・チェックサムを確認し、[検証記録](validation-v1.md)からAPI受領記録とローカルログを参照できる。
+
 ## 次に残る作業
 
 - 利用者のWindowsでv0.4の起動、履歴の詳細、再起動後の表示を確認する。
