@@ -54,3 +54,5 @@ The execution records introduced in v0.4 provide a basis for tracing proposals a
 - [Workflow events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
 - [AWS serverless service selection](https://docs.aws.amazon.com/decision-guides/latest/decision-guides/choosing-aws-serverless-service.html)
 - [Scheduled ECS tasks](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/tasks-scheduled-eventbridge-scheduler.html)
+
+V1 reuses this workflow with 40 application tests, 3 packaging tests, and the extended UI scenario check. See [V1 validation](validation-v1.md).

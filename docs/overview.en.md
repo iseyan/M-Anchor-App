@@ -54,3 +54,5 @@ The synthetic demo is a starting point for specifying one workflow; it is not ev
 The two demo cases illustrate unsupported resolution being rejected, uncertainty being retained, and admitted evidence supporting an update. v0.3 improved operation and explanation. v0.4 persisted execution metadata with each decision. v0.5 automated Linux/Windows verification and source ZIP creation. v0.5.1 adds English-first bilingual presentation and paired documentation.
 
 See the [demo guide](demo-guide.en.md), [validation record](validation-v0.5.1.md), and [evidence guide](evidence-guide.md) for methods and limits.
+
+V1 adds attack/control scenarios and links exact model input to each proposal. [V1 guide](v1-guide.md) describes the demonstration and scope.

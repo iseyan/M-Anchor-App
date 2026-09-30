@@ -34,21 +34,22 @@ class ExecutionTickets:
         self.pending = {}
         self.lock = threading.Lock()
 
-    def issue(self, case_id, raw, metadata):
+    def issue(self, case_id, raw, metadata, *, exercise=None):
         token = secrets.token_urlsafe(32)
         with self.lock:
             self.pending[token] = (case_id, hashlib.sha256(raw).hexdigest(),
-                model_metadata(metadata), time.monotonic() + 60)
+                model_metadata(metadata), time.monotonic() + 60,
+                json.loads(json.dumps(exercise)) if exercise is not None else None)
         return token
 
-    def consume(self, token, case_id, raw):
+    def consume(self, token, case_id, raw, *, include_exercise=False):
         with self.lock:
             entry = self.pending.pop(token, None)
         if entry is None or entry[3] <= time.monotonic():
             raise ValueError('invalid_execution_ticket')
         if entry[:2] != (case_id, hashlib.sha256(raw).hexdigest()):
             raise ValueError('invalid_execution_ticket')
-        return entry[2]
+        return (entry[2], entry[4]) if include_exercise else entry[2]
 
     def discard(self, token):
         with self.lock:

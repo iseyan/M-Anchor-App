@@ -28,6 +28,8 @@ context = client.state('DEMO-HOLD')
 | --- | --- | --- |
 | `GET /v1/cases/{id}` | agent_token | 状態と当該案件の認可済み証拠・解釈を取得 |
 | `POST /v1/cases/{id}/proposals` | agent_token | 生JSONの更新案を提出 |
+| `GET /admin/scenarios` | admin_token | 攻撃4種類と対照2種類の一覧 |
+| `POST /admin/scenario-run` | admin_token | モデルを使わず選んだ固定提案を提出 |
 | `GET /admin/cases` | admin_token | 全案件と証拠設定を取得 |
 | `POST /admin/demo-run` | admin_token | 指定デモの固定案をサーバーで生成してGateへ提出 |
 | `POST /admin/cases/{id}/proposals` | admin_token | 手動編集した生JSONを同じGateへ提出 |
@@ -73,11 +75,12 @@ v0.4の出力schemaは `m-anchor-app-observation/v2`。`history` の各項目に
 | 項目 | 内容 |
 | --- | --- |
 | id | DB内で一意の履歴番号。提出応答のaudit_idと対応 |
-| execution.source | live_model / fixed_demo / manual / agent_api |
+| execution.source | live_model / fixed_scenario / fixed_demo / manual / agent_api |
 | execution.received_at_utc | サーバーがGateへ渡す直前の時刻。commit完了時刻ではない |
 | execution.app_version | 受け付けたアプリの版 |
 | execution.submitted_case_id | 提出先案件。提案が不正でも提出先は残る |
 | execution.model_metadata | 提供元のmodel、response_id、input_tokens、output_tokens。該当しなければnull |
+| execution.exercise | V1の任意の演習情報とモデル入力原文。後述 |
 | proposal_text | UTF-8として読める原文。不正なUTF-8ならnull |
 | proposal_base64 | 提案の生バイト。復号後のSHA256がraw_sha256と対応 |
 | readback | status（matched / mismatch / not_applicable）とchecked_at_utc |
@@ -90,6 +93,18 @@ v0.4の出力schemaは `m-anchor-app-observation/v2`。`history` の各項目に
 
 固定デモは管理用APIが決まった提案を生成し、手動提出も管理用APIを通る。どちらもGateの規則を迂回できない。外部の専用Pythonクライアントによる通常の提出はagent_apiとなり、AI生成か人の入力かまでは識別しない。
 
-これらはサーバーの処理経路を示す説明記録であり、モデル提供元による電子署名や、改ざん不能な証明ではない。テストでモデル応答を置き換えた場合も同じ処理経路を通るので、模擬実行であることを検証資料とモデルIDに明示する。モデルの依頼文とキー入力欄は実行記録に保存しないが、提出された原文そのものは保存する。
+これらはサーバーの処理経路を示す説明記録であり、モデル提供元による電子署名や、改ざん不能な証明ではない。テストでモデル応答を置き換えた場合も同じ処理経路を通るので、模擬実行であることを検証資料とモデルIDに明示する。キー入力欄は実行記録に保存しない。V1からモデル経路の依頼文も提案とともに原文のまま保存するため、依頼文に貼り付けた秘密情報は記録に含まれる。旧版では依頼文は保持していない。
 
 JSON出力は全件をメモリに載せる小規模デモ向けの方式。画面上の100件制限で古い記録を切り捨てない。大量データ向けの分割出力や保持期限は未実装である。
+
+## V1の演習情報
+
+`GET /admin/scenarios` は攻撃4種類と対照2種類を返す。`POST /admin/scenario-run` は `{"scenario_id":"authority_override"}` のように一項目だけ受け付け、サーバー側で対象を選び、固定提案を同じGateへ提出する。モデルを呼ばず、編集した入力文も実行しない。
+
+`POST /admin/model-run` は従来の四項目に任意の `scenario_id` を追加でき、省略時は `custom` となる。定義済みシナリオと案件が一致しない場合、未知のID、呼出元が付加した演習情報は生成前に拒否する。シナリオ名は選択した演習であり、入力に対する信頼された判定ではない。
+
+`execution.exercise` はschema `m-anchor-exercise/v1`、scenario_id、category、英日title、mode、input_text、input_sha256、input_origin、input_sent_to_modelを持つ。モデル経路では入力原文とハッシュをチケットで案件・提案に結び付ける。固定シナリオでは入力項目はnull、input_sent_to_modelはfalse。modeはmodel_requestまたはfixed_proposal。模擬応答を用いる試験も同じ経路を使い、提供元が署名した証明とは扱わない。
+
+演習情報は観察用であり、証拠認可・規則変更・正本更新を許可しない。旧記録や他の経路では存在しない場合がある。既存の実行JSONに保存するためDB構造の変更はない。生成が失敗して提案が届かなければGateの履歴は作らず、画面にエラーを表示する。
+
+[V1手順](v1-guide.md)に適用範囲と入力文の保存を説明する。

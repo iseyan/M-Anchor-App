@@ -65,6 +65,14 @@ Stored proposals, reason codes, JSON schema, and historical observation bytes re
 
 The v0.5.1 code passed all three hosted verification environments and the packaging job in [Actions run #3](https://github.com/iseyan/M-Anchor-App/actions/runs/36746901627). The bilingual validation record links the API receipt and local logs.
 
+## October 1: V1 record-protection workflow
+
+The user requested a prompt-attack protection app and authorized V1 implementation. This release keeps the protected object to local case records. It adds four synthetic attacks, two controls, and explicit separation of fixed-proposal execution from model-input execution.
+
+The missing link in prior explanation records was the input that produced a proposal. V1 stores that exact text and SHA256 with optional exercise metadata, using the existing one-use ticket and atomic state/audit/execution transaction. The UI and documentation disclose the changed retention behavior. Older inputs are not reconstructed.
+
+The screen shows input, proposal, gate decision, and independent readback. A transport or generation failure is left unverified, not scored as a blocked attack. No attack classifier or universal jailbreak claim is added. Gate rules, formal core, provider request implementation, and client bytes are retained from v0.5.1. See [V1 guide](v1-guide.md) and [validation](validation-v1.md).
+
 ## Remaining work
 
 - Verify the current bilingual layout on the user's Windows browser and distinguish normal restart from a fresh demo.

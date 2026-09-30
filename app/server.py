@@ -14,12 +14,13 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit, unquote
 from gate import Store, GateError, canonical_json, _validate_authority
 from client import AnchorClient
-from model_bridge import run_model, ModelError
+from model_bridge import run_model, ModelError, validate_job
 from records import ExecutionTickets, history, utc_now
+from scenarios import SCENARIOS, scenario, exercise_record, fixed_proposal
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '0.5.1'
+APP_VERSION = '1.0.0'
 
 
 class LaunchTicket:
@@ -112,6 +113,8 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                 with Store(database) as store:
                     if path == '/admin/cases':
                         self.reply(200, store.authority_snapshot())
+                    elif path == '/admin/scenarios':
+                        self.reply(200, {'schema':'m-anchor-scenarios/v1', 'scenarios':SCENARIOS})
                     elif path == '/admin/history':
                         self.reply(200, history(store.connection, limit=100))
                     elif path.startswith('/admin/history/') and path.split('/')[-1].isdigit():
@@ -133,6 +136,7 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                             'authority': authority,
                             'history_limit': None, 'history_count': len(entries), 'history_complete': True,
                             'history': entries,
+                            'exercise_note': 'V1 model-route entries store input text and SHA256 in execution.exercise. Fixed scenarios submit proposals without a model and have null input_text. Scenario labels describe the selected exercise, not a detected attack or a success verdict. Older or other routes can have no exercise record. API failures before gate submission create no gate-history entry.',
                             'history_source_note': 'Execution metadata identifies the server route, not signed provenance. Null means not recorded. received_at_utc is server receipt time, not commit time. Readback is a later observation; null means not recorded or interrupted.',
                         })
                     elif path.startswith('/v1/cases/') and len(path.split('/')) == 4:
@@ -157,15 +161,16 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
             path = urlsplit(self.path).path
             model_job = path == '/admin/model-run'
             demo_job = path == '/admin/demo-run'
+            scenario_job = path == '/admin/scenario-run'
             session_job = path == '/launch-session'
             parts = path.split('/')
             manual_job = (len(parts) == 5 and parts[:3] == ['', 'admin', 'cases'] and parts[4] == 'proposals')
             if session_job and self.headers.get('Origin') != f'http://127.0.0.1:{self.server.server_port}':
                 self.reply(403, {'error': 'invalid_origin'})
                 return
-            if not session_job and not self.authorized('admin' if model_job or demo_job or manual_job else 'agent'):
+            if not session_job and not self.authorized('admin' if model_job or demo_job or scenario_job or manual_job else 'agent'):
                 return
-            if not (model_job or session_job or demo_job or manual_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
+            if not (model_job or session_job or demo_job or scenario_job or manual_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
                 self.reply(404, {'error': 'unknown_route'})
                 return
             if self.headers.get('Transfer-Encoding'):
@@ -203,16 +208,21 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                         return
                     try:
                         job = json.loads(raw.decode('utf-8'))
+                        if not isinstance(job, dict):
+                            raise ValueError('invalid_model_request')
+                        scenario_id = job.pop('scenario_id', 'custom')
+                        validate_job(job)
+                        exercise = exercise_record(scenario_id, job['case_id'], input_text=job['message'])
                         client = AnchorClient(credentials['agent_token'],
                             f'http://127.0.0.1:{self.server.server_port}')
                         def submit_model(case_id, proposal_raw, metadata):
-                            token = execution_tickets.issue(case_id, proposal_raw, metadata)
+                            token = execution_tickets.issue(case_id, proposal_raw, metadata, exercise=exercise)
                             try:
                                 return client.propose(case_id, proposal_raw, execution_ticket=token)
                             finally:
                                 execution_tickets.discard(token)
                         result = run_model(job, client, submit=submit_model)
-                        self.reply(200, result)
+                        self.reply(200, {**result, 'exercise':exercise})
                     except ModelError as exc:
                         self.reply(502, {'error':exc.code,'decision':'undetermined'})
                     except (ValueError,UnicodeError,TypeError):
@@ -221,7 +231,23 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                         model_lock.release()
                     return
                 source, metadata = ('manual' if manual_job else 'agent_api'), None
-                if demo_job:
+                exercise = None
+                if scenario_job:
+                    try:
+                        job = json.loads(raw)
+                        if not isinstance(job, dict) or set(job) != {'scenario_id'}:
+                            raise ValueError()
+                        item = scenario(job['scenario_id'])
+                        case_id = item['case_id']
+                        with Store(database) as store:
+                            state = store.snapshot(case_id)
+                        raw = fixed_proposal(item['id'], state)
+                        exercise = exercise_record(item['id'], case_id, fixed=True)
+                        source = 'fixed_scenario'
+                    except (ValueError, UnicodeError, TypeError):
+                        self.reply(400, {'error':'invalid_scenario_request'})
+                        return
+                elif demo_job:
                     try:
                         job = json.loads(raw)
                         if not isinstance(job, dict) or set(job) != {'case_id'} or job['case_id'] not in ('DEMO-HOLD','DEMO-UPDATE'):
@@ -243,15 +269,17 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                 supplied_ticket = self.headers.get('X-Execution-Ticket')
                 if supplied_ticket is not None:
                     try:
-                        if manual_job or demo_job:
+                        if manual_job or demo_job or scenario_job:
                             raise ValueError()
-                        metadata = execution_tickets.consume(supplied_ticket, case_id, raw)
+                        metadata, exercise = execution_tickets.consume(supplied_ticket, case_id, raw, include_exercise=True)
                         source = 'live_model'
                     except ValueError:
                         self.reply(403, {'error':'invalid_execution_ticket'})
                         return
                 execution = {'source':source, 'received_at_utc':utc_now(),
                     'app_version':APP_VERSION, 'submitted_case_id':case_id, 'model_metadata':metadata}
+                if exercise is not None:
+                    execution['exercise'] = exercise
                 with Store(database) as store:
                     decision = store.apply(raw, expected_case_id=case_id, execution=execution)
                 # Independent readback, rather than trusting only apply's return.
@@ -269,7 +297,8 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                     return
                 result = {**decision, 'state_changed': decision['decision'] == 'commit',
                     'readback_verified': readback['status'] == 'matched'}
-                self.reply(200, {'proposal_text':raw.decode('utf-8'), 'gate':result} if demo_job else result)
+                self.reply(200, {'proposal_text':raw.decode('utf-8'), 'gate':result, 'exercise':exercise}
+                    if demo_job or scenario_job else result)
             except (GateError, sqlite3.Error, TimeoutError):
                 self.reply(503, {'decision': 'undetermined', 'error': 'store_or_request_unavailable'})
 

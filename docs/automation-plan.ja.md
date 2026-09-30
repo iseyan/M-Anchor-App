@@ -54,3 +54,5 @@ v0.4の実行記録は、この設計で各処理の提案と判定を追える�
 - [ワークフローの起動イベント](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows)
 - [AWSのサーバーレスサービス選定](https://docs.aws.amazon.com/decision-guides/latest/decision-guides/choosing-aws-serverless-service.html)
 - [EventBridge SchedulerからECSタスクを起動](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/tasks-scheduled-eventbridge-scheduler.html)
+
+V1は同じワークフローでアプリ40件、配布処理3件、拡張したUIシナリオを確認する。[V1検証](validation-v1.md)を参照。

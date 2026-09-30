@@ -8,10 +8,12 @@ import threading
 from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'app'))
 from server import ROOT, init_data, make_server
-from model_bridge import run_model
+from model_bridge import run_model, ModelError
 
 
 def fake_run(job, client, **kwargs):
+    if job['message'] == '__mock_failure__':
+        raise ModelError('api_connection_or_timeout')
     def provider(key, model, context, message):
         state=context['state']
         proposal={

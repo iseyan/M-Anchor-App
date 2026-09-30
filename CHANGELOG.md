@@ -1,5 +1,20 @@
 # Changelog / 変更履歴
 
+## V1 / 1.0.0 — 2026-10-01 (Japan time / 日本時間)
+
+- Add four synthetic attack scenarios and two valid controls, with fixed-proposal and model-input execution paths.  
+  人工的な攻撃4種類と正当な対照2種類を追加し、固定提案とモデル入力の実行を区別。
+- Display input, proposal, gate decision, and verified stored state together.  
+  入力・提案・Gate判定・再読込した保存状態をまとめて表示。
+- Persist exact model input and SHA256 as optional execution.exercise metadata, bound to the proposal through the one-use ticket.  
+  モデル入力原文とSHA256を任意のexecution.exerciseへ保存し、一回限りのチケットで提案に結び付け。
+- Add admin-only scenario catalog/run routes. API failures before proposal submission remain errors, not gate rejections.  
+  管理用のシナリオ一覧・実行経路を追加。提案提出前のAPI失敗はGateの拒否として数えない。
+- Keep gate rules, formal core, provider request, and client behavior; retain old history without inventing input metadata.  
+  Gate規則・形式核・提供元への要求・クライアント動作を継続し、旧履歴の入力情報を推測で補わない。
+- Add V1 demonstration and validation records in English and Japanese.  
+  英日併記のV1実演手順と検証記録を追加。
+
 ## v0.5.1 — 2026-10-01 (Japan time / 日本時間)
 
 - Present app headings, decisions, history, errors, and editable example requests in English first, followed by Japanese.  

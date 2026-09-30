@@ -1,17 +1,21 @@
 # M-Anchor App
 
-Check AI-generated record updates before committing them to an authoritative store. This local prototype preserves unresolved candidates unless admitted evidence and deterministic update rules support a change.
+Protect case records from unauthorized AI updates. M-Anchor App V1 lets you try adversarial inputs, inspect the resulting proposals, and verify what the gate actually saved. Unresolved candidates are retained unless admitted evidence supports a permitted change.
 
-AIの記録更新案を正本への保存前に検査するローカル試作版です。認可済み証拠と更新規則が変更を支持しない限り、未決の候補を保持します。
+プロンプト攻撃による不正な案件記録の更新を防ぐローカルアプリです。V1では攻撃入力・生成された提案・Gateが実際に保存した結果を追えます。認可済み証拠が許された変更を支持しない限り、未決の候補を保持します。
 
 **Model proposes; deterministic layer commits.**  
 **モデルは提案し、決定論的な層が保存を確定する。**
 
 ## Current version / 現在の版
 
-**v0.5.1 — English-first bilingual interface and documentation.** English appears first in the app, including decisions, history, errors, and example requests. Japanese remains alongside it. API field names, stored proposals, and historical evidence retain their original format. GitHub Actions verifies Linux and Windows builds and creates the source ZIP.
+**V1 / 1.0.0 — Record protection against prompt attacks.** Four attack scenarios and two controls can run as fixed proposals without an API, or as editable inputs through the existing model connection. The screen separates input, proposal, gate decision, and the read-back record. Model inputs are now saved with each submitted proposal. English remains primary, with Japanese alongside it.
 
-**v0.5.1 — 英語を主とする英日併記版。** 画面・判定・履歴・エラー・依頼文の例は英語を先に、日本語を併記します。API項目名・保存された提案・過去の証拠記録は原形式を保持します。Linux・Windowsの検証とソースZIPの作成はGitHub Actionsで実行します。
+**V1 / 1.0.0 — プロンプト攻撃に対する記録保護。** 攻撃4種類と対照2種類を、APIなしの固定提案、または既存のモデル接続による編集可能な入力で試せます。画面では入力・提案・Gate判定・再読込した正本を区別し、提出された提案にモデル入力も結び付けて保存します。英語優先の英日併記を継続します。
+
+Start with the [V1 guide / V1実演手順](docs/v1-guide.md). The release remains a local source distribution.
+
+まず [V1実演手順](docs/v1-guide.md) を参照してください。ローカルのソース配布版です。
 
 | Documentation / 資料 | English | 日本語 |
 | --- | --- | --- |
@@ -20,7 +24,8 @@ AIの記録更新案を正本への保存前に検査するローカル試作版
 | Python client, API, records / 接続と記録 | [Integration](docs/integration.en.md) | [接続仕様](docs/integration.ja.md) |
 | Automation and future AWS work / 自動化とAWS計画 | [Automation plan](docs/automation-plan.en.md) | [自動化計画](docs/automation-plan.ja.md) |
 | Decisions and evidence / 判断と証拠 | [Development log](docs/development-log.en.md) | [開発記録](docs/development-log.ja.md) |
-| Current validation / 今回の検証 | [v0.5.1 validation](docs/validation-v0.5.1.md) | 同じ資料に併記 |
+| Current validation / 今回の検証 | [V1 validation](docs/validation-v1.md) | 同じ資料に併記 |
+| Attack scenarios and trace / 攻撃例と追跡 | [V1 guide](docs/v1-guide.md) | 同じ資料に併記 |
 | Earlier CI validation / 以前のCI検証 | [v0.5 validation](docs/validation-v0.5.en.md) | [v0.5検証](docs/validation-v0.5.ja.md) |
 | Earlier observations and plan / 過去の観察と計画 | [Evidence guide](docs/evidence-guide.md) | 同じ資料に併記・原記録へリンク |
 | Release history / 変更履歴 | [Changelog](CHANGELOG.md) | 同じ資料に併記 |
@@ -34,7 +39,7 @@ Python 3.10以上と `py` ランチャーが必要です。追加のpipインス
 1. Extract the app ZIP. / アプリのZIPを展開します。
 2. Double-click **`start.cmd`**. / **`start.cmd`** をダブルクリックします。
 3. The browser opens after the server is ready and connects automatically. / サーバー起動後にブラウザが開き、自動接続します。
-4. Use **“Test the gate without the model API / APIを使わずにGateを確かめる”** first. / まず固定デモのボタンで確認します。
+4. Select a Scenario and use **“Run fixed proposal (no API) / 固定提案を実行（APIなし）”** first. / まずシナリオを選び、固定提案のボタンで確認します。
 
 Keep the launch window open. Press Ctrl+C there to stop. Running the same `start.cmd` again retains the saved records and history.
 
@@ -61,9 +66,9 @@ For a differently named data folder: / 別名のデータフォルダを使う�
 py -3 app\launcher.py --data "path-to-existing-data"
 ```
 
-The data format is shared by v0.4, v0.5, and v0.5.1. Earlier data gains execution-metadata tables without inventing missing dates or model IDs. Existing cases, evidence, decisions, and connection keys are retained. Initialization never overwrites an existing store; incomplete folders cause an error.
+V1 retains the existing database layout and adds optional exercise fields inside execution metadata. Data from v0.4–v0.5.1 can be retained. Earlier data gains execution-metadata tables without inventing missing dates or model IDs. Existing cases, evidence, decisions, and connection keys are retained. Initialization never overwrites an existing store; incomplete folders cause an error.
 
-v0.4・v0.5・v0.5.1のデータ形式は共通です。それ以前のデータには実行情報用の表を追加しますが、未記録の日時やモデルIDは補完しません。案件・証拠・判定・接続キーは保持します。既存ストアを初期化で上書きせず、不完全なフォルダはエラーとして停止します。
+V1は既存のDB構成を保持し、実行情報の中に任意の演習項目を追加します。v0.4～v0.5.1のデータを引き継げます。それ以前のデータには実行情報用の表を追加しますが、未記録の日時やモデルIDは補完しません。案件・証拠・判定・接続キーは保持します。既存ストアを初期化で上書きせず、不完全なフォルダはエラーとして停止します。
 
 ## Connect a model / 実モデルを接続する
 
@@ -71,15 +76,15 @@ Select a case and enter an OpenAI API key, a model ID available to that key, and
 
 案件を選び、OpenAI APIキー・利用可能なモデルID・依頼文を入力します。1回のAPI呼出しで得た提案を、専用Pythonクライアントでそのまま提出します。依頼と案件情報はOpenAIへ送信され、料金が発生します。英語・日本語の依頼を使用でき、併記された例文は編集できます。
 
-The API key is excluded from model input and database records. Raw proposals are retained in audit history. Failed API calls are not retried automatically. If the saving outcome is unclear, refresh state and history before submitting again.
+The API key is excluded from model input and database records. Raw proposals and V1 model inputs are retained in audit history and included in JSON exports. Do not paste secrets into the input. Failed API calls are not retried automatically. If the saving outcome is unclear, refresh state and history before submitting again.
 
-APIキーはモデル入力やDBに保存しません。提案原文は監査履歴に残します。API失敗時に自動再試行は行いません。保存結果が不明な場合は、再提出の前に正本と履歴を更新してください。
+APIキーはモデル入力やDBに保存しません。提案原文とV1のモデル入力は監査履歴に残り、JSON出力に含みます。入力文に秘密情報を貼り付けないでください。API失敗時に自動再試行は行いません。保存結果が不明な場合は、再提出の前に正本と履歴を更新してください。
 
 ## Validation and scope / 検証と適用範囲
 
-The [v0.5.1 validation record](docs/validation-v0.5.1.md) distinguishes local checks, hosted CI, and unverified behavior. The suite contains 34 application tests, 3 packaging tests, and a UI logic check. Model responses are mocked; CI makes no paid model calls. Earlier user-supplied demo records are indexed in the [evidence guide](docs/evidence-guide.md).
+The [V1 validation record](docs/validation-v1.md) distinguishes local checks, hosted CI, and unverified behavior. The suite contains 40 application tests, 3 packaging tests, and a UI logic check. Model responses are mocked; CI makes no paid model calls. Earlier user-supplied demo records are indexed in the [evidence guide](docs/evidence-guide.md).
 
-[v0.5.1検証記録](docs/validation-v0.5.1.md)でローカル確認・CI・未確認事項を区別します。アプリ34件、配布処理3件、UIロジックを検査します。モデル応答は模擬し、CIで有料APIは使いません。過去の利用者側記録は[証拠ガイド](docs/evidence-guide.md)から確認できます。
+[V1検証記録](docs/validation-v1.md)でローカル確認・CI・未確認事項を区別します。アプリ40件、配布処理3件、UIロジックを検査します。モデル応答は模擬し、CIで有料APIは使いません。過去の利用者側記録は[証拠ガイド](docs/evidence-guide.md)から確認できます。
 
 Protection covers case records in this local store. The app does not establish evidence truth, control external tools, or isolate processes that already have direct access to the database. Evidence admission is configured during initialization. See the integration guide before considering a business connection.
 

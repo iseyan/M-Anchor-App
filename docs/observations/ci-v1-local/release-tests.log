@@ -1,0 +1,12 @@
+test_archive_preserves_bytes_and_excludes_unlisted_credentials (test_release.ReleaseTest.test_archive_preserves_bytes_and_excludes_unlisted_credentials) ... ok
+test_modified_source_blocks_packaging (test_release.ReleaseTest.test_modified_source_blocks_packaging) ... ok
+test_unsafe_and_duplicate_manifest_entries_rejected (test_release.ReleaseTest.test_unsafe_and_duplicate_manifest_entries_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.008s
+
+OK
+/tmp/tmpz6rz0vw4/output/m-anchor-app-local-v0.5.zip
+3 files; SHA256 dbadd5bf05a580ab7daf267bc4486a89f13e6b7afdc03b20db3e6df716a6d5ab
+/tmp/tmpz6rz0vw4/output/m-anchor-app-local-v0.5.zip
+3 files; SHA256 dbadd5bf05a580ab7daf267bc4486a89f13e6b7afdc03b20db3e6df716a6d5ab

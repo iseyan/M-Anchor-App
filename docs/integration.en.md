@@ -28,6 +28,8 @@ context = client.state('DEMO-HOLD')
 | --- | --- | --- |
 | `GET /v1/cases/{id}` | agent_token | Case state and its admitted evidence/interpretations |
 | `POST /v1/cases/{id}/proposals` | agent_token | Submit raw JSON |
+| `GET /admin/scenarios` | admin_token | Six synthetic attack/control scenarios |
+| `POST /admin/scenario-run` | admin_token | Submit the selected fixed proposal, without a model call |
 | `GET /admin/cases` | admin_token | All cases and evidence settings |
 | `POST /admin/demo-run` | admin_token | Generate and submit a fixed demo proposal on the server |
 | `POST /admin/cases/{id}/proposals` | admin_token | Submit manually edited raw JSON through the same gate |
@@ -68,16 +70,17 @@ This version has no runtime evidence admission/revocation, candidate restoration
 
 `/admin/report` uses SQLite backup to make a consistent in-memory copy and reads records, evidence configuration, and history from it. It does not update the source store. Copying the full database into memory is intended for a small local demo.
 
-The output schema remains `m-anchor-app-observation/v2` in v0.5.1. Each history entry includes:
+The output schema remains `m-anchor-app-observation/v2` in V1 (1.0.0). Each history entry includes:
 
 | Field | Meaning |
 | --- | --- |
 | id | Unique history number, corresponding to response audit_id |
-| execution.source | live_model / fixed_demo / manual / agent_api |
+| execution.source | live_model / fixed_scenario / fixed_demo / manual / agent_api |
 | execution.received_at_utc | Server time immediately before gate processing, not commit completion |
 | execution.app_version | Receiving app version |
 | execution.submitted_case_id | Target case, retained even for an invalid proposal |
 | execution.model_metadata | Provider model, response_id, input_tokens, output_tokens; otherwise null |
+| execution.exercise | Optional V1 scenario and exact model-input record; see below |
 | proposal_text | Original UTF-8 text, or null for invalid UTF-8 |
 | proposal_base64 | Raw bytes; decoded SHA256 matches raw_sha256 |
 | readback | status (matched / mismatch / not_applicable) and checked_at_utc |
@@ -90,6 +93,18 @@ The model route accepts four metadata fields from the server's generation proces
 
 Fixed demos and manual submissions use separate admin routes, all subject to the same gate. Ordinary external client submissions are `agent_api`; their authorship as AI or human is not identified.
 
-These records describe the server's processing route. They are not provider signatures or tamper-proof evidence. Tests that replace model responses still use that route and explicitly identify the mock in logs/model IDs. Requests to the model and key inputs are not saved in execution records; submitted proposal text is saved exactly.
+These records describe the server's processing route. They are not provider signatures or tamper-proof evidence. Tests that replace model responses still use that route and explicitly identify the mock in logs/model IDs. Key input fields are not saved. Since V1, model-route input text is saved exactly alongside the proposal, so secrets pasted into the request would be recorded. Older versions did not retain this input.
 
 The UI's 100-entry display limit does not remove old exported records. Large-data pagination and retention are not implemented. English/Japanese presentation never translates saved proposal bytes, JSON field names, reason codes, or hashes.
+
+## V1 exercise metadata
+
+`GET /admin/scenarios` lists four attack scenarios and two controls. `POST /admin/scenario-run` accepts exactly `{"scenario_id":"authority_override"}` (or another listed ID), chooses its target on the server, and submits a fixed proposal through the unchanged gate. It never calls a model and does not execute edited input text.
+
+`POST /admin/model-run` accepts the existing four fields and optional `scenario_id`. Omission means `custom`. Named scenarios must match their configured case; unknown IDs, mismatched targets, or caller-supplied exercise objects fail before model generation. This label describes a selected exercise, not a trusted judgment about input.
+
+V1 saves optional `execution.exercise` with schema `m-anchor-exercise/v1`, `scenario_id`, `category`, bilingual `title`, `mode`, `input_text`, `input_sha256`, `input_origin`, and `input_sent_to_model`. For model requests, the exact text and hash are bound to case/proposal bytes through the single-use ticket. For fixed scenarios, input fields are null and input_sent_to_model is false. Mode is `model_request` or `fixed_proposal`. Fields describe the server route, including an explicitly mocked route in tests; they are not provider-signed attestations.
+
+Exercise metadata is observational only. It cannot admit evidence, modify gate rules, or authorize a state transition. Old entries and other routes can lack it. The existing SQLite execution JSON stores the additional fields without a database-schema change. If a model call fails before proposal submission, no gate-history entry is created; the UI shows an error and no protection verdict.
+
+See the [V1 guide](v1-guide.md) for scope and the changed input-retention behavior.
