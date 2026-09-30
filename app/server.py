@@ -19,7 +19,7 @@ from records import ExecutionTickets, history, utc_now
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '0.5'
+APP_VERSION = '0.5.1'
 
 
 class LaunchTicket:

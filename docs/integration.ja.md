@@ -1,5 +1,7 @@
 # 接続と保護境界
 
+[English](integration.en.md) | [日本語](integration.ja.md)
+
 ## 専用Pythonクライアント
 
 `app/client.py` の `AnchorClient` が、状態取得と提案提出を担当する。接続先は起動ウィンドウのAddress、エージェントキーは当該データフォルダのcredentials.jsonで確認する。

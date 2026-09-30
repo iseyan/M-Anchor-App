@@ -1,113 +1,111 @@
 # M-Anchor App
 
-AIが作った記録の更新案を検査し、定めた条件を満たす更新だけを正本に保存するローカルアプリです。
+Check AI-generated record updates before committing them to an authoritative store. This local prototype preserves unresolved candidates unless admitted evidence and deterministic update rules support a change.
 
-**Model proposes; deterministic layer commits.**
+AIの記録更新案を正本への保存前に検査するローカル試作版です。認可済み証拠と更新規則が変更を支持しない限り、未決の候補を保持します。
 
-モデルは更新案を作り、モデルとは別の規則に基づくGateとストアが保存の可否を決めます。根拠のない確定によって未決の候補が失われることを防ぎ、認可された証拠による更新は通します。
+**Model proposes; deterministic layer commits.**  
+**モデルは提案し、決定論的な層が保存を確定する。**
 
-## 現在の版
+## Current version / 現在の版
 
-**v0.5 — 検証と配布物作成を自動化するローカル試作版。**
+**v0.5.1 — English-first bilingual interface and documentation.** English appears first in the app, including decisions, history, errors, and example requests. Japanese remains alongside it. API field names, stored proposals, and historical evidence retain their original format. GitHub Actions verifies Linux and Windows builds and creates the source ZIP.
 
-GitHub ActionsでLinux・Windowsの検証を行い、通過したソースから配布ZIPを作成する構成を追加しました。検証ログと、ソースのコミット・ZIPのSHA256を含む作成記録を残します。
+**v0.5.1 — 英語を主とする英日併記版。** 画面・判定・履歴・エラー・依頼文の例は英語を先に、日本語を併記します。API項目名・保存された提案・過去の証拠記録は原形式を保持します。Linux・Windowsの検証とソースZIPの作成はGitHub Actionsで実行します。
 
-提案の提出経路・受信日時・モデル情報を各判定に紐付けて保存します。再起動後も履歴の「詳細」から提案と更新前後を確認でき、JSONには全件の記録を出力します。旧版で記録していない項目は「未記録」と表示します。
+| Documentation / 資料 | English | 日本語 |
+| --- | --- | --- |
+| Purpose and scope / 概要と適用範囲 | [Overview](docs/overview.en.md) | [概要](docs/overview.ja.md) |
+| Demonstration / 実演 | [Demo guide](docs/demo-guide.en.md) | [デモ手順](docs/demo-guide.ja.md) |
+| Python client, API, records / 接続と記録 | [Integration](docs/integration.en.md) | [接続仕様](docs/integration.ja.md) |
+| Automation and future AWS work / 自動化とAWS計画 | [Automation plan](docs/automation-plan.en.md) | [自動化計画](docs/automation-plan.ja.md) |
+| Decisions and evidence / 判断と証拠 | [Development log](docs/development-log.en.md) | [開発記録](docs/development-log.ja.md) |
+| Current validation / 今回の検証 | [v0.5.1 validation](docs/validation-v0.5.1.md) | 同じ資料に併記 |
+| Earlier CI validation / 以前のCI検証 | [v0.5 validation](docs/validation-v0.5.en.md) | [v0.5検証](docs/validation-v0.5.ja.md) |
+| Earlier observations and plan / 過去の観察と計画 | [Evidence guide](docs/evidence-guide.md) | 同じ資料に併記・原記録へリンク |
+| Release history / 変更履歴 | [Changelog](CHANGELOG.md) | 同じ資料に併記 |
 
-| 資料 | 用途 |
-| --- | --- |
-| [概要と適用範囲](docs/overview.ja.md) | 企業の担当者など、初めて読む方への説明 |
-| [デモの実施手順](docs/demo-guide.ja.md) | APIを使わない実演と実モデル接続の確認 |
-| [接続と保護境界](docs/integration.ja.md) | Pythonからの接続、認可、記録形式 |
-| [v0.5の検証記録](docs/validation-v0.5.ja.md) | 確認した事項と未確認の事項 |
-| [自動化・AWS接続計画](docs/automation-plan.ja.md) | 開発の自動化と、常時運用する構成の整理 |
-| [開発記録](docs/development-log.ja.md) | 判断、変更理由、観察結果の経緯 |
-| [変更履歴](CHANGELOG.md) | 版ごとの変更点 |
-| [当初の開発・配布計画](plans/m-anchor-app-plan-2026-09-30.ja.md) | 2026年9月30日時点の計画 |
+## Run on Windows / Windowsで使う
 
-## Windowsで使う
+Requires Python 3.10 or later and the `py` launcher. No additional pip packages are needed. This is a source distribution; Python is not bundled.
 
-Python 3.10以上と `py` ランチャーが必要です。追加のpipインストールは不要です。
+Python 3.10以上と `py` ランチャーが必要です。追加のpipインストールは不要です。Pythonを同梱しないソース配布版です。
 
-1. 配布ZIPを展開します。
-2. `start.cmd` をダブルクリックします。
-3. サーバーの起動を確認してからブラウザが開き、自動接続します。
-4. まず「APIを使わずにGateを確かめる」の二つのボタンで動作を確認できます。
+1. Extract the app ZIP. / アプリのZIPを展開します。
+2. Double-click **`start.cmd`**. / **`start.cmd`** をダブルクリックします。
+3. The browser opens after the server is ready and connects automatically. / サーバー起動後にブラウザが開き、自動接続します。
+4. Use **“Test the gate without the model API / APIを使わずにGateを確かめる”** first. / まず固定デモのボタンで確認します。
 
-起動ウィンドウは開いたままにします。終了はCtrl+C。同じ `start.cmd` で再起動すると保存済みの状態を引き継ぎます。
+Keep the launch window open. Press Ctrl+C there to stop. Running the same `start.cmd` again retains the saved records and history.
 
-毎回新しい案件で説明する場合は **`start-fresh-demo.cmd`** を使います。`demo-runs/` の下に別のデータフォルダを作り、以前の案件と履歴は残します。空いているローカルポートを使うため、接続先の末尾番号は起動ごとに変わることがあります。
+起動ウィンドウは開いたままにします。終了はCtrl+Cです。同じ `start.cmd` で再起動すると、保存済みの正本と履歴を引き継ぎます。
 
-ブラウザを再読込するとメモリ中のキーが消えます。「手動で接続する」を開き、起動ウィンドウに表示されたデータフォルダの `credentials.json` から入力できます。自動接続をやり直す場合は、その起動ウィンドウで停止して `start.cmd` を再起動します。
+Use **`start-fresh-demo.cmd`** for a new demonstration. It creates a separate folder under `demo-runs/` and preserves previous data. The local port may change at each launch.
 
-## 旧版のデータを引き継ぐ
+新しい実演には **`start-fresh-demo.cmd`** を使います。`demo-runs/` に別フォルダを作り、以前のデータを残します。接続先のポート番号は起動ごとに変わることがあります。
 
-1. 旧版をCtrl+Cで停止します。
-2. 新版を別フォルダへ展開します。
-3. 旧版の `data` フォルダを、新版の `m-anchor-app/data` にフォルダごとコピーします。新版でまだ通常起動していない状態で行ってください。
-4. 新版の `start.cmd` を起動します。
+A page reload clears the keys held in page memory. Open “Connect manually / 手動で接続する” and enter the keys from `credentials.json` in the data folder shown by the launcher. To reconnect automatically, stop and relaunch the app.
 
-`data-ai-check` など別名のデータを使う場合は、次のように指定できます。
+ページの再読込でメモリ中のキーは消えます。起動ウィンドウに表示されたデータフォルダの `credentials.json` を使い、手動で接続できます。自動接続をやり直す場合は、アプリを停止して再起動します。
+
+## Keep existing data / 旧版のデータを引き継ぐ
+
+1. Stop the older app with Ctrl+C. / 旧版をCtrl+Cで停止します。
+2. Extract the new ZIP into a separate folder. / 新版を別フォルダへ展開します。
+3. Before its first normal launch, copy the old `data` folder into the new `m-anchor-app/data`. Keep the original as a backup. / 新版の通常起動前に、旧版の `data` を新版の `m-anchor-app/data` へコピーし、元データを保管します。
+4. Open the new `start.cmd`. / 新版の `start.cmd` を開きます。
+
+For a differently named data folder: / 別名のデータフォルダを使う場合：
 
 ```powershell
-py -3 app\launcher.py --data "旧版のデータフォルダのパス"
+py -3 app\launcher.py --data "path-to-existing-data"
 ```
 
-v0.4以降は実行情報用の表を追加します。v0.4からv0.5への更新ではデータ形式は共通です。案件・証拠・過去の判定・接続キーは引き継ぎ、過去の日時やモデルIDを推測で埋めません。元のデータフォルダを保管してから、新版のコピーで使ってください。
+The data format is shared by v0.4, v0.5, and v0.5.1. Earlier data gains execution-metadata tables without inventing missing dates or model IDs. Existing cases, evidence, decisions, and connection keys are retained. Initialization never overwrites an existing store; incomplete folders cause an error.
 
-既存データを初期化で上書きする処理はありません。不完全なデータフォルダはエラーにして停止します。
+v0.4・v0.5・v0.5.1のデータ形式は共通です。それ以前のデータには実行情報用の表を追加しますが、未記録の日時やモデルIDは補完しません。案件・証拠・判定・接続キーは保持します。既存ストアを初期化で上書きせず、不完全なフォルダはエラーとして停止します。
 
-## 実モデルを接続する
+## Connect a model / 実モデルを接続する
 
-デモカードで案件を選び、利用可能なOpenAI APIキー、モデルID、依頼文を入力します。実行すると1回のAPI呼出しで更新案を作成し、専用Pythonクライアント経由でGateへ提出します。入力と案件情報がOpenAIへ送信され、API利用料金が発生します。
+Select a case and enter an OpenAI API key, a model ID available to that key, and your request. Each run makes one API call, then submits the exact proposal through the dedicated Python client. Your request and case context are sent to OpenAI and API charges apply. Both English and Japanese requests are accepted; the example text is bilingual and editable.
 
-APIキーはモデルの入力やDBに保存しません。提案の生バイトは監査履歴に残します。API失敗時は自動再試行しません。保存結果の通信に失敗した場合は、状態と履歴を確認します。
+案件を選び、OpenAI APIキー・利用可能なモデルID・依頼文を入力します。1回のAPI呼出しで得た提案を、専用Pythonクライアントでそのまま提出します。依頼と案件情報はOpenAIへ送信され、料金が発生します。英語・日本語の依頼を使用でき、併記された例文は編集できます。
 
-## 確認状況
+The API key is excluded from model input and database records. Raw proposals are retained in audit history. Failed API calls are not retried automatically. If the saving outcome is unclear, refresh state and history before submitting again.
 
-v0.5はGitHub Actionsの初回実行で、Linux/Python 3.10・3.13、Windows/Python 3.13の検証と配布物作成が成功しました。各環境でアプリ34件・配布処理3件の試験、UIロジック、チェックサムを確認しています。[実行結果と検証範囲](docs/validation-v0.5.ja.md)を参照してください。
+APIキーはモデル入力やDBに保存しません。提案原文は監査履歴に残します。API失敗時に自動再試行は行いません。保存結果が不明な場合は、再提出の前に正本と履歴を更新してください。
 
-v0.4はLinux/Python 3.12上で34件の自動テストとUIロジック確認を完了しました。実HTTPサーバーの再起動後の記録保持、旧スキーマからの移行、保存失敗時のロールバック、100件を超える全履歴の出力を確認しています。モデルの応答は模擬し、有料APIは呼び出していません。[v0.4の検証記録](docs/validation-v0.4.ja.md)に確認方法と未確認事項を記載しました。
+## Validation and scope / 検証と適用範囲
 
-v0.2では、利用者のWindows環境で起動と実API経由の操作結果が確認されています。v0.3ではLinux/Python 3.12上で25件の自動テストとUIロジックの確認を完了しました。詳細は[配布時点の検証記録](docs/validation-v0.3.ja.md)を参照してください。
+The [v0.5.1 validation record](docs/validation-v0.5.1.md) distinguishes local checks, hosted CI, and unverified behavior. The suite contains 34 application tests, 3 packaging tests, and a UI logic check. Model responses are mocked; CI makes no paid model calls. Earlier user-supplied demo records are indexed in the [evidence guide](docs/evidence-guide.md).
 
-2026年10月1日、利用者側での操作後に「DEMO-HOLD：変更なし」「DEMO-UPDATE：保存」「DEMO-HOLD：拒否」の三件の履歴が報告されました。[利用者側の操作確認](docs/observations/2026-10-01-user-check-v0.3.ja.md)に資料と確認範囲を記録しています。
+[v0.5.1検証記録](docs/validation-v0.5.1.md)でローカル確認・CI・未確認事項を区別します。アプリ34件、配布処理3件、UIロジックを検査します。モデル応答は模擬し、CIで有料APIは使いません。過去の利用者側記録は[証拠ガイド](docs/evidence-guide.md)から確認できます。
 
-続いて[確認記録JSONを受領・照合](docs/observations/2026-10-01-export-receipt-v0.3.ja.md)し、正本・履歴・状態ハッシュ、直近の固定提案の対応と、JSON保存を確認しました。履歴1・2のモデル利用情報、自動接続、再起動後の状態、画面全体の描画は、このJSONの確認範囲に含めていません。
+Protection covers case records in this local store. The app does not establish evidence truth, control external tools, or isolate processes that already have direct access to the database. Evidence admission is configured during initialization. See the integration guide before considering a business connection.
 
-2026年10月1日、[v0.4の固定デモ三件のJSONを受領・照合](docs/observations/2026-10-01-export-receipt-v0.4.ja.md)しました。拒否・保存・変更なし、各実行の日時と提出経路、提案原文と状態ハッシュの対応を確認しています。利用者側での再起動の実施自体は、このJSONの記録対象に含まれません。
+保護対象はこのローカルストア内の案件記録です。証拠内容の真偽判定、外部ツールの制御、DBへ直接アクセスできるプロセスの隔離は行いません。証拠認可は初期化時に設定します。業務接続の検討には接続仕様を参照してください。
 
-## 開発用の起動と検査
+## Development / 開発
 
 ```sh
 python3 app/launcher.py
 python3 -m unittest discover -s app -v
-```
-
-UIロジックの追加確認にはNode.jsが必要です。
-
-```sh
 python3 scripts/check_ui.py
-```
-
-## GitHubから配布物を取得する
-
-1. [Actionsの一覧](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml)を開く。
-2. 成功した実行を選び、Artifactsから `m-anchor-app-package-番号` をダウンロードする。
-3. 展開すると、アプリのZIP、ZIPのSHA256、`build-info.json` が入っている。
-4. アプリのZIPをもう一度展開し、`start.cmd` を起動する。
-
-検証ログは `verification-OS-py版` にある。Artifactsは14日保持の設定で、取得にはGitHubへのログインが必要な場合がある。これはソース配布版で、Pythonの同梱やexe化は行っていない。Actionsの最新実行状態は上記の一覧で確認する。
-
-手元でも同じ検証と梱包を実行できる。
-
-```sh
 python3 scripts/ci.py
 python3 scripts/build_release.py --output dist
 ```
 
-## 配布と関連資料
+The UI logic check needs Node.js. CI and packaging record their results and check file hashes. / UIロジックの確認にはNode.jsが必要です。CIと配布処理は結果を記録し、ファイルのハッシュを照合します。
 
-実行ファイル化と配布ライセンスの確定は今後の作業です。この版で新たなLICENSEは設定していません。
+## Download from GitHub / GitHubから配布物を取得する
 
-- [M-Anchor Framework](https://github.com/iseyan/m-anchor-framework)
+1. Open [Actions](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml) and choose a successful run. / Actionsで成功した実行を選びます。
+2. Download `m-anchor-app-package-<number>` from Artifacts. / Artifactsから同名のファイルを取得します。
+3. Extract it to find the app ZIP, its SHA256, and `build-info.json`. / 展開するとアプリのZIP・SHA256・作成記録が入っています。
+4. Extract the app ZIP and open `start.cmd`. / アプリのZIPをもう一度展開し、`start.cmd` を開きます。
+
+Logs are in `verification-<OS>-py<version>`. Artifacts are configured for 14-day retention; GitHub sign-in may be required. Executable packaging and distribution licensing remain future work. This version adds no LICENSE file.
+
+ログは `verification-<OS>-py<version>` にあります。Artifactsの保持期間は14日で、取得にGitHubログインが必要な場合があります。実行ファイル化と配布ライセンスの確定は今後の作業です。この版でLICENSEは追加していません。
+
+Related project / 関連プロジェクト: [M-Anchor Framework](https://github.com/iseyan/m-anchor-framework)

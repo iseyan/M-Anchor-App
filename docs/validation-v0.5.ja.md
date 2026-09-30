@@ -1,5 +1,7 @@
 # v0.5 検証記録
 
+[English](validation-v0.5.en.md) | [日本語](validation-v0.5.ja.md)
+
 作業日：2026年10月1日（日本時間）。対象はM-Anchor Appの検証・配布自動化。正式な研究評価とは別の開発記録である。
 
 ## 検証構成

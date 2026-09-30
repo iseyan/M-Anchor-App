@@ -1,5 +1,7 @@
 # 開発の自動化とAWS接続の計画
 
+[English](automation-plan.en.md) | [日本語](automation-plan.ja.md)
+
 記録日：2026年10月1日（日本時間）。利用者からのGitHub Actions・AWS活用の質問を、今後の設計として整理する。当初は未実装の計画として記載した。v0.5では開発の自動化を実装し、AWSでの運用は引き続き計画として分ける。
 
 ## 二つの自動化

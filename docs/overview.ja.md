@@ -1,5 +1,7 @@
 # M-Anchor App：概要と適用範囲
 
+[English](overview.en.md) | [日本語](overview.ja.md)
+
 ## 何をするアプリか
 
 M-Anchor Appは、AIが作った記録の更新案を、正本へ保存する直前に検査するアプリである。モデルに正本の直接書込みを任せず、案件ごとの証拠認可と更新規則に従って保存する。
@@ -54,3 +56,5 @@ flowchart TD
 v0.5では、WindowsとLinuxでの検証とソース配布ZIPの作成をGitHub Actionsで自動化した。
 
 確認方法と制約は[検証記録](validation-v0.5.ja.md)、実演手順は[デモの実施手順](demo-guide.ja.md)に記載する。
+
+v0.5.1では画面・案内を英語優先の英日併記とし、主要資料に英語版を追加した。[今回の検証記録](validation-v0.5.1.md)を参照する。
