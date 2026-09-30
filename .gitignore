@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+data/
+data-*/
+demo-runs/
+credentials.json
+*.sqlite3
+*.sqlite3-*
+.env
+.env.*
+*.zip

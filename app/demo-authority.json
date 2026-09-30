@@ -1,0 +1,10 @@
+{
+  "schema_version": "m-anchor-stage3-authority/v1",
+  "cases": [
+    {"case_id":"DEMO-HOLD","omega":["h_A","h_B"],"candidates":["h_A","h_B"],"version":1,"require_full_incorporation":true},
+    {"case_id":"DEMO-UPDATE","omega":["h_A","h_B"],"candidates":["h_A","h_B"],"version":1,"require_full_incorporation":true}
+  ],
+  "evidence":[{"evidence_id":"e_B","active":true}],
+  "admissions":[{"case_id":"DEMO-UPDATE","evidence_id":"e_B"}],
+  "interpretations":[{"case_id":"DEMO-UPDATE","evidence_ids":["e_B"],"compatible":["h_B"],"map_version":"demo/v1"}]
+}
