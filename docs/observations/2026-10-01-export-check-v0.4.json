@@ -1,0 +1,31 @@
+{
+  "schema": "m-anchor-app-received-record-check/v1",
+  "source_filename": "m-anchor-app-record-2026-09-30T15-54-38-638Z.json",
+  "source_sha256": "6da483dcd78aca642ccec25418f6bde5695016a7e0cd59a40b8b64706cd54917",
+  "checked_at_utc": "2026-09-30T16:02:04.298495+00:00",
+  "method": "Offline consistency checks of supplied JSON; no direct access to user store; no model API call.",
+  "checks": {
+    "schema_and_app_version": true,
+    "three_complete_entries": true,
+    "expected_order": true,
+    "per_entry_execution_fields": true,
+    "timestamps_ordered": true,
+    "reported_readbacks_matched": true,
+    "raw_proposals_match": true,
+    "proposal_references_match": true,
+    "state_hashes_recompute": true,
+    "reject_and_noop_preserve_full_state": true,
+    "valid_update_expected": true,
+    "case_history_continuity": true,
+    "final_authority_matches_last_entries": true,
+    "demo_authority": true,
+    "credential_fields_absent": true
+  },
+  "all_checks_passed": true,
+  "limitations": [
+    "Not signed provenance or direct independent database readback.",
+    "The reported readback statuses were checked for internal consistency, not re-executed on the user computer.",
+    "No server lifecycle events are included; restart persistence cannot be established from this JSON alone.",
+    "All runs are fixed_demo; real-model metadata persistence is outside this received record."
+  ]
+}
