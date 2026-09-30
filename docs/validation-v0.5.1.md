@@ -35,9 +35,13 @@ Release packaging also verifies the source manifest and all ZIP entries. HTML ne
 
 ## Hosted CI / GitHub Actions
 
-The existing workflow will verify Linux/Python 3.10 and 3.13, Windows/Python 3.13, and then package successful source. Execution results will be linked here after the code commit runs.
+[Run #3](https://github.com/iseyan/M-Anchor-App/actions/runs/36746901627) succeeded for source commit `b9dc3ccd2cd7f8c86e3781af03bea6307b488639`. Linux/Python 3.10 and 3.13, Windows/Python 3.13, and the packaging job all completed successfully. Each verification environment ran the 34 app tests, 3 packaging tests, UI logic, and source checksums. The [API receipt](observations/2026-10-01-ci-v0.5.1.json) records job results and artifacts.
 
-既存のワークフローでLinux/Python 3.10・3.13、Windows/Python 3.13を検証し、成功したソースを梱包します。コードのコミット後に実行結果をここへ記録します。
+[実行 #3](https://github.com/iseyan/M-Anchor-App/actions/runs/36746901627)はコミット `b9dc3ccd2cd7f8c86e3781af03bea6307b488639` で成功しました。Linux/Python 3.10・3.13、Windows/Python 3.13と配布ジョブがすべて成功し、各検証環境でアプリ34件・配布3件・UI・チェックサムを確認しました。[API受領記録](observations/2026-10-01-ci-v0.5.1.json)にジョブ結果と成果物を保存しています。
+
+The archive is checked in the packaging job before upload; the uploaded ZIP was not separately downloaded and compared by the reviewer. Later documentation commits trigger their own runs, available in the Actions list.
+
+ZIPは配布ジョブ内でアップロード前に照合しています。アップロード後のZIPを確認者が別途ダウンロードして再照合したものではありません。記録追加後のコミットも個別の実行を起こし、Actions一覧で確認できます。
 
 [Actions runs / 実行一覧](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml)
 

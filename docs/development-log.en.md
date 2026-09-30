@@ -63,6 +63,8 @@ The user requested English as the primary language with Japanese alongside it, i
 
 Stored proposals, reason codes, JSON schema, and historical observation bytes remain unchanged. Earlier Japanese records are retained with an English/bilingual evidence guide. The language change does not alter evidence admission or commit authority. See [current validation](validation-v0.5.1.md).
 
+The v0.5.1 code passed all three hosted verification environments and the packaging job in [Actions run #3](https://github.com/iseyan/M-Anchor-App/actions/runs/36746901627). The bilingual validation record links the API receipt and local logs.
+
 ## Remaining work
 
 - Verify the current bilingual layout on the user's Windows browser and distinguish normal restart from a fresh demo.

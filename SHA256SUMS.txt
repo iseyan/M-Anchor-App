@@ -17,11 +17,12 @@ a0dd922e49e214942122d882b520e7dd4f72ecc250c0634f5b6b89f2a0470956  app/ui.html
 797ea46c650a1b2a648a2d54d3c746fb598cbff2cdb9802a57b51577ca6f653e  docs/automation-plan.ja.md
 5c5a0683029a126c4fa488c7378cfb1fd9483582b143e332733652aeb0358c68  docs/demo-guide.en.md
 2cfe4d1593395ec352ea055adf2691aedf6ade0213b2e50dd6c84c076717051c  docs/demo-guide.ja.md
-cafe9077eb75ef578f9b7c20b1eedca2678477a314c302a6bb53403cd44a51e1  docs/development-log.en.md
-94a8e89efd90904d94e32949bcdf3163ff1e7ebce593d54c3fc96be92cd395ed  docs/development-log.ja.md
+7d272bec4b802fe78bf3e8be26e28b83aa7ab4b2d2efb7adf91e91f515752c14  docs/development-log.en.md
+53ce4b9512d8122b3b6ebe05b31b0204af35241895fc75088bb2bfec1b283192  docs/development-log.ja.md
 676e4a02249da59240988e9c3363ef8e3fb3271a4bd6199aaa159ae39438f8d2  docs/evidence-guide.md
 c770d0933723ec890194cc2eb0918bcb6b07dcdd2e88e7684d1ee1a7999059db  docs/integration.en.md
 9da8a8da3ae66ce2b615a7f895f8356bb14ecd5f677d5b9ac2d4de958d25c1f9  docs/integration.ja.md
+d26018e565067992c567e08d10cca9d6b455d4243102d2e58bcd3778d6eb544a  docs/observations/2026-10-01-ci-v0.5.1.json
 f5a575625c24026a244349b9f79401cf7f461a0cc4001d65c51eea538e01ebe3  docs/observations/2026-10-01-ci-v0.5.json
 6098fd0be551893f0f6e23b1f8d624421ec8c0b41a36625c92104526045d200c  docs/observations/2026-10-01-export-check-v0.4.json
 629ca97cd2948ffdc232c1ab352d991aaf78f3b0ea423c5989b32f7c8bda05c5  docs/observations/2026-10-01-export-check.json
@@ -50,7 +51,7 @@ a720a1ab68bf5b93b0f7284cda27f838acfdb559a94e882e3cb9a35ab138fe62  docs/validatio
 3afcf221539dffa5ff12dc5c97e2abc4be753a5d15593e8f21ff831c7ae04545  docs/validation-v0.4-tests.txt
 b9a126524d29972766896a7174704679e73a546a70b37a1d14e4c60b5e21638a  docs/validation-v0.4-ui.txt
 477709e9d81e1ed663c7b1f1f9bda9c1a7c55a0120d8288b015204881ea24ccb  docs/validation-v0.4.ja.md
-4983b2448cfab55699f27d57a1d06dbddf9ecd5e7a952a93a17f8cc5e6b10e6a  docs/validation-v0.5.1.md
+de7b72f5bd314fdbf1f56e03f6f78abdd501239ca960289460d405bbfc8f7a87  docs/validation-v0.5.1.md
 c99d8e34543bc7d712e13f76981f78b138f9487334213d7ad9bdc455438039dc  docs/validation-v0.5.en.md
 9e1426090041fd11794893d773f9f2e908dbccf52df75bb9ef19a08cd8a7f1b4  docs/validation-v0.5.ja.md
 b4457fe00f31ac02289dcfa497e0af351f8867edef39718700042aaa6b3e5dbc  plans/m-anchor-app-plan-2026-09-30.ja.md
