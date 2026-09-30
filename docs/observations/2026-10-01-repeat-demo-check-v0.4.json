@@ -1,0 +1,44 @@
+{
+  "schema": "m-anchor-app-received-record-check/v1",
+  "source_filename": "m-anchor-app-record-2026-09-30T16-07-47-577Z.json",
+  "source_sha256": "cf47d468693c56b6eaf747b7bb93e0cb92dcdab9546e88e26bfab96fceaf14a5",
+  "previous_source_sha256": "6da483dcd78aca642ccec25418f6bde5695016a7e0cd59a40b8b64706cd54917",
+  "checked_at_utc": "2026-09-30T16:08:58.110791+00:00",
+  "checks": {
+    "schema_and_version": true,
+    "history_complete_three": true,
+    "expected_decisions": true,
+    "proposal_bytes_and_hashes": true,
+    "state_hashes": true,
+    "proposal_references": true,
+    "reject_noop_preserved": true,
+    "valid_transition": true,
+    "history_chain": true,
+    "final_authority": true,
+    "fixed_demo_metadata": true,
+    "reported_readbacks_matched": true,
+    "timestamps_ordered": true,
+    "authority_matches_previous_demo": true
+  },
+  "all_checks_passed": true,
+  "comparison": {
+    "previous_data_label": "data",
+    "current_data_label": "20261001-010702-387a19",
+    "same_history": false,
+    "same_proposals": true,
+    "previous_receipt_times": [
+      "2026-09-30T15:51:26.843618+00:00",
+      "2026-09-30T15:53:27.623209+00:00",
+      "2026-09-30T15:53:49.871263+00:00"
+    ],
+    "current_receipt_times": [
+      "2026-09-30T16:07:21.432096+00:00",
+      "2026-09-30T16:07:23.964699+00:00",
+      "2026-09-30T16:07:26.034488+00:00"
+    ]
+  },
+  "limitations": [
+    "No direct access to user database or process lifecycle.",
+    "Different receipt times identify new executions, not continuity of the prior history across restart."
+  ]
+}

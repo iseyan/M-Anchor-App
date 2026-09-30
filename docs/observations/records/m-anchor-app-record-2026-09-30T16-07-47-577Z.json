@@ -1,0 +1,285 @@
+{
+  "app_version": "0.4",
+  "authority": {
+    "admissions": [
+      {
+        "case_id": "DEMO-UPDATE",
+        "evidence_id": "e_B"
+      }
+    ],
+    "cases": [
+      {
+        "candidates": [
+          "h_A",
+          "h_B"
+        ],
+        "case_id": "DEMO-HOLD",
+        "cause_status": "unresolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b63d9c00882d71a6e42a1be77defa45723491bf03b0953fb73e144fb83cb1003",
+        "version": 1
+      },
+      {
+        "candidates": [
+          "h_B"
+        ],
+        "case_id": "DEMO-UPDATE",
+        "cause_status": "resolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b429dc2614ae12a5532251ae6bf99fa5ffcd22433bee72edc5d5662ab26046c4",
+        "version": 2
+      }
+    ],
+    "evidence": [
+      {
+        "active": true,
+        "evidence_id": "e_B"
+      }
+    ],
+    "interpretations": [
+      {
+        "case_id": "DEMO-UPDATE",
+        "compatible": [
+          "h_B"
+        ],
+        "evidence_ids": [
+          "e_B"
+        ],
+        "map_version": "demo/v1"
+      }
+    ],
+    "schema_version": "m-anchor-stage3-authority/v1"
+  },
+  "data_label": "20261001-010702-387a19",
+  "generated_at_utc": "2026-09-30T16:07:47.570832+00:00",
+  "history": [
+    {
+      "after": {
+        "candidates": [
+          "h_B"
+        ],
+        "case_id": "DEMO-UPDATE",
+        "cause_status": "resolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b429dc2614ae12a5532251ae6bf99fa5ffcd22433bee72edc5d5662ab26046c4",
+        "version": 2
+      },
+      "before": {
+        "candidates": [
+          "h_B"
+        ],
+        "case_id": "DEMO-UPDATE",
+        "cause_status": "resolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b429dc2614ae12a5532251ae6bf99fa5ffcd22433bee72edc5d5662ab26046c4",
+        "version": 2
+      },
+      "case_id": "DEMO-UPDATE",
+      "core_record": {
+        "action": {
+          "candidates": [
+            "h_B"
+          ],
+          "reason": "Evaluate collected proposal against externally admitted evidence.",
+          "value": "stage3-probe-evaluation"
+        },
+        "audit": {
+          "after": [
+            "h_B"
+          ],
+          "before": [
+            "h_B"
+          ],
+          "compatible": [
+            "h_B"
+          ],
+          "evidence": [
+            "e_B"
+          ],
+          "map_version": "demo/v1",
+          "removed": []
+        }
+      },
+      "decision": "no_commit",
+      "denied_authority_requests": [],
+      "execution": {
+        "app_version": "0.4",
+        "model_metadata": null,
+        "received_at_utc": "2026-09-30T16:07:26.034488+00:00",
+        "source": "fixed_demo",
+        "submitted_case_id": "DEMO-UPDATE"
+      },
+      "id": 3,
+      "proposal_base64": "ewogICJjYXNlX2lkIjogIkRFTU8tVVBEQVRFIiwKICAicmVmZXJlbmNlZF92ZXJzaW9uIjogMiwKICAicmVmZXJlbmNlZF9oYXNoIjogImI0MjlkYzI2MTRhZTEyYTU1MzIyNTFhZTZiZjk5ZmE1ZmZjZDIyNDMzYmVlNzJlZGM1ZDU2NjJhYjI2MDQ2YzQiLAogICJyZXRhaW5lZF9jYW5kaWRhdGVzIjogWwogICAgImhfQiIKICBdLAogICJjYXVzZV9zdGF0dXMiOiAicmVzb2x2ZWQiLAogICJldmlkZW5jZV91c2VkIjogWwogICAgImVfQiIKICBdLAogICJwcm9wb3NlZF92ZXJzaW9uX2FkdmFuY2UiOiBmYWxzZSwKICAiZnV0dXJlX2J5cGFzc19hdXRob3JpemVkIjogZmFsc2UKfQ==",
+      "proposal_text": "{\n  \"case_id\": \"DEMO-UPDATE\",\n  \"referenced_version\": 2,\n  \"referenced_hash\": \"b429dc2614ae12a5532251ae6bf99fa5ffcd22433bee72edc5d5662ab26046c4\",\n  \"retained_candidates\": [\n    \"h_B\"\n  ],\n  \"cause_status\": \"resolved\",\n  \"evidence_used\": [\n    \"e_B\"\n  ],\n  \"proposed_version_advance\": false,\n  \"future_bypass_authorized\": false\n}",
+      "raw_sha256": "6af814a8e30f955f2668d4008e97ceee15b3d845c2aefb67ba5b2940c12fff07",
+      "readback": {
+        "checked_at_utc": "2026-09-30T16:07:26.077274+00:00",
+        "status": "matched"
+      },
+      "reason": "no_state_change"
+    },
+    {
+      "after": {
+        "candidates": [
+          "h_B"
+        ],
+        "case_id": "DEMO-UPDATE",
+        "cause_status": "resolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b429dc2614ae12a5532251ae6bf99fa5ffcd22433bee72edc5d5662ab26046c4",
+        "version": 2
+      },
+      "before": {
+        "candidates": [
+          "h_A",
+          "h_B"
+        ],
+        "case_id": "DEMO-UPDATE",
+        "cause_status": "unresolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "5df0c9fef59eeb7ccfbb09fd7b31af199ca2c7095fbd68afe74c6422201812fe",
+        "version": 1
+      },
+      "case_id": "DEMO-UPDATE",
+      "core_record": {
+        "action": {
+          "candidates": [
+            "h_A",
+            "h_B"
+          ],
+          "reason": "Evaluate collected proposal against externally admitted evidence.",
+          "value": "stage3-probe-evaluation"
+        },
+        "audit": {
+          "after": [
+            "h_B"
+          ],
+          "before": [
+            "h_A",
+            "h_B"
+          ],
+          "compatible": [
+            "h_B"
+          ],
+          "evidence": [
+            "e_B"
+          ],
+          "map_version": "demo/v1",
+          "removed": [
+            "h_A"
+          ]
+        }
+      },
+      "decision": "commit",
+      "denied_authority_requests": [],
+      "execution": {
+        "app_version": "0.4",
+        "model_metadata": null,
+        "received_at_utc": "2026-09-30T16:07:23.964699+00:00",
+        "source": "fixed_demo",
+        "submitted_case_id": "DEMO-UPDATE"
+      },
+      "id": 2,
+      "proposal_base64": "ewogICJjYXNlX2lkIjogIkRFTU8tVVBEQVRFIiwKICAicmVmZXJlbmNlZF92ZXJzaW9uIjogMSwKICAicmVmZXJlbmNlZF9oYXNoIjogIjVkZjBjOWZlZjU5ZWViN2NjZmJiMDlmZDdiMzFhZjE5OWNhMmM3MDk1ZmJkNjhhZmU3NGM2NDIyMjAxODEyZmUiLAogICJyZXRhaW5lZF9jYW5kaWRhdGVzIjogWwogICAgImhfQiIKICBdLAogICJjYXVzZV9zdGF0dXMiOiAicmVzb2x2ZWQiLAogICJldmlkZW5jZV91c2VkIjogWwogICAgImVfQiIKICBdLAogICJwcm9wb3NlZF92ZXJzaW9uX2FkdmFuY2UiOiB0cnVlLAogICJmdXR1cmVfYnlwYXNzX2F1dGhvcml6ZWQiOiBmYWxzZQp9",
+      "proposal_text": "{\n  \"case_id\": \"DEMO-UPDATE\",\n  \"referenced_version\": 1,\n  \"referenced_hash\": \"5df0c9fef59eeb7ccfbb09fd7b31af199ca2c7095fbd68afe74c6422201812fe\",\n  \"retained_candidates\": [\n    \"h_B\"\n  ],\n  \"cause_status\": \"resolved\",\n  \"evidence_used\": [\n    \"e_B\"\n  ],\n  \"proposed_version_advance\": true,\n  \"future_bypass_authorized\": false\n}",
+      "raw_sha256": "0eb0e63c122bc06656ff8c7212006eb5a0ad6e16821f24a21d315b47d9733a4d",
+      "readback": {
+        "checked_at_utc": "2026-09-30T16:07:24.007672+00:00",
+        "status": "matched"
+      },
+      "reason": "accepted"
+    },
+    {
+      "after": {
+        "candidates": [
+          "h_A",
+          "h_B"
+        ],
+        "case_id": "DEMO-HOLD",
+        "cause_status": "unresolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b63d9c00882d71a6e42a1be77defa45723491bf03b0953fb73e144fb83cb1003",
+        "version": 1
+      },
+      "before": {
+        "candidates": [
+          "h_A",
+          "h_B"
+        ],
+        "case_id": "DEMO-HOLD",
+        "cause_status": "unresolved",
+        "omega": [
+          "h_A",
+          "h_B"
+        ],
+        "require_full_incorporation": true,
+        "selected_response": null,
+        "state_hash": "b63d9c00882d71a6e42a1be77defa45723491bf03b0953fb73e144fb83cb1003",
+        "version": 1
+      },
+      "case_id": "DEMO-HOLD",
+      "core_record": null,
+      "decision": "reject",
+      "denied_authority_requests": [],
+      "detail": "Unsupported removal: ['h_A']",
+      "execution": {
+        "app_version": "0.4",
+        "model_metadata": null,
+        "received_at_utc": "2026-09-30T16:07:21.432096+00:00",
+        "source": "fixed_demo",
+        "submitted_case_id": "DEMO-HOLD"
+      },
+      "id": 1,
+      "proposal_base64": "ewogICJjYXNlX2lkIjogIkRFTU8tSE9MRCIsCiAgInJlZmVyZW5jZWRfdmVyc2lvbiI6IDEsCiAgInJlZmVyZW5jZWRfaGFzaCI6ICJiNjNkOWMwMDg4MmQ3MWE2ZTQyYTFiZTc3ZGVmYTQ1NzIzNDkxYmYwM2IwOTUzZmI3M2UxNDRmYjgzY2IxMDAzIiwKICAicmV0YWluZWRfY2FuZGlkYXRlcyI6IFsKICAgICJoX0IiCiAgXSwKICAiY2F1c2Vfc3RhdHVzIjogInJlc29sdmVkIiwKICAiZXZpZGVuY2VfdXNlZCI6IFtdLAogICJwcm9wb3NlZF92ZXJzaW9uX2FkdmFuY2UiOiB0cnVlLAogICJmdXR1cmVfYnlwYXNzX2F1dGhvcml6ZWQiOiBmYWxzZQp9",
+      "proposal_text": "{\n  \"case_id\": \"DEMO-HOLD\",\n  \"referenced_version\": 1,\n  \"referenced_hash\": \"b63d9c00882d71a6e42a1be77defa45723491bf03b0953fb73e144fb83cb1003\",\n  \"retained_candidates\": [\n    \"h_B\"\n  ],\n  \"cause_status\": \"resolved\",\n  \"evidence_used\": [],\n  \"proposed_version_advance\": true,\n  \"future_bypass_authorized\": false\n}",
+      "raw_sha256": "3c84e72fea8bd8bcf6b6052532b59550188ff0c15a594346561fa59c38c97492",
+      "readback": {
+        "checked_at_utc": "2026-09-30T16:07:21.478119+00:00",
+        "status": "matched"
+      },
+      "reason": "invalid_transition"
+    }
+  ],
+  "history_complete": true,
+  "history_count": 3,
+  "history_limit": null,
+  "history_source_note": "Execution metadata identifies the server route, not signed provenance. Null means not recorded. received_at_utc is server receipt time, not commit time. Readback is a later observation; null means not recorded or interrupted.",
+  "schema": "m-anchor-app-observation/v2",
+  "scope": "Local case records; not evidence-truth verification or external tool control."
+}
