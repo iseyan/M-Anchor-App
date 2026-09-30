@@ -1,0 +1,27 @@
+{
+  "schema": "m-anchor-app-received-record-check/v1",
+  "record_file": "m-anchor-app-record-2026-09-30T15-21-20-696Z.json",
+  "record_sha256": "c9e660b47877436077f134fbf6fe38a61d49e82630854a12da309686ebd26ab8",
+  "record_app_version": "0.3",
+  "generated_at_utc": "2026-09-30T15:21:20.689216+00:00",
+  "checks": {
+    "schema_and_app_version": true,
+    "expected_history_sequence": true,
+    "all_state_hashes_recompute": true,
+    "no_op_and_reject_preserve_entire_state": true,
+    "valid_update": true,
+    "valid_update_uses_admitted_evidence": true,
+    "per_case_history_continuity": true,
+    "exported_state_matches_latest_history": true,
+    "latest_proposal_hash_matches_history": true,
+    "latest_gate_matches_history": true,
+    "latest_is_fixed_demo_with_verified_readback": true,
+    "no_credential_fields_or_api_key_pattern": true
+  },
+  "all_checks_passed": true,
+  "limits": [
+    "Checks are consistency checks on the supplied JSON, not independent access to the user database.",
+    "Model metadata and raw proposals for history items 1 and 2 are absent. Their model provenance is not verified by this file.",
+    "No new model API calls or user-store mutations were performed."
+  ]
+}
