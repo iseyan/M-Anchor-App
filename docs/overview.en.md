@@ -1,6 +1,6 @@
 # Purpose and scope
 
-[English](overview.en.md) | [日本語](overview.ja.md)
+[日本語](overview.ja.md)
 
 ## What the app does
 
@@ -21,7 +21,7 @@ flowchart TD
     G -->|Invalid or unchanged| K[Keep current record]
 ```
 
-“Rejected / 拒否” means the proposal violated the rules. “No change / 変更なし” means the proposed state did not require a change. A model that preserves uncertainty and a gate that rejects an unsupported model proposal are different observations, even when both leave the same record.
+“Rejected” means the proposal violated the rules. “No change” means the proposed state did not require a change. A model that preserves uncertainty and a gate that rejects an unsupported model proposal are different observations, even when both leave the same record.
 
 ## Current scope
 

@@ -1,5 +1,7 @@
 # M-Anchor App V1
 
+[English](technical-note.en.md)
+
 ## プロンプト攻撃による不正な記録更新を無効化する決定論的ゲート
 
 Ise（iseyan）・ソフトウェア実演の技術説明・2026年10月1日・アプリ1.0.0
@@ -16,7 +18,7 @@ M-Anchor Appは、AIが生成する提案と案件正本の更新を分離する
 
 ここでいう **攻撃の無効化は、不正な提案をGate経由で案件正本の更新として成立させないこと** です。すべてのプロンプトの善悪を判定する機構ではありません。流暢な説明、モデルの自己申告による承認、選択したシナリオ名は更新権限を与えません。
 
-原則は **Model proposes; deterministic layer commits.（モデルは提案し、決定論的な層が保存を確定する）** です。提供するのはローカルで動くソース配布の試作アプリであり、OS全体を保護するサービスではありません。
+原則は **モデルは提案し、決定論的な層が保存を確定する。** です。提供するのはローカルで動くソース配布の試作アプリであり、OS全体を保護するサービスではありません。
 
 ### 2. 機構と信頼境界
 
@@ -50,9 +52,9 @@ M-Anchor Appは、AIが生成する提案と案件正本の更新を分離する
 
 ### 4. 再現と実装検査
 
-WindowsではPython 3.10以上と `py` ランチャーを用意し、ソースZIPを展開して `start-fresh-demo.cmd` を開きます。上段でシナリオを選び、**Run fixed proposal (no API) / 固定提案を実行（APIなし）** を使います。シナリオ別の検査に下段の従来デモボタンを使わないでください。攻撃4例は拒否、未決保持は変更なし、正当更新はUPDATEのVersion 1から2への保存になります。同じ正当シナリオを再実行すると現時点の状態を参照する新しい提案となり、変更なしになります。古いVersion 1の提案原文の再送は別の検査で、Version不一致になり得ます。
+WindowsではPython 3.10以上と `py` ランチャーを用意し、ソースZIPを展開して `start-fresh-demo.cmd` を開きます。上段でシナリオを選び、**固定提案を実行（APIなし）** を使います。シナリオ別の検査に下段の従来デモボタンを使わないでください。攻撃4例は拒否、未決保持は変更なし、正当更新はUPDATEのVersion 1から2への保存になります。同じ正当シナリオを再実行すると現時点の状態を参照する新しい提案となり、変更なしになります。古いVersion 1の提案原文の再送は別の検査で、Version不一致になり得ます。
 
-候補・状態・Version・ハッシュの前後と再読込を確認し、JSONを保存します。固定検査にモデルのキーやAPI呼出しは不要です。任意のモデル実行には利用者側のAPI接続が必要であり、出力の再現性は保証しません。[再現手順](reproduce.md)に詳細があります。
+候補・状態・Version・ハッシュの前後と再読込を確認し、JSONを保存します。固定検査にモデルのキーやAPI呼出しは不要です。任意のモデル実行には利用者側のAPI接続が必要であり、出力の再現性は保証しません。[再現手順](reproduce.ja.md)に詳細があります。
 
 既存V1のCIでは、アプリ40件・配布処理3件・UIロジックを、LinuxのPython 3.10／3.13、WindowsのPython 3.13で確認しています。CIのモデル応答は模擬です。証拠追加時点の成功記録は [Actions 36801164455](https://github.com/iseyan/M-Anchor-App/actions/runs/36801164455) です。CI成功は実装検査であり、独立したセキュリティ監査ではありません。
 
@@ -69,5 +71,5 @@ V1の対象は設定済みのローカル案件ストアです。あらゆる誤
 - 実装・証拠の基準：[コミット1ecdbb0](https://github.com/iseyan/M-Anchor-App/tree/1ecdbb0dcab41fe0f6ac10951b21f0f20eb46530)。今回の準備では資料と引用情報を追加し、アプリコードは変更しません。配布ZIPの作成元は `build-info.json` で識別します。
 - [A：20件の原出力](../observations/records/m-anchor-app-record-2026-10-01T01-01-50-675Z.json)：55,654 bytes、SHA256 `098377b4761f2d118e5fdb46ebd1e7550bfa15a13493c1aa706f11b13e1692d8`。
 - [B：1件の原出力](../observations/records/m-anchor-app-record-2026-10-01T01-22-01-406Z.json)：6,061 bytes、SHA256 `c3f0f0adbe7f8374c4587a47121a3ee271636f26177c87b7b10c34587a3fd3b6`。
-- [利用者側の観察と解釈](../observations/2026-10-01-user-check-v1.md)、[V1検証](../validation-v1.md)、[Gate実装](../../app/gate.py)、[モデル向け指示](../../app/model_bridge.py)。
+- [利用者側の観察と解釈](../observations/2026-10-01-user-check-v1.ja.md)、[V1検証](../validation-v1.ja.md)、[Gate実装](../../app/gate.py)、[モデル向け指示](../../app/model_bridge.py)。
 - 関連する [M-Anchor Framework](https://github.com/iseyan/m-anchor-framework) のDOI `10.5281/zenodo.22918471` は別のフレームワーク評価版を指します。アプリのDOIとして転用しません。

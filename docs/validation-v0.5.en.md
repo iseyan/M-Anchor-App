@@ -1,6 +1,6 @@
 # v0.5 validation record
 
-[English](validation-v0.5.en.md) | [日本語](validation-v0.5.ja.md)
+[日本語](validation-v0.5.ja.md)
 
 Work date: October 1, 2026 (Japan time). This app-development record covers verification and packaging automation, separately from formal research evaluations.
 

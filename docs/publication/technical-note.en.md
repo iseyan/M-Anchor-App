@@ -1,5 +1,7 @@
 # M-Anchor App V1
 
+[日本語](technical-note.ja.md)
+
 ## A Deterministic Gate for Containing Prompt-Induced Unauthorized Record Updates
 
 Ise (iseyan) · Software demonstration note · October 1, 2026 · App 1.0.0

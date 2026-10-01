@@ -1,6 +1,6 @@
 # Development automation and future AWS operation
 
-[English](automation-plan.en.md) | [日本語](automation-plan.ja.md)
+[日本語](automation-plan.ja.md)
 
 Recorded October 1, 2026 (Japan time). Development automation was implemented in v0.5. AWS operation remains a design proposal; no AWS resources have been created for this app.
 

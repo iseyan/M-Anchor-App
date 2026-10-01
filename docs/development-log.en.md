@@ -1,5 +1,11 @@
 # Development log
 
+[日本語](development-log.ja.md)
+
+## October 1: separate documentation by language
+
+At the owner’s request, split the README, changelog, V1 guides, validation, observation commentary, and publication instructions into English and Japanese editions. Add English translations of six dated Japanese records, and separate the briefing PDF by language. Original JSON, test logs, application code, bilingual UI, model input templates, LICENSE, NOTICE, and citation metadata retain their bytes. Documentation links follow the selected language; historical translations identify their sources and do not add observations. App version remains 1.0.0; the new source commit and ZIP hash identify this documentation revision. Earlier descriptions of bilingual documents below refer to the layout at the time.
+
 ## October 1, 12:01 Japan time: Apache-2.0 selected
 
 The owner authorized third-party commercial use, modification, and redistribution. Added the standard Apache License 2.0 and an attribution NOTICE covering this app distribution, including its project documentation, observation records, and the included copy of the minimal core. Updated citation metadata, publication text, and distribution instructions. Linked external projects are not relicensed. App code, the core hash, and original evidence bytes remain unchanged; app version stays 1.0.0. Earlier license-pending entries below describe the state before this decision. Zenodo publication and an app DOI remain outstanding.
@@ -8,15 +14,13 @@ The owner authorized third-party commercial use, modification, and redistributio
 
 Prepared English-first publication materials describing the app as a deterministic gate for containing prompt-induced unauthorized record updates. Added a technical note in both languages, six-scenario reproduction instructions, a record-to-claim table, copy-ready Zenodo description, upload guidance, and `CITATION.cff` using the existing Ise/iseyan author spelling. Four fixed attack types and three model-route observations remain explicitly distinct. The app, gate, model instructions, and original evidence bytes are unchanged. The app is still 1.0.0; source commit and package hash distinguish this documentation snapshot. No Zenodo record, DOI, license grant, or release tag was created. Owner selection of distribution terms remains before final publication.
 
-[English](development-log.en.md) | [日本語](development-log.ja.md)
-
 This log explains the app's purpose, decisions, changes, and observations for third-party readers. It is separate from the existing formal research evaluation. Dates below follow Japan time where specified in the original records.
 
 ## September 30, 2026: a small distribution
 
 The scope was narrowed to one dedicated Python client and one protected operation: updating a case record. The model proposes; the external gate and store decide whether to commit. No UI approval bypasses the rules.
 
-The original name was Anchor Control. After basic checks, the project became M-Anchor App in `iseyan/M-Anchor-App`. The original Japanese [planning memo](../plans/m-anchor-app-plan-2026-09-30.ja.md) remains a dated record; the [evidence guide](evidence-guide.md) explains it in both languages.
+The original name was Anchor Control. After basic checks, the project became M-Anchor App in `iseyan/M-Anchor-App`. The [planning memo](../plans/m-anchor-app-plan-2026-09-30.en.md), translated from the Japanese original, remains a dated record; the [evidence guide](evidence-guide.md) links the original and its English translation.
 
 ## v0.1 and v0.2: observations
 
@@ -35,7 +39,7 @@ Observed usability problems included finding keys, connection failures before se
 
 The launcher waits for server readiness and connects through a one-use ticket. Cases start unselected; the run button names the target. The UI displays before/after state and separates Saved, Rejected, and No change. Fresh demos use separate data, and JSON exports/documentation support external explanations.
 
-Gate, formal core, model bridge, and client bytes remained unchanged from v0.2. One of 25 development tests initially failed because the export transaction conflicted with the gate transaction. Export was corrected to read a consistent in-memory SQLite backup without changing the gate; all 25 passed. UI logic also passed using a DOM substitute and real HTTP, not browser rendering. See the original [v0.3 validation](validation-v0.3.ja.md).
+Gate, formal core, model bridge, and client bytes remained unchanged from v0.2. One of 25 development tests initially failed because the export transaction conflicted with the gate transaction. Export was corrected to read a consistent in-memory SQLite backup without changing the gate; all 25 passed. UI logic also passed using a DOM substitute and real HTTP, not browser rendering. See the original [v0.3 validation](validation-v0.3.en.md).
 
 ## October 1: v0.3 user records
 
@@ -51,7 +55,7 @@ Routes are derived from server processing, not caller claims. One-use internal t
 
 Old history is preserved without inventing missing dates/model IDs. History IDs distinguish repeated identical proposals. The UI shows 100 entries; exports include all. Details reopen past proposals, states, decisions, and available model metadata.
 
-All 34 application tests and UI logic passed locally. Tests covered restart, migration, rollback on SQL failure, and 103-entry exports. Models were mocked; no paid API was used. See the original [v0.4 validation](validation-v0.4.ja.md).
+All 34 application tests and UI logic passed locally. Tests covered restart, migration, rollback on SQL failure, and 103-entry exports. Models were mocked; no paid API was used. See the original [v0.4 validation](validation-v0.4.en.md).
 
 ## v0.4: received demo exports
 

@@ -1,6 +1,6 @@
 # Integration and protection boundary
 
-[English](integration.en.md) | [日本語](integration.ja.md)
+[日本語](integration.ja.md)
 
 ## Dedicated Python client
 
@@ -43,10 +43,10 @@ HTTP 200 means a check result was received. Read `decision` to determine what ha
 
 | decision | UI | Meaning |
 | --- | --- | --- |
-| commit | Saved / 保存 | Update committed |
-| reject | Rejected / 拒否 | Proposal rejected under the rules |
-| no_commit | No change / 変更なし | Stored state unchanged |
-| undetermined | Undetermined / 結果未確定 | Outcome not confirmed; refresh state and history |
+| commit | Saved | Update committed |
+| reject | Rejected | Proposal rejected under the rules |
+| no_commit | No change | Stored state unchanged |
+| undetermined | Undetermined | Outcome not confirmed; refresh state and history |
 
 ## Automatic connection at launch
 
