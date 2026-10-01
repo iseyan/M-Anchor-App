@@ -18,9 +18,9 @@ d679ebe1c3038f4d2e8f61611b7707787999e38480e610ec2d9220bd8c8839b1  app/ui.html
 7c22f6215928bb9a5469cdbf64c48446bc9b6b9c5ffe49b5e312c062bd81e538  docs/automation-plan.ja.md
 e276675270eb692484f85d7da96466dac29d36b62ec87a4ecfdc5e702583bd13  docs/demo-guide.en.md
 e0afb7de2a2aaad328ea90fc82991be5142f273cd4a460daa5565070fea85c61  docs/demo-guide.ja.md
-285b500a07b7f5ff935ebbfc42ee1c9f92bb409631922c61a84dfd167569acdd  docs/development-log.en.md
-2780dec6476fb62571350b330e009526b03666eb82c9b769bc1abb4068bc0f20  docs/development-log.ja.md
-676e4a02249da59240988e9c3363ef8e3fb3271a4bd6199aaa159ae39438f8d2  docs/evidence-guide.md
+a8ccf5949048bb6e64f1cdbc28c0556fac07f8dfa9271fbd20a56714ac1eded5  docs/development-log.en.md
+75e264a8b18d69af2a2786907295cdb57ebe7caace03a4b5c85f6a86ed7f3a1c  docs/development-log.ja.md
+7ec6030c34fdd40a378f3e486a626e5db58acf4025cc3dc3618622540800db43  docs/evidence-guide.md
 c02bd8991633331c28769834c7ee77280e56b03a02e57b7834c3ae285b17b204  docs/integration.en.md
 9da1ae6c4d66b1bd5ccb647bacd296242cba3b33cf9bed829e04cb904ba86f22  docs/integration.ja.md
 d26018e565067992c567e08d10cca9d6b455d4243102d2e58bcd3778d6eb544a  docs/observations/2026-10-01-ci-v0.5.1.json
@@ -32,6 +32,7 @@ ca556dbbd7b8ad6b9f1c5402a5232b4501be5c434c30b758caeb908f93e0adbb  docs/observati
 fe75494a5b90cd4d9b06c3439f3b176da30af8aa3eb97a074c7796291ac09648  docs/observations/2026-10-01-export-receipt-v0.4.ja.md
 8071b7ab2f0bd57e88059ad3062aa231909f43f71fc99236491f4ef381ad988e  docs/observations/2026-10-01-repeat-demo-check-v0.4.json
 1240390837a51b9403aaeca6425a0e9c48cab4292684570e74cfa0dda2903163  docs/observations/2026-10-01-user-check-v0.3.ja.md
+f95048f1c2d1efcb5561ada1346f8bc7977c224cfabacfd4330b83a7d5918e06  docs/observations/2026-10-01-user-check-v1.md
 b72d1c68d1b15efeb1ad133a4f4bb679652d57a6e72eb1e45e25cf2b1c22b1fb  docs/observations/ci-v0.5-local/app-tests.log
 c7dde674d5ddb28924e2dc7cfbd028cb3826b2a1631a1a2799a83dfe22cbe269  docs/observations/ci-v0.5-local/ci-report.json
 f7c36bc7583c1d671d8d6abe6bbb675f4b76e34337b6ac7d55cfd41dcc131ea0  docs/observations/ci-v0.5-local/initial-checksum-failure.log
@@ -48,6 +49,7 @@ ed03df1a33a6a7c08938a9c531bb1a05c78bbcee3d4f90630cb0578706b5c1aa  docs/observati
 c9e660b47877436077f134fbf6fe38a61d49e82630854a12da309686ebd26ab8  docs/observations/records/m-anchor-app-record-2026-09-30T15-21-20-696Z.json
 6da483dcd78aca642ccec25418f6bde5695016a7e0cd59a40b8b64706cd54917  docs/observations/records/m-anchor-app-record-2026-09-30T15-54-38-638Z.json
 cf47d468693c56b6eaf747b7bb93e0cb92dcdab9546e88e26bfab96fceaf14a5  docs/observations/records/m-anchor-app-record-2026-09-30T16-07-47-577Z.json
+098377b4761f2d118e5fdb46ebd1e7550bfa15a13493c1aa706f11b13e1692d8  docs/observations/records/m-anchor-app-record-2026-10-01T01-01-50-675Z.json
 657838c9c39adf4c52ce6ff8a9d8bed10a42f36062d2449341b80a29da153f14  docs/overview.en.md
 5d954fd8ae3d1a4c0e73122561926cf1cd17d88f9eb98e423de3a563c84f5403  docs/overview.ja.md
 128cadc0543b515f63a701a5b00bf66b82b062002eed88d9464fea79eb289d0b  docs/v1-guide.md
@@ -60,7 +62,7 @@ b9a126524d29972766896a7174704679e73a546a70b37a1d14e4c60b5e21638a  docs/validatio
 de7b72f5bd314fdbf1f56e03f6f78abdd501239ca960289460d405bbfc8f7a87  docs/validation-v0.5.1.md
 c99d8e34543bc7d712e13f76981f78b138f9487334213d7ad9bdc455438039dc  docs/validation-v0.5.en.md
 9e1426090041fd11794893d773f9f2e908dbccf52df75bb9ef19a08cd8a7f1b4  docs/validation-v0.5.ja.md
-c5c42a4c10d70e968430aebdec229c40654dde6f3e78fb753637670cc2fe80d0  docs/validation-v1.md
+637172bdd8e971376c5371a080006610bbff639337679b9e5b3a487888505fb4  docs/validation-v1.md
 b4457fe00f31ac02289dcfa497e0af351f8867edef39718700042aaa6b3e5dbc  plans/m-anchor-app-plan-2026-09-30.ja.md
 7a5ad1bf4af4467345931f9294ead86b4dbf62e95dd9a20d372b618fd6c52726  scripts/build_release.py
 7a7a91c28afa649405717bd9c2d21c159e96ee9fddf06c8138bcaac624a2ee9a  scripts/check_ui.cjs

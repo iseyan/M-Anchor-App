@@ -77,10 +77,17 @@ V1 passed Linux/Python 3.10 and 3.13, Windows/Python 3.13, and packaging in [Act
 
 ## Remaining work
 
-- Verify the current bilingual layout on the user's Windows browser and distinguish normal restart from a fresh demo.
+- Simplify the two fixed-execution controls; guided user operation exposed repeated legacy-demo runs when a scenario run was intended.
+- Observe one model-generated supported update from a fresh Version 1 case. Keep normal restart and fresh-demo observations separate.
 - Check CI and packaging results for each new change.
 - Specify one business record, its evidence authority, and valid/invalid update examples.
 - Decide licensing and executable distribution.
 - Select cloud operation only after defining the integration and run frequency.
 
 Future entries should state what changed, why, the verification environment and method, and remaining uncertainty.
+
+## October 1: V1 user export through 10:01 Japan time
+
+Received 20 cumulative records: 14 legacy fixed-demo runs, four fixed scenarios, and two model API runs. The fixed runs cover unsupported candidate removal, forged evidence admission, authority escalation, reference-hash tampering, unchanged state, and a valid evidence-based update. Source bytes and an English-first bilingual [observation](observations/2026-10-01-user-check-v1.md) are retained.
+
+The model preserved HOLD's unresolved candidates in #19. UPDATE was already Version 2 before model run #20, so no change was appropriate. Neither is a gate rejection of an invalid model output or a new model-generated commit. The latter positive-control observation remains pending; only one fresh UPDATE run is needed. All 20 raw-proposal/state hashes, recorded readbacks and history continuity matched. Both model input hashes matched. No application code or research-stage status was changed.

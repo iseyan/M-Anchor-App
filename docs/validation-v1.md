@@ -57,7 +57,13 @@ ZIPは配布ジョブ内でアップロード前に照合しています。確�
 
 [Actions runs / 実行一覧](https://github.com/iseyan/M-Anchor-App/actions/workflows/verify-package.yml)
 
-## What these results do not establish / 確認範囲の限界
+## User observation received later / 後から受領した利用者側の観察
+
+The [October 1 user observation](observations/2026-10-01-user-check-v1.md) retains a cumulative 20-entry export: 18 fixed proposals and two model-route no-change results. Exact input/proposal correspondence, state hashes, history continuity, and readbacks matched. The HOLD model output preserved uncertainty; UPDATE was already Version 2. A model-generated Version 1→2 commit is still unobserved in that export. These user observations are separate from the mocked automated checks above.
+
+[10月1日の利用者側観察](observations/2026-10-01-user-check-v1.md)に、固定18件・モデル経由の変更なし2件を含む累積20件の出力を保持した。入力・提案・状態ハッシュ・履歴のつながり・再読込が一致した。HOLDではモデル出力が未決を保持し、UPDATEは実行前からVersion 2だった。この出力ではモデル生成案によるVersion 1→2の保存は未確認である。利用者側の観察と、上記の模擬モデルによる自動検査を区別する。
+
+## What these automated results do not establish / 自動検査の確認範囲の限界
 
 Fixed proposals test the gate even when the proposed update is invalid; they do not test model resistance. Mocked model calls test application integration, not live-model robustness. No attack detection rate, universal jailbreak protection, external-tool control, or indirect-injection integration is claimed. Full browser rendering and operation of V1 on the user's device remain unverified by these automated checks.
 
