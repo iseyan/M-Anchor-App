@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use M-Anchor App, cite this software and identify the source commit or archived version. The app has no Zenodo DOI yet."
+type: software
+title: "M-Anchor App V1: A Deterministic Gate for Containing Prompt-Induced Unauthorized Record Updates"
+authors:
+  - family-names: Ise
+    alias: iseyan
+    website: "https://github.com/iseyan"
+version: "1.0.0"
+date-released: "2026-10-01"
+repository-code: "https://github.com/iseyan/M-Anchor-App"
+url: "https://github.com/iseyan/M-Anchor-App"
+abstract: >-
+  M-Anchor App is a local Python application that separates model-generated
+  proposals from authoritative case-record updates. A deterministic gate checks
+  state references, externally admitted evidence, candidate transitions, and
+  authority requests before committing an update. The V1 demonstration includes
+  four fixed attack types, two controls, and user-supplied records of three model
+  runs. Protection is bounded to the configured case store; the application does
+  not prevent all prompt attacks or establish the truth of model output.
+keywords:
+  - prompt injection
+  - prompt attacks
+  - deterministic gate
+  - record integrity
+  - AI agents
+  - evidence admission
+  - candidate preservation
+  - M-Anchor

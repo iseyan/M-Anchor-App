@@ -7,6 +7,16 @@ Protect case records from unauthorized AI updates. M-Anchor App V1 lets you try 
 **Model proposes; deterministic layer commits.**  
 **モデルは提案し、決定論的な層が保存を確定する。**
 
+## Publication materials / 発表用資料
+
+**M-Anchor App V1: A Deterministic Gate for Containing Prompt-Induced Unauthorized Record Updates**
+
+**プロンプト攻撃による不正な記録更新を無効化する決定論的ゲート**
+
+The [publication package](docs/publication/README.md) includes a technical note, reproduction steps, evidence mapping, Zenodo description, and upload instructions. Here, neutralization means blocking an unauthorized record transition at the gate. It does not mean preventing every incorrect model output. The app has no assigned Zenodo DOI in this preparation; licensing remains to be selected.
+
+[発表用パッケージ](docs/publication/README.md)に技術説明・再現手順・証拠の対応・Zenodo掲載文・登録手順をまとめました。「無効化」はGateで不正な記録遷移を成立させない範囲を指し、あらゆるモデルの誤出力を防ぐ意味ではありません。今回の準備ではアプリのZenodo DOIは未発行で、ライセンスの選択が残っています。
+
 ## Current version / 現在の版
 
 **V1 / 1.0.0 — Record protection against prompt attacks.** Four attack scenarios and two controls can run as fixed proposals without an API, or as editable inputs through the existing model connection. The screen separates input, proposal, gate decision, and the read-back record. Model inputs are now saved with each submitted proposal. English remains primary, with Japanese alongside it.

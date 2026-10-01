@@ -1,5 +1,9 @@
 # Development log
 
+## October 1: publication preparation for Zenodo
+
+Prepared English-first publication materials describing the app as a deterministic gate for containing prompt-induced unauthorized record updates. Added a technical note in both languages, six-scenario reproduction instructions, a record-to-claim table, copy-ready Zenodo description, upload guidance, and `CITATION.cff` using the existing Ise/iseyan author spelling. Four fixed attack types and three model-route observations remain explicitly distinct. The app, gate, model instructions, and original evidence bytes are unchanged. The app is still 1.0.0; source commit and package hash distinguish this documentation snapshot. No Zenodo record, DOI, license grant, or release tag was created. Owner selection of distribution terms remains before final publication.
+
 [English](development-log.en.md) | [日本語](development-log.ja.md)
 
 This log explains the app's purpose, decisions, changes, and observations for third-party readers. It is separate from the existing formal research evaluation. Dates below follow Japan time where specified in the original records.
