@@ -1,0 +1,12 @@
+M-Anchor App
+Copyright 2026 Ise (iseyan)
+
+Licensed under the Apache License, Version 2.0.
+https://github.com/iseyan/M-Anchor-App
+
+This distribution includes the M-Anchor minimal Python v0.1 core at
+app/vendor/python_v0.1/m_anchor_minimal.py, by Ise (iseyan).
+Related project: https://github.com/iseyan/m-anchor-framework
+The core bytes are retained unchanged in this distribution.
+
+This notice supplies attribution information and does not modify the License.

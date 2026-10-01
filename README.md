@@ -13,9 +13,9 @@ Protect case records from unauthorized AI updates. M-Anchor App V1 lets you try 
 
 **プロンプト攻撃による不正な記録更新を無効化する決定論的ゲート**
 
-The [publication package](docs/publication/README.md) includes a technical note, reproduction steps, evidence mapping, Zenodo description, and upload instructions. Here, neutralization means blocking an unauthorized record transition at the gate. It does not mean preventing every incorrect model output. The app has no assigned Zenodo DOI in this preparation; licensing remains to be selected.
+The [publication package](docs/publication/README.md) includes a technical note, reproduction steps, evidence mapping, Zenodo description, and upload instructions. Here, neutralization means blocking an unauthorized record transition at the gate. It does not mean preventing every incorrect model output. The app and included project materials are distributed under Apache-2.0. A Zenodo DOI for the app has not yet been assigned.
 
-[発表用パッケージ](docs/publication/README.md)に技術説明・再現手順・証拠の対応・Zenodo掲載文・登録手順をまとめました。「無効化」はGateで不正な記録遷移を成立させない範囲を指し、あらゆるモデルの誤出力を防ぐ意味ではありません。今回の準備ではアプリのZenodo DOIは未発行で、ライセンスの選択が残っています。
+[発表用パッケージ](docs/publication/README.md)に技術説明・再現手順・証拠の対応・Zenodo掲載文・登録手順をまとめました。「無効化」はGateで不正な記録遷移を成立させない範囲を指し、あらゆるモデルの誤出力を防ぐ意味ではありません。アプリと同梱のプロジェクト資料はApache-2.0で配布します。アプリのZenodo DOIは未発行です。
 
 ## Current version / 現在の版
 
@@ -119,8 +119,18 @@ The UI logic check needs Node.js. CI and packaging record their results and chec
 3. Extract it to find the app ZIP, its SHA256, and `build-info.json`. / 展開するとアプリのZIP・SHA256・作成記録が入っています。
 4. Extract the app ZIP and open `start.cmd`. / アプリのZIPをもう一度展開し、`start.cmd` を開きます。
 
-Logs are in `verification-<OS>-py<version>`. Artifacts are configured for 14-day retention; GitHub sign-in may be required. Executable packaging and distribution licensing remain future work. This version adds no LICENSE file.
+Logs are in `verification-<OS>-py<version>`. Artifacts are configured for 14-day retention; GitHub sign-in may be required. Executable packaging remains future work. Distribution terms are given below.
 
-ログは `verification-<OS>-py<version>` にあります。Artifactsの保持期間は14日で、取得にGitHubログインが必要な場合があります。実行ファイル化と配布ライセンスの確定は今後の作業です。この版でLICENSEは追加していません。
+ログは `verification-<OS>-py<version>` にあります。Artifactsの保持期間は14日で、取得にGitHubログインが必要な場合があります。実行ファイル化は今後の作業です。配布条件は下記に示します。
+
+## License / ライセンス
+
+Copyright 2026 Ise (iseyan). This distribution, including its source code, project documentation, and included observation records, is licensed under the [Apache License 2.0](LICENSE), except where otherwise stated. Commercial use, modification, and redistribution are permitted under its terms. See [NOTICE](NOTICE) for attribution. The separate linked M-Anchor Framework repository and external materials are not relicensed by this declaration.
+
+Copyright 2026 Ise (iseyan)。この配布物のソースコード・プロジェクト資料・同梱観察記録は、別途の明記がない限り[Apache License 2.0](LICENSE)で許諾します。その条件の下で商用利用・改変・再配布が可能です。帰属情報は[NOTICE](NOTICE)を参照してください。リンク先の別リポジトリM-Anchor Frameworkや外部資料の条件は、この宣言で変更しません。
+
+Redistribution must meet the license's notice and change-marking conditions. The software is provided without warranties as specified in the license; this is not an additional usage restriction. Trademark rights are not granted except as the license provides.
+
+再配布ではライセンス所定の表示保持・変更表示などの条件に従ってください。保証の取扱いはライセンス本文に従い、追加の利用制限は設けません。商標権の許諾は同ライセンスが定める範囲に限ります。
 
 Related project / 関連プロジェクト: [M-Anchor Framework](https://github.com/iseyan/m-anchor-framework)

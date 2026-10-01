@@ -1,5 +1,9 @@
 # Development log
 
+## October 1, 12:01 Japan time: Apache-2.0 selected
+
+The owner authorized third-party commercial use, modification, and redistribution. Added the standard Apache License 2.0 and an attribution NOTICE covering this app distribution, including its project documentation, observation records, and the included copy of the minimal core. Updated citation metadata, publication text, and distribution instructions. Linked external projects are not relicensed. App code, the core hash, and original evidence bytes remain unchanged; app version stays 1.0.0. Earlier license-pending entries below describe the state before this decision. Zenodo publication and an app DOI remain outstanding.
+
 ## October 1: publication preparation for Zenodo
 
 Prepared English-first publication materials describing the app as a deterministic gate for containing prompt-induced unauthorized record updates. Added a technical note in both languages, six-scenario reproduction instructions, a record-to-claim table, copy-ready Zenodo description, upload guidance, and `CITATION.cff` using the existing Ise/iseyan author spelling. Four fixed attack types and three model-route observations remain explicitly distinct. The app, gate, model instructions, and original evidence bytes are unchanged. The app is still 1.0.0; source commit and package hash distinguish this documentation snapshot. No Zenodo record, DOI, license grant, or release tag was created. Owner selection of distribution terms remains before final publication.
@@ -84,7 +88,7 @@ V1 passed Linux/Python 3.10 and 3.13, Windows/Python 3.13, and packaging in [Act
 - Simplify the two fixed-execution controls; guided user operation exposed repeated legacy-demo runs when a scenario run was intended.
 - Check CI and packaging results for each new change.
 - Specify one business record, its evidence authority, and valid/invalid update examples.
-- Decide licensing and executable distribution.
+- Consider executable distribution; Apache-2.0 licensing was selected on October 1.
 - Select cloud operation only after defining the integration and run frequency.
 
 Future entries should state what changed, why, the verification environment and method, and remaining uncertainty.

@@ -4,9 +4,9 @@
 
 **M-Anchor App V1：プロンプト攻撃による不正な記録更新を無効化する決定論的ゲート**
 
-Prepared on October 1, 2026. App version: **1.0.0**. This is a software demonstration with inspectable observations. A Zenodo record has not been published and no app DOI has been assigned in this preparation task. Distribution licensing remains to be selected by the owner.
+Prepared on October 1, 2026. App version: **1.0.0**. This is a software demonstration with inspectable observations. A Zenodo record has not been published and no app DOI has been assigned in this preparation task. The owner has selected **Apache-2.0** for this distribution, including its project documentation and observations. See [LICENSE](../../LICENSE) and [NOTICE](../../NOTICE).
 
-2026年10月1日作成。アプリ版は **1.0.0**。検査記録を確認できるソフトウェア実演として発表するための資料です。今回の準備ではZenodoへの公開とアプリのDOI発行は行っていません。配布ライセンスは所有者による選択が残っています。
+2026年10月1日作成。アプリ版は **1.0.0**。検査記録を確認できるソフトウェア実演として発表するための資料です。今回の準備ではZenodoへの公開とアプリのDOI発行は行っていません。所有者の選択により、同梱資料・観察記録を含むこの配布物を **Apache-2.0** で許諾します。[LICENSE](../../LICENSE)と[NOTICE](../../NOTICE)を参照してください。
 
 ## The claim / 発表する主張
 
@@ -21,7 +21,7 @@ The app demonstrates a gate that rejects proposals violating configured evidence
 | [Technical note - English](technical-note.en.md) / [技術説明 - 日本語](technical-note.ja.md) | Mechanism, observed results, and limits / 機構・観察結果・限界 |
 | [Reproduction guide / 再現手順](reproduce.md) | Six fixed scenarios, result interpretation, optional model run / 固定6例・判定の読み方・任意のモデル実行 |
 | [Zenodo description / 掲載文](zenodo-description.md) | English-first description ready to copy / 英語主・日本語併記の転記用文章 |
-| [Upload guide / 登録手順](zenodo-upload-guide.md) | Metadata, files, license decision, DOI handling / 登録情報・ファイル・ライセンス選択・DOI |
+| [Upload guide / 登録手順](zenodo-upload-guide.md) | Metadata, files, Apache-2.0, DOI handling / 登録情報・ファイル・Apache-2.0・DOI |
 | [Citation information / 引用情報](../../CITATION.cff) | Existing author spelling, software version, repository / 既存の著者表記・ソフトウェア版・リポジトリ |
 | [Original observations / 原観察記録](../observations/2026-10-01-user-check-v1.md) | Exact exports, routes, hashes, and record IDs / 原JSON・経路・ハッシュ・履歴番号 |
 

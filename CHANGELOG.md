@@ -1,5 +1,12 @@
 # Changelog / 変更履歴
 
+## V1 licensing and publication update — 2026-10-01 (Japan time / 日本時間)
+
+- License this distribution under Apache-2.0, permitting commercial use, modification, and redistribution under its terms. Add LICENSE and NOTICE; align citation and publication materials.  
+  この配布物をApache-2.0とし、その条件の下で商用利用・改変・再配布を許可。LICENSE・NOTICEを追加し、引用情報・発表資料を統一。
+- Keep application code and original observations unchanged. App version remains 1.0.0; source commit and archive hash identify the licensed distribution.  
+  アプリコードと原観察記録は変更せず、アプリ版は1.0.0を維持。許諾済み配布物はソースコミットとZIPハッシュで識別。
+
 ## V1 / 1.0.0 — 2026-10-01 (Japan time / 日本時間)
 
 - Add four synthetic attack scenarios and two valid controls, with fixed-proposal and model-input execution paths.  

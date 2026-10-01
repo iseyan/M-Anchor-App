@@ -4,7 +4,7 @@
 
 Ise (iseyan) · Software demonstration note · October 1, 2026 · App 1.0.0
 
-Publication preparation. No app DOI has been assigned here. Distribution licensing is not yet selected. The author spelling follows the related framework's existing citation metadata; no affiliation or ORCID is asserted.
+Publication preparation. No app DOI has been assigned here. Copyright 2026 Ise (iseyan). The app and this note are licensed under [Apache-2.0](../../LICENSE); commercial use, modification, and redistribution are permitted under its terms. See [NOTICE](../../NOTICE).
 
 ### Abstract
 
