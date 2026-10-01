@@ -13,6 +13,7 @@ This English-first index explains earlier Japanese planning and observation reco
 | [v0.4 local validation](validation-v0.4.ja.md) | 34 tests: restart, migration, rollback, full export beyond 100 entries; UI logic. / 再起動・移行・ロールバック・100件超出力を含む34件とUI確認。 | Mocked models; not a paid API run. / モデル応答は模擬。 |
 | [v0.4 export receipt and repeat demo](observations/2026-10-01-export-receipt-v0.4.ja.md) | Fixed Rejected → Saved → No change runs, proposal/hash correspondence, readbacks, and reproduction in separate data. / 固定案三判定、原文・ハッシュ・再読込と別データでの再実演。 | Separate data is not proof of restarting the same store; no model API was used. / 別データは同一ストアの再起動の証拠ではなく、実モデルは使用していない。 |
 | [V1 user observation](observations/2026-10-01-user-check-v1.md) | 18 fixed runs and two model-route no-change results; exact input/proposal linkage, hashes and readbacks matched. / 固定18件・モデル経由の変更なし2件、入力・提案・ハッシュ・再読込の対応を確認。 | The model kept HOLD unresolved; UPDATE was already Version 2. A new model-generated commit remains unobserved in this export. / モデルがHOLDの未決を保持し、UPDATEは更新済み。モデル生成案による新規保存は未確認。 |
+| [V1 model commit follow-up](observations/2026-10-01-user-check-v1.md) | A separate model-route entry saved UPDATE from Version 1 to 2, using admitted e_B, with matched readback. / 別出力のモデル経由1件で、認可済みe_BによるVersion 1→2の保存と再読込一致を確認。 | Both exports say `data`; directory identity and launch/reset method are not established. / 両出力の表示はdataであり、ディレクトリの同一性や起動・初期化方法は未確認。 |
 
 Raw exports / 元JSON：
 
@@ -20,5 +21,6 @@ Raw exports / 元JSON：
 - [v0.4 export](observations/records/m-anchor-app-record-2026-09-30T15-54-38-638Z.json) — SHA256 `6da483dcd78aca642ccec25418f6bde5695016a7e0cd59a40b8b64706cd54917`
 - [v0.4 fresh-demo export](observations/records/m-anchor-app-record-2026-09-30T16-07-47-577Z.json) — SHA256 `cf47d468693c56b6eaf747b7bb93e0cb92dcdab9546e88e26bfab96fceaf14a5`
 - [V1 cumulative export, 20 entries / V1累積出力20件](observations/records/m-anchor-app-record-2026-10-01T01-01-50-675Z.json) — SHA256 `098377b4761f2d118e5fdb46ebd1e7550bfa15a13493c1aa706f11b13e1692d8`
+- [V1 model commit export, one entry / V1モデル保存出力1件](observations/records/m-anchor-app-record-2026-10-01T01-22-01-406Z.json) — SHA256 `c3f0f0adbe7f8374c4587a47121a3ee271636f26177c87b7b10c34587a3fd3b6`
 
 Receipt times may be expressed in Japan time; JSON timestamps use UTC. App observations do not replace formal research evaluation. / 受領記録には日本時間、JSONにはUTCを使います。アプリの観察は正式な研究評価を代替しません。

@@ -63,6 +63,10 @@ The [October 1 user observation](observations/2026-10-01-user-check-v1.md) retai
 
 [10月1日の利用者側観察](observations/2026-10-01-user-check-v1.md)に、固定18件・モデル経由の変更なし2件を含む累積20件の出力を保持した。入力・提案・状態ハッシュ・履歴のつながり・再読込が一致した。HOLDではモデル出力が未決を保持し、UPDATEは実行前からVersion 2だった。この出力ではモデル生成案によるVersion 1→2の保存は未確認である。利用者側の観察と、上記の模擬モデルによる自動検査を区別する。
 
+A separate export at 10:22 Japan time subsequently records the missing positive control: model route, admitted e_B, `commit / accepted`, Version 1→2, and matched readback. The observation now retains both original exports and the matched input, proposal and state checks. The planned basic fixed/model checks are complete for these supplied examples; this is not a general robustness claim or a research-stage completion.
+
+その後、日本時間10時22分の別出力で、残っていた正当更新の対照を確認した。モデル経由で認可済みe_Bを使い、`commit / accepted`、Version 1→2、再読込一致を記録する。観察メモに両方の原出力と、入力・提案・状態の照合結果を保持した。今回用意した例について、予定した固定提案・モデル経由の基本確認は完了した。一般的な堅牢性や研究工程の完了を主張するものではない。
+
 ## What these automated results do not establish / 自動検査の確認範囲の限界
 
 Fixed proposals test the gate even when the proposed update is invalid; they do not test model resistance. Mocked model calls test application integration, not live-model robustness. No attack detection rate, universal jailbreak protection, external-tool control, or indirect-injection integration is claimed. Full browser rendering and operation of V1 on the user's device remain unverified by these automated checks.

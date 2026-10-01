@@ -78,7 +78,6 @@ V1 passed Linux/Python 3.10 and 3.13, Windows/Python 3.13, and packaging in [Act
 ## Remaining work
 
 - Simplify the two fixed-execution controls; guided user operation exposed repeated legacy-demo runs when a scenario run was intended.
-- Observe one model-generated supported update from a fresh Version 1 case. Keep normal restart and fresh-demo observations separate.
 - Check CI and packaging results for each new change.
 - Specify one business record, its evidence authority, and valid/invalid update examples.
 - Decide licensing and executable distribution.
@@ -91,3 +90,7 @@ Future entries should state what changed, why, the verification environment and 
 Received 20 cumulative records: 14 legacy fixed-demo runs, four fixed scenarios, and two model API runs. The fixed runs cover unsupported candidate removal, forged evidence admission, authority escalation, reference-hash tampering, unchanged state, and a valid evidence-based update. Source bytes and an English-first bilingual [observation](observations/2026-10-01-user-check-v1.md) are retained.
 
 The model preserved HOLD's unresolved candidates in #19. UPDATE was already Version 2 before model run #20, so no change was appropriate. Neither is a gate rejection of an invalid model output or a new model-generated commit. The latter positive-control observation remains pending; only one fresh UPDATE run is needed. All 20 raw-proposal/state hashes, recorded readbacks and history continuity matched. Both model input hashes matched. No application code or research-stage status was changed.
+
+## October 1: positive control received at 10:22 Japan time
+
+A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing the admitted e_B update, which the gate saved as h_B / resolved / Version 2 from Version 1. Input and proposal hashes, before/after states, exported records, and matched readback agree. This completes the positive-control observation left pending above and the planned basic checks for these examples. Both original exports are linked in the [observation](observations/2026-10-01-user-check-v1.md). Their common `data` label does not establish folder identity or how the Version 1 state was initialized. App code is unchanged; no new API call was made during review.
