@@ -91,6 +91,21 @@ class AppTest(unittest.TestCase):
         with Store(self.data / 'state.sqlite3') as store:
             self.assertEqual(store.connection.execute('SELECT raw FROM audit').fetchone()[0],raw)
 
+    def test_raw_null_proposal_rejected_without_changing_authority(self):
+        before = self.admin('/admin/cases')
+        raw = b'null'
+        decision = self.client.propose('DEMO-HOLD', raw)
+        self.assertEqual(decision['decision'], 'reject')
+        self.assertEqual(decision['reason'], 'invalid_proposal')
+        self.assertEqual(decision['detail'], 'Expected an object')
+        self.assertFalse(decision['state_changed'])
+        self.assertEqual(self.admin('/admin/cases'), before)
+        with Store(self.data / 'state.sqlite3') as reopened:
+            self.assertEqual(reopened.authority_snapshot(), before)
+            saved = reopened.connection.execute(
+                'SELECT raw FROM audit WHERE id=?', (decision['audit_id'],)).fetchone()
+            self.assertEqual(saved[0], raw)
+
     def test_admission_does_not_cross_cases(self):
         self.assertEqual(self.send(self.proposal('DEMO-HOLD',['e_B']))['decision'],'reject')
 
