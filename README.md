@@ -27,6 +27,7 @@ Start with the [V1 guide](docs/v1-guide.md). The release remains a local source 
 | Decisions and evidence | [Read](docs/development-log.en.md) |
 | Current validation | [Read](docs/validation-v1.md) |
 | Scenarios and trace | [Read](docs/v1-guide.md) |
+| Workflow demo (unreleased addition) | [Read](docs/workflow-demo.en.md) |
 | Earlier observations and plan | [Read](docs/evidence-guide.md) |
 | Release history | [Read](CHANGELOG.md) |
 

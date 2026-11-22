@@ -2,6 +2,13 @@
 
 [日本語](CHANGELOG.ja.md)
 
+## Unreleased: workflow demo — 2026-11-22 (Japan time)
+
+- Add a screen (`/workflow`) that judges an unresolved cause and an authorized payment separately. One submission is run through a decision gate and a simulated ledger; payment completion, handoff of the unresolved cause, and denial of extra operations are shown separately from the same record.
+- The first version has one case: cause unresolved, payment approved. Four submissions for that case are included verbatim from the frozen Experiment 3 records of M-Anchor-challenge. The screen supports a two-choice versus three-value handoff field, editing the submission, and saving the record.
+- The screen uses no key, calls no model, and does not read or write the authoritative store. Existing gate rules, storage format and integration interface are unchanged. App version remains 1.0.0.
+- See the [workflow demo guide](docs/workflow-demo.en.md).
+
 ## Documentation language editions — 2026-10-01 (Japan time)
 
 - Separate non-app documentation into English and Japanese files, with language-specific navigation. Add English translations of historical Japanese plans and review notes.

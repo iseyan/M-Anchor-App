@@ -106,3 +106,13 @@ The model preserved HOLD's unresolved candidates in #19. UPDATE was already Vers
 ## October 1: positive control received at 10:22 Japan time
 
 A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing the admitted e_B update, which the gate saved as h_B / resolved / Version 2 from Version 1. Input and proposal hashes, before/after states, exported records, and matched readback agree. This completes the positive-control observation left pending above and the planned basic checks for these examples. Both original exports are linked in the [observation](observations/2026-10-01-user-check-v1.md). Their common `data` label does not establish folder identity or how the Version 1 state was initialized. App code is unchanged; no new API call was made during review.
+
+## November 22: workflow demo (unreleased)
+
+**What changed.** Added a screen at `/workflow` that judges an unresolved cause and an authorized payment separately. One submission is run through a decision gate and a simulated ledger; payment completion, handoff of the unresolved cause, and denial of extra operations are shown separately from the same record. The first version has one case (cause unresolved, payment approved) with four submissions included verbatim from the frozen Experiment 3 records of M-Anchor-challenge (commit `6315248`, case `F-LT6-01`, repetition 1).
+
+**Why.** To give a third party an entry point for checking, from the same record, whether the authorized payment went through, whether the unresolved cause was carried forward, and whether extra operations were stopped.
+
+**What was checked, and where.** On Linux with Python 3: 54 app tests, the release tests, both UI logic checks and the checksum verification passed. The gate and ledger are a port of the experiment harness rules; the 5,435 Experiment 3 episodes with a single submission and no environment change were run through them, and every decision, reason, application and ledger payment matched the experiment record. The screen was opened in Chrome and the four submissions and the two-choice field were inspected visually. These checks were made by Claude, not by the user.
+
+**Not yet checked.** Launch and display on Windows. The case "cause explained, payment not approved" is not included, because the frozen Experiment 3 records contain no such case. The third planned case, a legitimate payment proposed together with an extra operation, is included as a submission for the same case (gemma3 · C3). The app version remains 1.0.0; whether to raise it is undecided.

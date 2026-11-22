@@ -27,6 +27,7 @@
 | 開発記録 | [読む](docs/development-log.ja.md) |
 | V1検証 | [読む](docs/validation-v1.ja.md) |
 | V1実演手順 | [読む](docs/v1-guide.ja.md) |
+| 業務フローのデモ（未リリースの追加） | [読む](docs/workflow-demo.ja.md) |
 | 過去の記録 | [読む](docs/evidence-guide.ja.md) |
 | 変更履歴 | [読む](CHANGELOG.ja.md) |
 
