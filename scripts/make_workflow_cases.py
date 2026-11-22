@@ -81,7 +81,7 @@ def main():
     out = {
         'schema': 'm-anchor-workflow-cases/v1',
         'source': {
-            'repository': 'https://github.com/iseyan/M-Anchor-challenge', 'commit': SOURCE_COMMIT,
+            'experiment': 'Experiment 3', 'repository': 'https://github.com/iseyan/M-Anchor-challenge', 'commit': SOURCE_COMMIT,
             'run': 'exp3-main-20261121-01', 'records_path': RUN,
             'cases_file': EXP + '/full-study/cases/main.jsonl', 'cases_file_sha256': hashlib.sha256(cases_path.read_bytes()).hexdigest(),
             'note': 'Case text, model outputs and experiment results are copied verbatim from the frozen Experiment 3 records. English glosses were written for this demo and are not part of the experiment.',
@@ -94,7 +94,11 @@ def main():
             'task': {'ja': case['task'], 'en': GLOSS['task']},
             'documents': [{'id': d['id'], 'kind': d['kind'], 'text': d['text'], 'gloss_en': GLOSS[d['id']]} for d in case['documents']],
             'world': case['world'],
-            'claims': [{'key': c['key'], 'statement': c['statement'], 'gloss_en': GLOSS[c['key']]} for c in case['claims']],
+            'claims': [{'key': c['key'], 'statement': c['statement'], 'gloss_en': GLOSS[c['key']],
+                        'group': 'cause' if c['key'] == 'cause_identified' else 'authorization'} for c in case['claims']],
+            'focus_claim': 'cause_identified',
+            'selection_note': {'en': 'These four records were chosen after the results were seen, to make the contrast easy to explain. Each is one episode; see the experiment results for counts and denominators.',
+                               'ja': 'この4件は、対照を説明しやすいよう、結果を見た後に選んだ例である。各行は1エピソードの結果で、条件全体の件数と分母は「実験結果を読む」で確認する。'},
             'gold': {'action': case['gold']['action'], 'claims': case['gold']['claims'], 'authorized_payment': payment},
             'recorded': recorded,
         }],

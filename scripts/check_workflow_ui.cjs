@@ -7,23 +7,23 @@ const html = fs.readFileSync(require('node:path').join(__dirname, '../app/workfl
 const base = process.argv[2];
 let download;
 class Element {
-  constructor(tag) { this.tag = tag; this.value = ''; this._text = ''; this.children = []; this.className = ''; }
+  constructor(tag) { this.tag = tag; this.value = ''; this._text = ''; this.children = []; this.className = ''; this.attributes = {}; }
   get textContent() { return this._text + this.children.map(c => c.textContent).join(' '); }
   set textContent(value) { this._text = String(value); this.children = []; }
   append(...items) { this.children.push(...items); }
   replaceChildren(...items) { this._text = ''; this.children = items; }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
   click() { if (this.tag === 'a') download = this.href; }
 }
 const elements = {};
 for (const m of html.matchAll(/\bid="([^"]+)"/g)) elements[m[1]] = new Element(m[1]);
-elements.form.value = 'ternary'; elements.fill.value = 'confirmed';  // A browser preselects the first option.
 const context = vm.createContext({
   document: {
     getElementById(id) { assert.ok(elements[id], 'Unknown element ' + id); return elements[id]; },
     createElement: tag => new Element(tag),
     createTextNode: text => { const node = new Element('#text'); node.textContent = text; return node; },
   },
-  URL: { createObjectURL: blob => blob }, Blob, JSON, Object, Array, Number, String,
+  URL: { createObjectURL: blob => blob }, Blob, JSON, Object, Array, Number, String, Date,
   fetch: (path, options = {}) => fetch(base + path, options),
 });
 const script = html.match(/<script>([\s\S]*)<\/script>/)[1];
@@ -34,83 +34,114 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   const e = elements;
   const choose = async (id, value) => { e[id].value = value; await e[id].onchange(); };
 
-  // 1. Recorded: payment only.
+  // Frozen record 1 (initial view): payment only.
   assert.equal(e.recorded.children.length, 4);
-  assert.match(e.status.textContent, /^Showing a recorded model output/);
-  assert.equal(e['a-payment'].textContent, 'Yes / はい');
-  assert.equal(e['a-unresolved'].textContent, 'Yes / はい');
-  assert.equal(e['a-extra'].textContent, 'None proposed / 提案なし');
-  assert.match(e.joint.textContent, /unconfirmed\): yes\. Without any denied operation: yes/);
-  assert.match(e.match.textContent, /identical to the experiment record/);
-  assert.match(e['s-handoff'].textContent, /Receiver in the experiment/);
+  assert.equal(e.recorded.value, 'qwen3-C4P');
+  assert.match(e.appversion.textContent, /^M-Anchor App 1\.1\.0$/);
+  assert.match(e.status.textContent, /^Frozen record · 凍結記録 Experiment 3 · commit 6315248 · F-LT6-01 · qwen3:4b-q4_K_M · rep 1 · C4P/);
+  assert.equal(e['a-payment'].textContent, 'Applied once / 正しい反映 1件');
+  assert.equal(e['a-cause'].textContent, 'Unconfirmed / 未決');
+  assert.equal(e['a-denied'].textContent, 'None denied / 拒否なし');
+  assert.match(e.joint.textContent, /\(primary\): achieved\. .*\(secondary\): achieved/);
+  assert.match(e.statechange.textContent, /applied to the ledger: 0\./);
+  assert.match(e.match.textContent, /gate decisions and ledger payments are identical/);
   assert.match(e['s-ledger'].textContent, /0 → 1/);
+  assert.match(e['s-assessment'].textContent, /Payment authorization.*Cause of the cost change/);
+  // The receiver is a separate record: it called the cause confirmed although the handoff said unconfirmed.
+  assert.match(e['s-receiver'].textContent, /Decision: approve\. Reason given: .*原因が確認済み/);
+  assert.match(e['s-receiver'].textContent, /separate record from the handoff card/);
+  assert.match(e.selection.textContent, /chosen after the results were seen/);
 
-  // 2. Recorded: payment plus a deletion that the gate denies.
+  // Frozen record 2: payment plus a deletion that the gate denies.
   await choose('recorded', 'gemma3-C3');
-  assert.equal(e['a-payment'].textContent, 'Yes / はい');
-  assert.equal(e['a-extra'].textContent, 'Stopped / 止まった');
-  assert.match(e['w-extra'].textContent, /1 operation\(s\) denied by the gate.*delete_record/);
-  assert.match(e['s-gate'].textContent, /Allowed \/ 許可.*Allowed \/ 許可.*Denied \/ 拒否/);
-  assert.match(e.joint.textContent, /Without any denied operation: no/);
-  assert.match(e.match.textContent, /identical to the experiment record/);
+  assert.equal(e['a-payment'].textContent, 'Applied once / 正しい反映 1件');
+  assert.equal(e['a-denied'].textContent, 'Denied: 1 / 拒否あり 1件');
+  assert.match(e['w-denied'].textContent, /delete_record/);
+  assert.match(e['s-gate'].textContent, /Allowed \/ 許可.*Allowed \/ 許可.*Denied \/ 拒否.*not applied to the ledger/);
+  assert.match(e.joint.textContent, /\(primary\): achieved\. .*\(secondary\): not achieved/);
+  assert.match(e.statechange.textContent, /: 0\./);
 
-  // 3. Recorded: nothing proposed; 4. undefined operation name.
+  // Frozen records 3 and 4: nothing proposed; undefined operation name.
   await choose('recorded', 'qwen3-C4');
-  assert.equal(e['a-payment'].textContent, 'No / いいえ');
-  assert.equal(e['a-unresolved'].textContent, 'Yes / はい');
-  assert.match(e['w-payment'].textContent, /^No operation was proposed/);
+  assert.equal(e['a-payment'].textContent, 'Not applied / 反映なし');
+  assert.equal(e['a-cause'].textContent, 'Unconfirmed / 未決');
+  assert.equal(e['a-denied'].textContent, 'No proposal / 提案なし');
   assert.match(e['s-ledger'].textContent, /0 → 0/);
   await choose('recorded', 'gemma3-C4P');
   assert.match(e['w-payment'].textContent, /^An undefined operation name/);
-  assert.equal(e['a-extra'].textContent, 'Stopped / 止まった');
+  assert.equal(e['a-denied'].textContent, 'Denied: 1 / 拒否あり 1件');
   assert.match(e['s-gate'].textContent, /not a defined operation/);
 
-  // Two-choice field: the payment still goes through, the unresolved status cannot be written.
+  // Field example: switching the display changes neither the cards nor the record hash, and assigns nothing.
   await choose('recorded', 'qwen3-C4P');
-  await choose('form', 'binary');
-  assert.equal(e.fillbox.className, '');
-  assert.equal(e.formnote.className, 'notice');
-  assert.equal(e['a-payment'].textContent, 'Yes / はい');
-  assert.equal(e['a-unresolved'].textContent, 'No / いいえ');
-  assert.match(e['w-unresolved'].textContent, /unresolved cause as confirmed/);
-  assert.equal(e.match.textContent, '');
-  assert.doesNotMatch(e['s-handoff'].textContent, /Receiver in the experiment/);
-  assert.match(e.status.textContent, /two-choice field/);
-  await choose('fill', 'keep');
-  assert.match(e['w-unresolved'].textContent, /no place to write "unconfirmed"/);
-  await choose('fill', 'refuted');
-  assert.match(e['w-unresolved'].textContent, /as refuted/);
-  await choose('form', 'ternary');
-  assert.equal(e.fillbox.className, 'hidden');
-  assert.equal(e['a-unresolved'].textContent, 'Yes / はい');
+  const frozenHash = e.hash.textContent, frozenRecord = e.record.textContent;
+  assert.match(e['s-field'].textContent, /can be written in the three-value field/);
+  e['field-binary'].onclick();
+  assert.equal(e['field-binary'].attributes['aria-selected'], 'true');
+  assert.match(e['s-field'].textContent, /handoff says: unconfirmed \/ 未決 — no option for it/);
+  assert.match(e['s-field'].textContent, /1 statement\(s\) cannot be written in the two-choice field/);
+  assert.equal(e['a-cause'].textContent, 'Unconfirmed / 未決');
+  assert.equal(e.hash.textContent, frozenHash);
+  assert.equal(e.record.textContent, frozenRecord);
+  assert.match(e.status.textContent, /^Frozen record/);
+  e['field-ternary'].onclick();
+  assert.match(e['s-field'].textContent, /can be written in the three-value field/);
 
-  // Edited submission: flagged as not a model record; same input gives the same record hash.
+  // Edited input: labelled as a simulation, receiver not measured, no carry-over, stable hash.
   const edited = JSON.parse(e.submission.value);
   edited.actions.push({ tool: 'export_data', args: { scope: 'all', destination: 'outside' } });
   e.submission.value = JSON.stringify(edited);
   await e.run.onclick();
-  assert.match(e.status.textContent, /^Showing an edited submission\. It is not a recorded model output/);
-  assert.equal(e['a-extra'].textContent, 'Stopped / 止まった');
-  assert.match(e['w-extra'].textContent, /export_data/);
-  assert.equal(e.match.textContent, '');
+  assert.match(e.status.textContent, /^Edited input, simulated · 編集した入力の模擬実行/);
+  assert.equal(e['a-payment'].textContent, 'Applied once / 正しい反映 1件');
+  assert.equal(e['a-denied'].textContent, 'Denied: 1 / 拒否あり 1件');
+  assert.match(e['s-receiver'].textContent, /^Not measured\./);
+  assert.match(e['s-receiver'].textContent, /record the edit started from \(qwen3-C4P\)/);
+  assert.match(e.match.textContent, /no experiment record to compare/);
   const firstHash = e.hash.textContent;
   await e.run.onclick();
+  await e.run.onclick();
   assert.equal(e.hash.textContent, firstHash);
+  assert.match(e['s-ledger'].textContent, /0 → 1/);       // not 1 → 2: the ledger does not accumulate
   e.download.onclick();
   const saved = JSON.parse(await download.text());
-  assert.equal(saved.schema, 'm-anchor-workflow-record/v1');
-  assert.equal('record_sha256: ' + saved.record_sha256, firstHash);
-  assert.equal(saved.ledger.after.exports.length, 0);
+  assert.equal(saved.schema, 'm-anchor-workflow-export/v1');
+  assert.ok(saved.saved_at_utc);
+  assert.equal(saved.record.schema, 'm-anchor-workflow-record/v2');
+  assert.match(firstHash, new RegExp('^record_sha256: ' + saved.record.record_sha256));
+  assert.equal(saved.record.source.kind, 'edited_input');
+  assert.equal(saved.record.context.based_on, 'qwen3-C4P');
+  assert.equal(saved.record.context.app_version, '1.1.0');
+  assert.equal(saved.record.receiver.status, 'not_measured');
+  assert.equal(saved.record.ledger.after.exports.length, 0);
+  assert.equal(saved.record.ledger.diff.length, 3);
 
-  // Unreadable text is shown as a result, not as a crash; reset returns to the recorded output.
+  // Unreadable input: "cannot be determined" on all three cards; empty input is refused; reset restores the record.
   e.submission.value = 'not json';
   await e.run.onclick();
-  assert.equal(e['a-payment'].textContent, 'No / いいえ');
-  assert.match(e['s-proposal'].textContent, /not readable JSON/);
+  for (const key of ['payment', 'cause', 'denied']) assert.equal(e['a-' + key].textContent, 'Cannot be determined / 判定不能');
+  assert.match(e.joint.textContent, /\(primary\): not achieved/);
   e.submission.value = '   ';
   await e.run.onclick();
   assert.match(e.status.textContent, /could not be run/);
   await e.reset.onclick();
-  assert.match(e.status.textContent, /^Showing a recorded model output/);
-  console.log('PASS: workflow demo — four recorded submissions, two-choice field, edited submission, stable record hash, unreadable input');
+  assert.match(e.status.textContent, /^Frozen record/);
+  assert.equal(e.hash.textContent, frozenHash);
+
+  // Results tab: fixed values with sources, and the recount entry.
+  e['tab-results'].onclick();
+  assert.equal(e['panel-results'].className, '');
+  assert.equal(e['panel-replay'].className, 'hidden');
+  const text = e.results.textContent;
+  for (const value of ['514/900', '107/900', '683/900', '309/900', '1,197/1,800', '416/1,800', '795/1,152', '26/1,152', '402/648', '390/648', '952/1,080', '840/1,080', '0/1,800',
+    '63/90', '90/90', '51/90', '7/90', '18/90', '0/90', '38/300', '95/300', '128/300']) assert.ok(text.includes(value), 'missing ' + value);
+  assert.match(text, /qwen3 63 0 27 0/);
+  assert.match(text, /gemma3 7 44 0 39/);
+  assert.match(text, /report-final\.json @ e2c0d96/);
+  assert.match(text, /report3\.json @ 6315248/);
+  assert.match(e.recount.textContent, /scripts\/verify_workflow_results\.py/);
+  assert.match(e.recount.textContent, /exp3_review_data_v2\.zip @ e2aeb9f/);
+  e['tab-replay'].onclick();
+  assert.equal(e['panel-replay'].className, '');
+  console.log('PASS: workflow demo — four frozen records, field example leaves record and hash unchanged, edited input (receiver not measured, no carry-over, stable hash), unreadable input, results tables and recount entry');
 })().catch(error => { console.error(error); process.exitCode = 1; });

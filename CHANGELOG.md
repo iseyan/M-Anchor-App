@@ -2,11 +2,14 @@
 
 [日本語](CHANGELOG.ja.md)
 
-## Unreleased: workflow demo — 2026-11-22 (Japan time)
+## 1.1.0 release candidate: workflow demo — 2026-11-22 (Japan time)
 
-- Add a screen (`/workflow`) that judges an unresolved cause and an authorized payment separately. One submission is run through a decision gate and a simulated ledger; payment completion, handoff of the unresolved cause, and denial of extra operations are shown separately from the same record.
-- The first version has one case: cause unresolved, payment approved. Four submissions for that case are included verbatim from the frozen Experiment 3 records of M-Anchor-challenge. The screen supports a two-choice versus three-value handoff field, editing the submission, and saving the record.
-- The screen uses no key, calls no model, and does not read or write the authoritative store. Existing gate rules, storage format and integration interface are unchanged. App version remains 1.0.0.
+- Add a screen (`/workflow`) that judges an unresolved cause and an authorized payment separately. Two views: "Replay a record" and "Read the experiment results".
+- Replay: four submissions for case `F-LT6-01`, repetition 1, copied from the frozen Experiment 3 records of M-Anchor-challenge. Assessment, proposal, gate decision, ledger and handoff are shown side by side, with three results from the same record: was the correct payment applied, did the handoff keep the cause unresolved, was any proposal denied. The receiver's decision is shown in its own box.
+- Frozen records, the field display example, and simulated runs of edited input are told apart on screen and in the saved record. The two-choice versus three-value comparison is a display example and changes neither the record, the results nor the hash.
+- Results: frozen aggregates of Experiment 2 (C3/C4) and Experiment 3 (C4/C4P), bundled as fixed values with source commits and SHA-256. `scripts/verify_workflow_results.py` recomputes them from episode data and compares.
+- `start.cmd` and `start-fresh-demo.cmd` first check whether `py -3` gives Python 3.10 or later, then fall back to `python`; if neither is available they print the required version.
+- The screen uses no key, calls no model, and does not read or write the authoritative store. Existing gate rules, storage format and integration interface are unchanged.
 - See the [workflow demo guide](docs/workflow-demo.en.md).
 
 ## Documentation language editions — 2026-10-01 (Japan time)

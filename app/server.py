@@ -17,11 +17,11 @@ from client import AnchorClient
 from model_bridge import run_model, ModelError, validate_job
 from records import ExecutionTickets, history, utc_now
 from scenarios import SCENARIOS, scenario, exercise_record, fixed_proposal
-from workflow import WorkflowError, load_cases, run_request
+from workflow import WorkflowError, load_cases, load_results, run_request
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '1.0.0'
+APP_VERSION = '1.1.0'
 
 
 class LaunchTicket:
@@ -62,6 +62,7 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
     ticket = LaunchTicket(launch_ticket)
     execution_tickets = ExecutionTickets()
     workflow_cases = load_cases()  # Read-only fixtures for the stateless workflow demo.
+    workflow_results = load_results()
     # Fail before listening if the core or trusted store cannot be verified.
     with Store(database) as store:
         store.authority_snapshot()
@@ -114,7 +115,10 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                 self.reply(200, (ROOT / 'workflow.html').read_text(encoding='utf-8'), html=True)
                 return
             if path == '/workflow/cases':
-                self.reply(200, workflow_cases)
+                self.reply(200, {**workflow_cases, 'app_version': APP_VERSION})
+                return
+            if path == '/workflow/results':
+                self.reply(200, workflow_results)
                 return
             role = 'admin' if path.startswith('/admin/') else 'agent'
             if not self.authorized(role):
@@ -207,7 +211,7 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                     return
                 if workflow_job:
                     try:
-                        self.reply(200, run_request(workflow_cases, json.loads(raw.decode('utf-8'))))
+                        self.reply(200, run_request(workflow_cases, json.loads(raw.decode('utf-8')), app_version=APP_VERSION))
                     except (WorkflowError, ValueError, UnicodeError, TypeError):
                         self.reply(400, {'error': 'invalid_workflow_request'})
                     return
