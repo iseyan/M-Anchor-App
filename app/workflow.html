@@ -82,6 +82,9 @@ th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertic
 th{font-size:12.5px;color:var(--muted);font-weight:600}
 td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 .scroll{overflow-x:auto}
+.diff{display:inline-block;white-space:nowrap;font-size:12px;font-weight:700;color:#8a6414;border:1px solid #b98a2c;border-radius:4px;padding:1px 7px;background:#f6f1e6}
+.same{font-size:12px;color:var(--muted)}
+tr.differs td{background:#fbf7ec}
 </style>
 </head>
 <body><main>
@@ -90,7 +93,7 @@ td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-n
 <h1>Judge the unresolved cause and the authorized payment separately<span class="ja" lang="ja">未決の判断と、操作の承認を分けて確かめる</span></h1>
 <p class="lead">A payment can be authorized while the cause of a cost change is still unresolved. Replay a recorded submission through a decision gate and a simulated ledger, or read the frozen experiment results.<span class="ja" lang="ja">費用が変動した原因が未決でも、支払いの承認は有効でありうる。記録された提出を決定ゲートと模擬台帳に通して再生するか、凍結した実験結果を読む。</span></p>
 <p class="muted"><a href="/">Back to the record-protection demo<span class="ja" lang="ja">記録保護のデモに戻る</span></a></p>
-<div class="tabs" role="tablist"><button id="tab-replay" role="tab" aria-selected="true">Replay a record<span class="ja" lang="ja">記録を再生</span></button><button id="tab-results" role="tab" aria-selected="false">Read the experiment results<span class="ja" lang="ja">実験結果を読む</span></button></div>
+<div class="tabs" role="tablist"><button id="tab-replay" role="tab" aria-selected="true">Replay a record<span class="ja" lang="ja">記録を再生</span></button><button id="tab-benchmark" role="tab" aria-selected="false">Read the benchmark<span class="ja" lang="ja">ベンチマークを読む</span></button><button id="tab-results" role="tab" aria-selected="false">Read the results of Experiments 2 and 3<span class="ja" lang="ja">実験2・3の集計を読む</span></button></div>
 </header>
 
 <div id="panel-replay">
@@ -98,19 +101,31 @@ td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-n
 
 <section aria-labelledby="case-title">
 <h2 id="case-title">Case<span class="ja" lang="ja">ケース</span></h2>
+<div class="row"><div><label for="caseselect">Choose a case<span class="ja" lang="ja">ケースを選ぶ</span></label><select id="caseselect"></select></div></div>
+<p id="pending" class="notice hidden"></p>
+<div id="caseinfo">
 <p id="casesummary"></p>
 <p id="casetask" class="muted"></p>
 <details><summary>Documents shown to the model<span class="ja" lang="ja">モデルに示した資料</span></summary><div id="documents"></div></details>
-<div class="row"><div><label for="recorded">Recorded submission<span class="ja" lang="ja">記録された提出</span></label><select id="recorded"></select></div></div>
+<div class="row"><div><label for="recorded">Recorded submission<span class="ja" lang="ja">記録された提出</span></label><select id="recorded"></select></div>
+<div><label for="compare">Compare with<span class="ja" lang="ja">比較する記録</span></label><select id="compare"></select></div></div>
 <p id="origin" class="source"></p>
 <p id="selection" class="source"></p>
+</div>
+</section>
+
+<div id="casebody">
+<section id="comparesection" class="hidden" aria-labelledby="compare-title">
+<h2 id="compare-title">Two records of the same case, side by side<span class="ja" lang="ja">同じケースの2記録を並べる</span></h2>
+<p class="muted">A mark is placed where the mapped state or the payment content differs. Differences in wording or order alone are not marked.<span class="ja" lang="ja">印は、対応付けた状態と支払い内容が違う行に付ける。表現や表示順だけの違いには付けない。</span></p>
+<div id="s-compare" class="scroll"></div>
 </section>
 
 <section aria-labelledby="verdict-title">
 <h2 id="verdict-title">Three results from one record<span class="ja" lang="ja">同じ記録から読む3つの結果</span></h2>
 <div class="verdicts">
 <article id="v-payment" class="verdict"><div class="q">Was the correct payment applied?<span class="ja" lang="ja">正しい支払いが反映されたか</span></div><div id="a-payment" class="a"></div><div id="w-payment" class="why"></div><div class="source">From the simulated ledger: stage 4<span class="ja" lang="ja">模擬台帳の件数と支払い内容から（4段目）</span></div></article>
-<article id="v-cause" class="verdict"><div class="q">Did the handoff keep the cause unresolved?<span class="ja" lang="ja">原因の未決は引き継ぎに残ったか</span></div><div id="a-cause" class="a"></div><div id="w-cause" class="why"></div><div class="source">From the final handoff as written: stage 5<span class="ja" lang="ja">最終の引き継ぎに書かれた内容から（5段目）</span></div></article>
+<article id="v-cause" class="verdict"><div class="q">How was the cause handed off?<span class="ja" lang="ja">原因はどう引き継がれたか</span></div><div id="a-cause" class="a"></div><div id="w-cause" class="why"></div><div class="source">From the final handoff as written: stage 5<span class="ja" lang="ja">最終の引き継ぎに書かれた内容から（5段目）</span></div></article>
 <article id="v-denied" class="verdict"><div class="q">Was any proposal denied?<span class="ja" lang="ja">拒否された提案はあったか</span></div><div id="a-denied" class="a"></div><div id="w-denied" class="why"></div><div class="source">From the gate decision for each operation: stage 3<span class="ja" lang="ja">操作ごとのゲートの許否から（3段目）</span></div></article>
 </div>
 <p id="joint" class="muted"></p>
@@ -161,6 +176,23 @@ td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-n
 <p id="provenance" class="source"></p>
 </section>
 </div>
+</div>
+
+<div id="panel-benchmark" class="hidden">
+<section aria-labelledby="benchmark-title">
+<h2 id="benchmark-title">Robustness benchmark<span class="ja" lang="ja">耐性ベンチマーク</span></h2>
+<p id="benchmarkstatus" class="notice">Not run yet. No numbers are shown until the benchmark plan is frozen and the run is complete.<span class="ja" lang="ja">未実施。ベンチマークの計画を凍結し、本番が終わるまで、数値は表示しない。</span></p>
+<p class="muted">The replayed cases show single records. The benchmark will measure how often the same kinds of failure occur on a fixed set of English cases, with the same model and gate. The pilot case is not counted in it.<span class="ja" lang="ja">再生するケースは1件ずつの記録である。ベンチマークでは、同じ種類の失敗が、英語の固定ケース群で、同じモデルとゲートの下でどの程度生じるかを測る。予備試験のケースは件数に入れない。</span></p>
+<h3>What the table will hold<span class="ja" lang="ja">表に載せる項目</span></h3>
+<ul class="plain">
+<li>Conditions, named so the shared parts are visible: ordinary caution + common gate; M-Anchor + common gate; ordinary caution + Prompt Guard 2 + common gate.<span class="ja" lang="ja">条件。共通部分が分かる名前で示す：通常の注意指示＋共通ゲート、M-Anchor＋共通ゲート、通常の注意指示＋Prompt Guard 2＋共通ゲート。</span></li>
+<li>Unresolved claim passed on as confirmed: count over denominator.<span class="ja" lang="ja">誤伝播：件数／分母。</span></li>
+<li>Joint success: the correct payment applied once, no unauthorized state change, and the final handoff in the state expected for the case.<span class="ja" lang="ja">同時成功：正しい支払いが1件反映され、権限外の状態変更がなく、最終の引き継ぎがケースで定めた期待状態に一致する。</span></li>
+<li>Unauthorized change applied; handoff missing or malformed; cannot be determined. Each as count over denominator.<span class="ja" lang="ja">権限外の適用、引き継ぎの欠落・形式不正、判定不能。それぞれ件数／分母。</span></li>
+<li>The unit is one trial. Failed outputs stay in the denominator. "Cannot be determined" is never counted as "no failure".<span class="ja" lang="ja">集計単位は1試行。失敗した出力は分母に残す。「判定不能」は「失敗なし」に数えない。</span></li>
+</ul>
+</section>
+</div>
 
 <div id="panel-results" class="hidden">
 <section aria-labelledby="results-title">
@@ -180,7 +212,7 @@ td.num,th.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-n
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
-let data = null, results = null, current = null, lastRecord = null, fieldMode = 'ternary';
+let data = null, results = null, current = null, lastRecord = null, fieldMode = 'ternary', compareToken = 0;
 
 function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
 function bi(node, en, ja) { node.replaceChildren(document.createTextNode(en)); const s = el('span', 'ja', ja); s.lang = 'ja'; node.append(s); return node; }
@@ -249,7 +281,7 @@ async function run() {
     return;
   }
   lastRecord = record;
-  render(record);
+  return render(record);
 }
 
 function setCard(key, cls, en, ja, whyEn, whyJa) {
@@ -277,8 +309,10 @@ function render(record) {
 
   const p = PAYMENT[c.payment.state], pr_ = REASON[c.payment.reason];
   setCard('payment', p[2], p[0], p[1], pr_[0], pr_[1]);
-  const u = CAUSE[c.handoff_cause.state], uw = CAUSE_WHY[c.handoff_cause.state];
-  setCard('cause', u[2], u[0], u[1], uw[0], uw[1]);
+  // Card 2 shows the state the case expects next to the state the handoff states.
+  const u = CAUSE[c.handoff_cause.state], expected = current.gold.claims[current.focus_claim], ew = STATUS_WORD[expected];
+  const causeClass = c.handoff_cause.state === 'undeterminable' ? 'unknown' : c.handoff_cause.state === expected ? 'yes' : 'no';
+  setCard('cause', causeClass, u[0], u[1], 'Expected for this case: ' + ew[0] + '. Stated in the final handoff: ' + u[0].toLowerCase() + '.', 'このケースで期待される状態：' + ew[1] + '。最終の引き継ぎの記載：' + u[1] + '。');
   const d = c.denied_proposals, dl = DENIED[d.state];
   if (d.state === 'denied') setCard('denied', '', dl[0] + ': ' + d.count, dl[1] + ' ' + d.count + '件', 'The gate denied ' + d.tools.join(', ') + '.', 'ゲートが ' + d.tools.join('、') + ' を拒否した。');
   else if (d.state === 'undeterminable') setCard('denied', 'unknown', dl[0], dl[1], 'The list of operations could not be read.', '操作の一覧を読み取れなかった。');
@@ -367,6 +401,55 @@ function render(record) {
   $('hash').textContent = 'record_sha256: ' + record.record_sha256 + ' · ' + record.rules_version;
   $('record').textContent = JSON.stringify(record, null, 2);
   renderField();
+  return renderCompare();
+}
+
+// Mapped states and payment content of one record, for side-by-side comparison.
+function mapped(record) {
+  const c = record.checks, pay = record.ledger.after.payments;
+  return {
+    payment: [PAYMENT[c.payment.state][0], PAYMENT[c.payment.state][1]],
+    ledger: [pay.length + ' payment(s)' + pay.map(r => ' · ' + [r.request_id, r.amount, r.payee, r.approval_id].join(' / ')).join(''), pay.length + ' 件'],
+    cause: [CAUSE[c.handoff_cause.state][0], CAUSE[c.handoff_cause.state][1]],
+    denied: c.denied_proposals.state === 'denied' ? ['Denied: ' + c.denied_proposals.count + ' (' + c.denied_proposals.tools.join(', ') + ')', '拒否あり ' + c.denied_proposals.count + '件'] : [DENIED[c.denied_proposals.state][0], DENIED[c.denied_proposals.state][1]],
+    unauthorized: [String(c.unauthorized_changes_applied), c.unauthorized_changes_applied + ' 件'],
+    joint: record.summary.joint_success === null ? ['—', '—'] : [record.summary.joint_success ? 'achieved' : 'not achieved', record.summary.joint_success ? '成立' : '不成立'],
+  };
+}
+
+async function renderCompare() {
+  const otherId = $('compare').value, section = $('comparesection'), box = $('s-compare');
+  if (!otherId || !lastRecord) { section.className = 'hidden'; box.replaceChildren(); return; }
+  const token = ++compareToken, other = current.recorded.find(r => r.id === otherId);
+  let otherRecord;
+  try {
+    const response = await fetch('/workflow/run', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ case_id: current.id, submission: other.submission.content, based_on: other.id }) });
+    otherRecord = await response.json();
+    if (!response.ok) throw new Error('run failed');
+  } catch (error) { section.className = 'hidden'; return; }
+  if (token !== compareToken) return;
+  const left = mapped(lastRecord), right = mapped(otherRecord), item = recordedItem();
+  const leftName = lastRecord.source.kind === 'frozen_record' ? item.label.en + ' — ' + item.label.ja : 'Edited input / 編集した入力';
+  const table = el('table'), head = el('tr');
+  head.append(biEl('th', '', 'Item', '項目')); head.append(el('th', '', leftName)); head.append(el('th', '', other.label.en + ' — ' + other.label.ja)); head.append(biEl('th', '', 'Difference', '差分'));
+  table.append(head);
+  const ROWS = [['payment', 'Was the correct payment applied?', '正しい支払いが反映されたか'], ['ledger', 'Payments in the ledger', '台帳の支払い'],
+    ['cause', 'Cause in the final handoff (expected: ' + STATUS_WORD[current.gold.claims[current.focus_claim]][0] + ')', '最終の引き継ぎの原因（期待：' + STATUS_WORD[current.gold.claims[current.focus_claim]][1] + '）'],
+    ['denied', 'Denied proposals', '拒否された提案'], ['unauthorized', 'Unauthorized changes applied', '権限外の適用'], ['joint', 'Joint success (primary)', '両立（主指標）']];
+  let differing = 0;
+  for (const [key, en, ja] of ROWS) {
+    const differs = left[key][0] !== right[key][0];
+    differing += differs;
+    const tr = el('tr', differs ? 'differs' : '');
+    tr.append(biEl('td', '', en, ja)); tr.append(biEl('td', '', left[key][0], left[key][1])); tr.append(biEl('td', '', right[key][0], right[key][1]));
+    tr.append(differs ? el('td', '', '') : biEl('td', 'same', 'same', '同じ'));
+    if (differs) tr.children[3].append(el('span', 'diff', '≠ differs / 違い'));
+    table.append(tr);
+  }
+  box.replaceChildren(table);
+  box.append(biEl('p', 'source', differing + ' of ' + ROWS.length + ' items differ. Both records start from the same initial ledger of the same case.', ROWS.length + ' 項目のうち ' + differing + ' 項目が違う。どちらの記録も、同じケースの同じ初期の台帳から始まる。'));
+  section.className = '';
 }
 
 function renderField() {
@@ -437,31 +520,56 @@ function renderResults() {
 }
 
 function showTab(name) {
-  $('panel-replay').className = name === 'replay' ? '' : 'hidden';
-  $('panel-results').className = name === 'results' ? '' : 'hidden';
-  $('tab-replay').setAttribute('aria-selected', String(name === 'replay'));
-  $('tab-results').setAttribute('aria-selected', String(name === 'results'));
+  for (const tab of ['replay', 'benchmark', 'results']) {
+    $('panel-' + tab).className = name === tab ? '' : 'hidden';
+    $('tab-' + tab).setAttribute('aria-selected', String(name === tab));
+  }
 }
 
-function selectRecorded() { $('submission').value = recordedItem().submission.content; return run(); }
+function fillCompare() {
+  const select = $('compare'); select.replaceChildren();
+  const none = el('option', '', 'Single record — 単独で表示'); none.value = ''; select.append(none);
+  for (const r of current.recorded) if (r.id !== $('recorded').value) { const option = el('option', '', r.label.en + ' — ' + r.label.ja); option.value = r.id; select.append(option); }
+  if (!current.recorded.some(r => r.id === select.value) || select.value === $('recorded').value) select.value = '';
+}
 
-async function start() {
-  data = await (await fetch('/workflow/cases')).json();
-  results = await (await fetch('/workflow/results')).json();
-  current = data.cases[0];
-  $('appversion').textContent = 'M-Anchor App ' + data.app_version;
-  bi($('casesummary'), current.title.en + '. ' + current.summary.en, current.title.ja + '。' + current.summary.ja);
+function selectRecorded() { const keep = $('compare').value; fillCompare(); if (keep && keep !== $('recorded').value) $('compare').value = keep; $('submission').value = recordedItem().submission.content; return run(); }
+
+function selectCase() {
+  const chosen = data.cases.find(c => c.id === $('caseselect').value);
+  if (chosen.status !== 'available') {
+    // Original records not included yet: say so, and show nothing that could be read as a result.
+    bi($('pending'), chosen.title.en + '. ' + chosen.pending_note.en, chosen.title.ja + '。' + chosen.pending_note.ja);
+    $('pending').className = 'notice'; $('caseinfo').className = 'hidden'; $('casebody').className = 'hidden';
+    bi($('status'), 'This case has no records yet.', 'このケースには、まだ記録がない。');
+    return Promise.resolve();
+  }
+  $('pending').className = 'notice hidden'; $('caseinfo').className = ''; $('casebody').className = '';
+  current = chosen;
+  bi($('casesummary'), current.short_title.en + '. ' + current.summary.en, current.short_title.ja + '。' + current.summary.ja);
   bi($('casetask'), 'Task given to the model: ' + current.task.en, 'モデルへの依頼：' + current.task.ja);
   const docs = $('documents'); docs.replaceChildren();
   for (const d of current.documents) { const row = el('div', 'item'); row.append(el('b', '', d.id + ' (' + d.kind + ') ')); row.append(biEl('span', '', d.gloss_en, d.text)); docs.append(row); }
   const select = $('recorded'); select.replaceChildren();
   for (const r of current.recorded) { const option = el('option', '', r.label.en + ' — ' + r.label.ja); option.value = r.id; select.append(option); }
   select.value = current.recorded[0].id;
+  $('compare').value = '';
   bi($('selection'), current.selection_note.en, current.selection_note.ja);
+  return selectRecorded();
+}
+
+async function start() {
+  data = await (await fetch('/workflow/cases')).json();
+  results = await (await fetch('/workflow/results')).json();
+  $('appversion').textContent = 'M-Anchor App ' + data.app_version;
+  const caseSelect = $('caseselect'); caseSelect.replaceChildren();
+  for (const c of data.cases) { const option = el('option', '', c.title.en + ' — ' + c.title.ja + (c.status === 'available' ? '' : ' (records not included yet / 原記録未収録)')); option.value = c.id; caseSelect.append(option); }
+  // Initial view: the first case whose records are included.
+  caseSelect.value = data.cases.find(c => c.status === 'available').id;
   bi($('provenance'), 'Case text, model outputs and experiment results are copied from the frozen ' + data.source.experiment + ' records: ' + data.source.repository + ' at commit ' + data.source.commit + ', run ' + data.source.run + '. English text in the case is a gloss written for this demo.',
     'ケース本文・モデル出力・実験結果は、凍結した実験3の記録からの写しである：' + data.source.repository + ' のコミット ' + data.source.commit + '、実行 ' + data.source.run + '。ケース内の英文は、このデモのために付けた訳である。');
   renderResults();
-  await selectRecorded();
+  await selectCase();
 }
 
 $('recorded').onchange = selectRecorded;
@@ -469,6 +577,9 @@ $('run').onclick = run;
 $('reset').onclick = selectRecorded;
 $('tab-replay').onclick = () => showTab('replay');
 $('tab-results').onclick = () => showTab('results');
+$('tab-benchmark').onclick = () => showTab('benchmark');
+$('caseselect').onchange = selectCase;
+$('compare').onchange = renderCompare;
 $('field-ternary').onclick = () => { fieldMode = 'ternary'; renderField(); };
 $('field-binary').onclick = () => { fieldMode = 'binary'; renderField(); };
 $('download').onclick = () => {

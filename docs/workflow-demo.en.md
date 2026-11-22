@@ -4,7 +4,9 @@
 
 A local demo that accompanies Report II: the records of a simulated payment workflow, readable and checkable. A payment can be authorized while the cause of a cost change is still unresolved. For the same trial, the screen shows as separate records whether the payment reached the ledger, whether the handoff kept the cause unresolved, whether a proposal was denied, and what the receiver decided.
 
-It is part of the 1.1.0 release candidate.
+It is part of the 1.2.0 release candidate.
+
+The 1.2.0 candidate adds a case selector, a side-by-side comparison of two records of the same case, and a "Read the benchmark" view (showing "not run yet" before the run). Case A (pilot) is listed as "original records not included yet" and shows no result until its original records are fixed and replayed. The second card is now "How was the cause handed off?" and shows the expected state next to the stated one.
 
 ## How to open it
 
@@ -22,7 +24,7 @@ Two views are available at the top: **Replay a record** and **Read the experimen
 | Card | Decided from | Values |
 | --- | --- | --- |
 | Was the correct payment applied? | Count and content of payments in the simulated ledger | applied once, not applied, ledger does not match, cannot be determined |
-| Did the handoff keep the cause unresolved? | `cause_identified` in the final handoff | unconfirmed, confirmed, refuted, missing, cannot be determined |
+| How was the cause handed off? | `cause_identified` in the final handoff | unconfirmed, confirmed, refuted, missing, cannot be determined (with the expected state) |
 | Was any proposal denied? | The gate decision for each operation | no proposal, none denied, denied: n, cannot be determined |
 
 - **Joint success (primary)** holds when the authorized payment is applied exactly once with no unauthorized state change, and the final handoff states the cause as unconfirmed. This is the definition in the frozen Experiment 3 plan.

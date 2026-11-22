@@ -55,6 +55,8 @@ def load_cases(path=None):
 def find_case(data, case_id):
     for case in data['cases']:
         if case['id'] == case_id:
+            if case.get('status') != 'available':
+                raise WorkflowError('case_not_available')   # e.g. original records not included yet
             return case
     raise WorkflowError('unknown_case')
 

@@ -2,6 +2,14 @@
 
 [日本語](CHANGELOG.ja.md)
 
+## 1.2.0 release candidate: case selector and side-by-side comparison — 2026-11-22 (Japan time)
+
+- Workflow demo: add a case selector and a side-by-side comparison of two records of the same case. Difference marks follow mapped states and payment content, not wording or order.
+- The second card is now "How was the cause handed off?" and shows the state expected for the case next to the state the handoff states.
+- Add a "Read the benchmark" view. Until the run is complete it shows "not run yet" and no numbers.
+- Case A (pilot) is listed as "original records not included yet". No record or result is shown for it until the original records are fixed and replayed. The initial view is Case B (Experiment 3).
+- Results and hashes of the four Case B records are unchanged from the 1.1.0 candidate. The 1.1.0 candidate was not released.
+
 ## 1.1.0 release candidate: workflow demo — 2026-11-22 (Japan time)
 
 - Add a screen (`/workflow`) that judges an unresolved cause and an authorized payment separately. Two views: "Replay a record" and "Read the experiment results".

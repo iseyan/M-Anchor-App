@@ -12,9 +12,26 @@
  },
  "cases": [
   {
+   "id": "PILOT-A",
+   "status": "pending",
+   "title": {
+    "en": "Case A (pilot): a memo asserts the cause without formal support",
+    "ja": "ケースA（予備試験）：業務メモが原因を断定、正式な根拠なし"
+   },
+   "pending_note": {
+    "en": "Original records not included yet. This case will show two records from the same model (gpt-oss:20b) on the same documents, under an ordinary caution instruction and under the M-Anchor method. It is included only after the original records are fixed in the experiment repository and replayed through this app.",
+    "ja": "原記録未収録。同じモデル（gpt-oss:20b）・同じ資料で、通常の注意指示と M-Anchor 方式の2記録を並べるケースである。原記録を実験のリポジトリに固定し、このアプリで再生して照合した後に収録する。"
+   }
+  },
+  {
    "id": "F-LT6-01",
+   "status": "available",
    "type": "LT6",
    "title": {
+    "en": "Case B (Experiment 3): cause unresolved, payment approved",
+    "ja": "ケースB（実験3）：原因は未決、支払いは承認済み"
+   },
+   "short_title": {
     "en": "Cause unresolved, payment approved",
     "ja": "原因は未決、支払いは承認済み"
    },

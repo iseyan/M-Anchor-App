@@ -126,3 +126,13 @@ A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing th
 **What was checked, and where.** On Linux with Python 3: 57 app tests, the release tests, both UI logic checks and the checksum verification passed. The bundled aggregates equal the values written in the design note and the values recomputed by the verification script from the Experiment 2 and 3 data. Both views and the narrow layout were inspected in Chrome. These checks were made by Claude.
 
 **Not yet checked.** The launch scripts were not run on Windows. Acceptance items W1–W3, display in a real browser on Windows, and a first-time reader check are open. The `verify_exp3_review_data.py` named in the design note was not available, so `scripts/verify_workflow_results.py` was written for the same purpose. A public reference for Report II is not set. The citation file (CITATION.cff) still names the released 1.0.0. P1 (individual Experiment 2 records) has not been started.
+
+## November 22: case selector and side-by-side comparison (1.2.0 release candidate)
+
+**What changed.** Implemented the "before the original records arrive" work of design note v0.4: a case selector, a side-by-side comparison of two records of the same case, a "Read the benchmark" view (showing "not run yet"), and the expected state next to the stated one on the second card. Case A (pilot) is present only as "original records not included yet".
+
+**Why.** The demo's lead example becomes the difference between two records of the same model under two conditions. The screen is built on the Experiment 3 records before the pilot records arrive.
+
+**What was checked, and where.** On Linux with Python 3: 59 app tests, the release tests, both UI logic checks and the checksum verification passed. A test pins the hashes of the four Case B records to those of the 1.1.0 candidate. The comparison, the pending case and the benchmark view were inspected in Chrome. Checked by Claude.
+
+**Not yet checked.** The Case A package has not arrived; fixing it in the repository and acceptance item A1 are open. Including the control case (S3) requires widening joint success to "matches the expected state", which will raise the rules version. Launch on Windows (W1–W3) and a first-time reader check remain open.

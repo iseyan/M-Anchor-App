@@ -37,10 +37,17 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   // Frozen record 1 (initial view): payment only.
   assert.equal(e.recorded.children.length, 4);
   assert.equal(e.recorded.value, 'qwen3-C4P');
-  assert.match(e.appversion.textContent, /^M-Anchor App 1\.1\.0$/);
+  assert.match(e.appversion.textContent, /^M-Anchor App 1\.2\.0$/);
+  // Until the pilot records are included, the first available case (Case B) is the initial view.
+  assert.equal(e.caseselect.children.length, 2);
+  assert.equal(e.caseselect.value, 'F-LT6-01');
+  assert.match(e.caseselect.children[0].textContent, /Case A \(pilot\).*records not included yet/);
+  assert.equal(e.comparesection.className, 'hidden');
   assert.match(e.status.textContent, /^Frozen record · 凍結記録 Experiment 3 · commit 6315248 · F-LT6-01 · qwen3:4b-q4_K_M · rep 1 · C4P/);
   assert.equal(e['a-payment'].textContent, 'Applied once / 正しい反映 1件');
   assert.equal(e['a-cause'].textContent, 'Unconfirmed / 未決');
+  assert.match(e['w-cause'].textContent, /^Expected for this case: unconfirmed\. Stated in the final handoff: unconfirmed\./);
+  assert.equal(e['v-cause'].className, 'verdict yes');
   assert.equal(e['a-denied'].textContent, 'None denied / 拒否なし');
   assert.match(e.joint.textContent, /\(primary\): achieved\. .*\(secondary\): achieved/);
   assert.match(e.statechange.textContent, /applied to the ledger: 0\./);
@@ -71,6 +78,32 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e['w-payment'].textContent, /^An undefined operation name/);
   assert.equal(e['a-denied'].textContent, 'Denied: 1 / 拒否あり 1件');
   assert.match(e['s-gate'].textContent, /not a defined operation/);
+
+  // Side-by-side comparison: marks follow mapped states and payment content, not wording.
+  await choose('recorded', 'qwen3-C4');
+  await choose('compare', 'qwen3-C4P');
+  assert.equal(e.comparesection.className, '');
+  let rows = e['s-compare'].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0], r.className]);
+  assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Was', 'Payments', 'Denied', 'Joint']);   // payment, ledger, no proposal vs none denied, joint success
+  assert.match(e['s-compare'].textContent, /4 of 6 items differ/);
+  assert.match(e['s-compare'].textContent, /Cause in the final handoff \(expected: unconfirmed\).*Unconfirmed.*Unconfirmed.*same/);
+  await choose('recorded', 'gemma3-C3');
+  assert.equal(e.compare.value, 'qwen3-C4P');
+  rows = e['s-compare'].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0], r.className]);
+  // Same payment written with a different amount format ("98000" vs 98000) is not marked; only the denied proposal differs.
+  assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Denied']);
+  await choose('compare', '');
+  assert.equal(e.comparesection.className, 'hidden');
+
+  // A case whose original records are not included shows no result at all.
+  await choose('caseselect', 'PILOT-A');
+  assert.equal(e.pending.className, 'notice');
+  assert.match(e.pending.textContent, /Original records not included yet.*原記録未収録/);
+  assert.equal(e.casebody.className, 'hidden');
+  assert.equal(e.caseinfo.className, 'hidden');
+  await choose('caseselect', 'F-LT6-01');
+  assert.equal(e.casebody.className, '');
+  assert.equal(e.recorded.value, 'qwen3-C4P');
 
   // Field example: switching the display changes neither the cards nor the record hash, and assigns nothing.
   await choose('recorded', 'qwen3-C4P');
@@ -111,7 +144,7 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(firstHash, new RegExp('^record_sha256: ' + saved.record.record_sha256));
   assert.equal(saved.record.source.kind, 'edited_input');
   assert.equal(saved.record.context.based_on, 'qwen3-C4P');
-  assert.equal(saved.record.context.app_version, '1.1.0');
+  assert.equal(saved.record.context.app_version, '1.2.0');
   assert.equal(saved.record.receiver.status, 'not_measured');
   assert.equal(saved.record.ledger.after.exports.length, 0);
   assert.equal(saved.record.ledger.diff.length, 3);
@@ -128,6 +161,14 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.status.textContent, /^Frozen record/);
   assert.equal(e.hash.textContent, frozenHash);
 
+  // Benchmark tab: "not run yet", and no numbers.
+  e['tab-benchmark'].onclick();
+  assert.equal(e['panel-benchmark'].className, '');
+  assert.equal(e['panel-replay'].className, 'hidden');
+  assert.equal(e['tab-benchmark'].attributes['aria-selected'], 'true');
+  assert.match(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /Not run yet\./);
+  assert.doesNotMatch(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /\d+\s*\/\s*\d+|\d+%/);
+
   // Results tab: fixed values with sources, and the recount entry.
   e['tab-results'].onclick();
   assert.equal(e['panel-results'].className, '');
@@ -143,5 +184,5 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.recount.textContent, /exp3_review_data_v2\.zip @ e2aeb9f/);
   e['tab-replay'].onclick();
   assert.equal(e['panel-replay'].className, '');
-  console.log('PASS: workflow demo — four frozen records, field example leaves record and hash unchanged, edited input (receiver not measured, no carry-over, stable hash), unreadable input, results tables and recount entry');
+  console.log('PASS: workflow demo — case selector with a pending case, four frozen records, side-by-side comparison, benchmark not run, field example leaves record and hash unchanged, edited input (receiver not measured, no carry-over, stable hash), unreadable input, results tables and recount entry');
 })().catch(error => { console.error(error); process.exitCode = 1; });

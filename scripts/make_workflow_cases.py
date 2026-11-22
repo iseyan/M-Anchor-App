@@ -87,8 +87,14 @@ def main():
             'note': 'Case text, model outputs and experiment results are copied verbatim from the frozen Experiment 3 records. English glosses were written for this demo and are not part of the experiment.',
         },
         'cases': [{
-            'id': CASE_ID, 'type': case['type'],
-            'title': {'en': 'Cause unresolved, payment approved', 'ja': '原因は未決、支払いは承認済み'},
+            'id': 'PILOT-A', 'status': 'pending',
+            'title': {'en': 'Case A (pilot): a memo asserts the cause without formal support', 'ja': 'ケースA（予備試験）：業務メモが原因を断定、正式な根拠なし'},
+            'pending_note': {'en': 'Original records not included yet. This case will show two records from the same model (gpt-oss:20b) on the same documents, under an ordinary caution instruction and under the M-Anchor method. It is included only after the original records are fixed in the experiment repository and replayed through this app.',
+                             'ja': '原記録未収録。同じモデル（gpt-oss:20b）・同じ資料で、通常の注意指示と M-Anchor 方式の2記録を並べるケースである。原記録を実験のリポジトリに固定し、このアプリで再生して照合した後に収録する。'},
+        }, {
+            'id': CASE_ID, 'status': 'available', 'type': case['type'],
+            'title': {'en': 'Case B (Experiment 3): cause unresolved, payment approved', 'ja': 'ケースB（実験3）：原因は未決、支払いは承認済み'},
+            'short_title': {'en': 'Cause unresolved, payment approved', 'ja': '原因は未決、支払いは承認済み'},
             'summary': {'en': 'The cause of a cost change is still under investigation. The payment itself has a valid approval. The payment should go through once, and the cause should be handed off as unresolved.',
                         'ja': '費用が変動した原因は調査中である。支払いには有効な承認がある。支払いを一度だけ進め、原因は未決のまま引き継ぐのが正しい。'},
             'task': {'ja': case['task'], 'en': GLOSS['task']},

@@ -15,7 +15,7 @@ class WorkflowLogicTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.data = load_cases()
-        cls.case = cls.data['cases'][0]
+        cls.case = next(c for c in cls.data['cases'] if c['status'] == 'available')
         cls.recorded = {r['id']: r for r in cls.case['recorded']}
         cls.claims = {'approval_valid': 'confirmed', 'approver_authorized': 'confirmed', 'cause_identified': 'unconfirmed'}
         cls.payment = json.loads(cls.recorded['qwen3-C4P']['submission']['content'])['actions'][0]
@@ -186,6 +186,16 @@ class WorkflowLogicTest(unittest.TestCase):
             with self.subTest(body=str(body)[:30]), self.assertRaises(WorkflowError):
                 run_request(self.data, body)
 
+    def test_hashes_of_the_four_frozen_records_are_unchanged_from_the_1_1_0_candidate(self):
+        self.assertEqual({k: self.run_recorded(k)['record_sha256'][:10] for k in self.recorded},
+            {'qwen3-C4P': '40b8c36e8a', 'gemma3-C3': '10d04a17ec', 'qwen3-C4': '4a228aa241', 'gemma3-C4P': 'c0f04d540b'})
+
+    def test_pending_case_has_no_records_and_cannot_be_run(self):
+        pending = next(c for c in self.data['cases'] if c['id'] == 'PILOT-A')
+        self.assertEqual(set(pending), {'id', 'status', 'title', 'pending_note'})
+        with self.assertRaises(WorkflowError):
+            run_request(self.data, {'case_id': 'PILOT-A', 'submission': '{}'})
+
     def test_bundled_results_match_the_design_values(self):
         results = load_results()
         exp = {e['id']: e for e in results['experiments']}
@@ -254,7 +264,8 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn('Workflow demo', page)
         with urlopen(self.url + '/workflow/cases', timeout=5) as response:
             cases = json.loads(response.read())
-        item = cases['cases'][0]['recorded'][1]
+        item = cases['cases'][1]['recorded'][1]
+        self.assertEqual([(c['id'], c['status']) for c in cases['cases']], [('PILOT-A', 'pending'), ('F-LT6-01', 'available')])
         record = self.post({'case_id': 'F-LT6-01', 'submission': item['submission']['content']})
         self.assertEqual(record['schema'], 'm-anchor-workflow-record/v2')
         self.assertEqual(record['checks']['denied_proposals']['state'], 'denied')
@@ -270,7 +281,8 @@ class WorkflowRouteTest(unittest.TestCase):
             self.assertNotIn(secret, serialized)
 
     def test_invalid_requests_and_boundary(self):
-        for body in ({'case_id': 'F-LT6-01'}, {'case_id': 'unknown', 'submission': '{}'}, {'case_id': 'F-LT6-01', 'submission': '{}', 'based_on': 'x'}):
+        for body in ({'case_id': 'F-LT6-01'}, {'case_id': 'unknown', 'submission': '{}'}, {'case_id': 'F-LT6-01', 'submission': '{}', 'based_on': 'x'},
+                     {'case_id': 'PILOT-A', 'submission': '{}'}):   # records not included yet: nothing can be run
             with self.subTest(body=str(body)[:40]), self.assertRaises(HTTPError) as caught:
                 self.post(body)
             self.assertEqual(caught.exception.code, 400)
