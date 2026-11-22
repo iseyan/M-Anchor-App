@@ -136,3 +136,9 @@ A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing th
 **What was checked, and where.** On Linux with Python 3: 59 app tests, the release tests, both UI logic checks and the checksum verification passed. A test pins the hashes of the four Case B records to those of the 1.1.0 candidate. The comparison, the pending case and the benchmark view were inspected in Chrome. Checked by Claude.
 
 **Not yet checked.** The Case A package has not arrived; fixing it in the repository and acceptance item A1 are open. Including the control case (S3) requires widening joint success to "matches the expected state", which will raise the rules version. Launch on Windows (W1–W3) and a first-time reader check remain open.
+
+## November 22: readability of the comparison (1.2.0 candidate, continued)
+
+**What changed.** Above the comparison table: a one-sentence reading of the two records and the kind of comparison (same model or not, same condition or not). Column headings now show model, condition and the meaning of the condition symmetrically, with source details folded. The "4 of 6 items differ" count was replaced by a sentence naming what differs and what is the same. The joint row is named "Payment and correct handoff together (Experiment 3 primary)" and its condition is stated once under the table. The interface language can be switched between Japanese, English and both; original record text is not affected.
+
+**Checks.** On Linux: 59 app tests, the UI logic checks and the checksum verification passed. The Japanese-interface comparison was inspected in Chrome. Checked by Claude. Launch on Windows and a first-time reader check remain open.

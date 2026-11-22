@@ -84,12 +84,14 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   await choose('compare', 'qwen3-C4P');
   assert.equal(e.comparesection.className, '');
   let rows = e['s-compare'].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0], r.className]);
-  assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Was', 'Payments', 'Denied', 'Joint']);   // payment, ledger, no proposal vs none denied, joint success
-  assert.match(e['s-compare'].textContent, /4 of 6 items differ/);
+  assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Was', 'Payments', 'Denied', 'Payment']);   // payment, ledger, no proposal vs none denied, joint
+  assert.match(e['s-compare'].textContent, /Different: whether the payment was applied, denied proposals\. Same: the cause in the handoff, unauthorized changes applied\. The ledger and the joint row follow the payment row/);
+  assert.match(e.comparesummary.textContent, /^Both hand off the cause as unconfirmed\. The left record proposed no operation; the right record applied the correct payment once\./);
+  assert.match(e.status.textContent, /^Left record · 左の記録 Frozen record/);
   // Each column names its own model and condition; the note says what differs between the columns.
   const heads = e['s-compare'].children[0].children[0].children;
-  assert.match(heads[1].textContent, /^qwen3 · C4 Frozen record: Experiment 3 · commit 6315248 · F-LT6-01 · qwen3:4b-q4_K_M · rep 1 · C4 /);
-  assert.match(heads[2].textContent, /^qwen3 · C4P Frozen record: .* qwen3:4b-q4_K_M · rep 1 · C4P /);
+  assert.match(heads[1].textContent, /^qwen3 · C4 C4: gate \+ M-Anchor epistemic-state block .*Record details.*Frozen record: Experiment 3 · commit 6315248 · F-LT6-01 · qwen3:4b-q4_K_M · rep 1 · C4 · S2\|/);
+  assert.match(heads[2].textContent, /^qwen3 · C4P C4P: gate \+ epistemic-state block \+ sentence/);
   assert.match(e.comparekind.textContent, /^Same case, same model, different condition \(C4 vs C4P\)/);
   assert.match(e['s-compare'].textContent, /Cause in the final handoff \(expected: unconfirmed\).*Unconfirmed.*Unconfirmed.*same/);
   await choose('recorded', 'gemma3-C3');
@@ -98,12 +100,22 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   // Same payment written with a different amount format ("98000" vs 98000) is not marked; only the denied proposal differs.
   assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Denied']);
   assert.match(e.comparekind.textContent, /different model and different condition.*cannot be attributed.*同じ案件・異なるモデルと条件/);
-  assert.match(e['s-compare'].children[0].children[0].children[1].textContent, /^gemma3 · C3 /);
+  assert.match(e['s-compare'].children[0].children[0].children[1].textContent, /^gemma3 · C3 C3: gate only/);
+  assert.match(e.comparesummary.textContent, /The left record applied the correct payment once, and the gate denied delete_record; the right record applied the correct payment once\./);
+  assert.match(e.compare.children[1].textContent, /^gemma3 · C4P \(same model/);
   await choose('compare', 'gemma3-C4P');
   assert.match(e.comparekind.textContent, /^Same case, same model, different condition \(C3 vs C4P\)/);
   await choose('compare', 'qwen3-C4P');
   await choose('compare', '');
   assert.equal(e.comparesection.className, 'hidden');
+
+  // Interface language switch: one class on the root; records and results are untouched.
+  assert.equal(e.root.className, '');
+  e['lang-ja'].onclick();
+  assert.equal(e.root.className, 'lang-ja');
+  assert.equal(e['lang-ja'].attributes['aria-pressed'], 'true');
+  e['lang-both'].onclick();
+  assert.equal(e.root.className, '');
 
   // A case whose original records are not included shows no result at all.
   await choose('caseselect', 'PILOT-A');
