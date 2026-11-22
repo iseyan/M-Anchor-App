@@ -219,7 +219,7 @@ tr.differs td{background:#fbf7ec}
 </section>
 </div>
 
-<p class="source"><span class="en">Scope: one fixed case in a simulated workflow, and descriptive counts from two experiments with two small local models. The replayed records are single episodes chosen after the results were seen. No model is called from this screen and nothing here changes the app's authoritative store.</span><span class="ja" lang="ja">適用範囲：模擬業務の固定ケース1件と、小型ローカルモデル2種による2つの実験の件数の記述。再生する記録は、結果を見た後に選んだ1エピソードずつである。この画面からモデルは呼ばず、アプリの正本も変更しない。</span></p>
+<p class="source"><span class="en">Scope: fixed cases in a simulated workflow, and descriptive counts from two experiments with two small local models. The replayed records are single runs chosen after the results were seen; the pilot case is a development example with one run per condition. No model is called from this screen and nothing here changes the app's authoritative store.</span><span class="ja" lang="ja">適用範囲：模擬業務の固定ケースと、小型ローカルモデル2種による2つの実験の件数の記述。再生する記録は、結果を見た後に選んだ1回ずつの実行である。予備試験のケースは開発用の例で、各条件1回である。この画面からモデルは呼ばず、アプリの正本も変更しない。</span></p>
 </main>
 <script>
 "use strict";
@@ -275,6 +275,8 @@ const STATUS_WORD = { confirmed: ['confirmed', '確定'], unconfirmed: ['unconfi
 const word = v => STATUS_WORD[v] ? STATUS_WORD[v][0] + ' / ' + STATUS_WORD[v][1] : String(v);
 const GROUP = { authorization: ['Payment authorization', '支払いの承認'], cause: ['Cause of the cost change', '費用変動の原因'] };
 
+const shortOf = r => r.sender.split(':')[0] + ' · ' + (r.condition_short || r.condition);
+const isRecorded = record => record.source.kind === 'frozen_record' || record.source.kind === 'pilot_record';
 function recordedItem() { return current.recorded.find(r => r.id === $('recorded').value); }
 function sourceLine(src) { return src.experiment + ' · commit ' + src.commit + ' · ' + src.case_id + ' · ' + src.sender + ' · rep ' + src.rep + ' · ' + src.condition; }
 
@@ -314,11 +316,12 @@ function claimRows(target, getter) {
 }
 
 function render(record) {
-  const item = recordedItem(), frozen = record.source.kind === 'frozen_record', c = record.checks;
+  const item = recordedItem(), frozen = isRecorded(record), pilot = current.origin === 'pilot', c = record.checks;
   const status = $('status'); status.replaceChildren();
-  if ($('compare').value) status.append(el('span', 'badge', 'Left record · 左の記録'));
-  if (frozen) { status.append(el('span', 'badge frozen', 'Frozen record · 凍結記録')); status.append(biEl('span', '', sourceLine(record.source) + '. Replayed through the gate and ledger in this app.', '実験の凍結記録。このアプリのゲートと台帳で再生した結果を表示している。')); }
-  else { status.append(el('span', 'badge edited', 'Edited input, simulated · 編集した入力の模擬実行')); status.append(biEl('span', '', 'Computed from the initial state of the case. It is not a recorded model output.', 'ケースの初期状態から計算した結果である。モデルの記録ではない。')); }
+  if ($('compare').value) status.append(biEl('span', 'badge', 'Left record', '左の記録'));
+  if (frozen && pilot) { status.append(biEl('span', 'badge frozen', 'Pilot record, converted', '予備試験の記録（変換して再生）')); status.append(biEl('span', '', sourceLine(record.source) + '. One run. The two-field pilot output was converted to this app\'s input and replayed through the gate and ledger in this app.', '予備試験の記録。1回の実行。2項目の出力をこのアプリの入力に変換し、このアプリのゲートと台帳で再生した結果を表示している。')); }
+  else if (frozen) { status.append(biEl('span', 'badge frozen', 'Frozen record', '凍結記録')); status.append(biEl('span', '', sourceLine(record.source) + '. Replayed through the gate and ledger in this app.', '実験の凍結記録。このアプリのゲートと台帳で再生した結果を表示している。')); }
+  else { status.append(biEl('span', 'badge edited', 'Edited input, simulated', '編集した入力の模擬実行')); status.append(biEl('span', '', 'Computed from the initial state of the case. It is not a recorded model output.', 'ケースの初期状態から計算した結果である。モデルの記録ではない。')); }
 
   const p = PAYMENT[c.payment.state], pr_ = REASON[c.payment.reason];
   setCard('payment', p[2], p[0], p[1], pr_[0], pr_[1]);
@@ -332,14 +335,27 @@ function render(record) {
   else if (d.state === 'no_proposal') setCard('denied', '', dl[0], dl[1], 'No operation was proposed.', '操作は提案されなかった。');
   else setCard('denied', '', dl[0], dl[1], 'The gate allowed every proposed operation.', 'ゲートは、提案された操作をすべて許可した。');
   const j = record.summary.joint_success, j2 = record.summary.joint_success_without_denied_operation;
-  if (j === null) $('joint').textContent = '';
-  else bi($('joint'), 'LT6 joint success (primary): ' + (j ? 'achieved' : 'not achieved') + '. Joint success with no denied proposal (secondary): ' + (j2 ? 'achieved' : 'not achieved') + '.',
-    'LT6 の両立（主指標）：' + (j ? '成立' : '不成立') + '。拒否を伴わない両立（副次）：' + (j2 ? '成立' : '不成立') + '。');
+  const jn = pilot ? ['Payment and unconfirmed handoff together (same definition as the Experiment 3 primary measure): ', '支払いと未決の引き継ぎの両立（実験3の主指標と同じ定義）：'] : ['LT6 joint success (primary): ', 'LT6 の両立（主指標）：'];
+  if (j === null) {
+    const hit = c.handoff_cause.state === expected;
+    bi($('joint'), 'The handoff ' + (hit ? 'matches' : 'does not match') + ' the state expected for this case (' + ew[0] + '). The Experiment 3 joint measure is defined for a cause handed off as unconfirmed, so it is not computed here.', '引き継ぎは、このケースの期待状態（' + ew[1] + '）と' + (hit ? '一致している' : '一致していない') + '。実験3の両立は「未決として引き継ぐ」場合の定義なので、このケースでは計算しない。');
+  }
+  else bi($('joint'), jn[0] + (j ? 'achieved' : 'not achieved') + '. Joint success with no denied proposal (secondary): ' + (j2 ? 'achieved' : 'not achieved') + '.',
+    jn[1] + (j ? '成立' : '不成立') + '。拒否を伴わない両立（副次）：' + (j2 ? '成立' : '不成立') + '。');
   bi($('statechange'), 'Unauthorized state changes or external transfers applied to the ledger: ' + c.unauthorized_changes_applied + '.', '台帳に入った権限外の状態変更・外部送信：' + c.unauthorized_changes_applied + ' 件。');
 
   // 1 Assessment: the recorded first-stage output of the selected run, cause and authorization shown apart.
   const a = $('s-assessment'); a.replaceChildren();
   let assessment = null;
+  if (pilot) {
+    // The pilot had no separate assessment stage. Show the model's original output and what this condition added to the request.
+    const orig = el('div', 'item'); orig.append(biEl('div', 'k', 'Original model output (two fields)', 'モデルの原出力（2項目）')); orig.append(el('code', '', item.original.content)); a.append(orig);
+    const add = el('div', 'item'); add.append(biEl('div', 'k', 'Added to the request in condition ' + item.condition, '条件 ' + item.condition + ' で依頼に加えた内容'));
+    if (item.input_added.system || item.input_added.user) { for (const t of [item.input_added.system, item.input_added.user]) if (t) add.append(el('div', '', t)); }
+    else add.append(biEl('div', '', 'Nothing beyond the shared request.', '共通の依頼のほかに追加なし。'));
+    a.append(add);
+    a.append(biEl('p', 'source', 'The pilot had no separate assessment stage. Request text is reconstructed from the pilot code.' + (frozen ? '' : ' It belongs to the record the edit started from.'), '予備試験に、独立した評価段階はない。依頼文は実行コードから再構成したものである。' + (frozen ? '' : '編集前の記録のものである。')));
+  } else {
   try { assessment = JSON.parse(item.assessment.content); } catch (error) { assessment = null; }
   if (assessment && assessment.claims) {
     claimRows(a, (claim, row) => {
@@ -352,6 +368,7 @@ function render(record) {
     a.append(rec);
   } else a.append(biEl('p', 'empty', 'The recorded assessment could not be read.', '記録された評価を読めなかった。'));
   a.append(biEl('p', 'source', 'Recorded output of ' + item.sender + ', shared by all conditions of this trial.' + (frozen ? '' : ' It belongs to the record the edit started from.'), item.sender + ' の記録された出力。この試行の全条件で共有。' + (frozen ? '' : '編集前の記録のものである。')));
+  }
 
   // 2 Proposal, 3 Gate, 4 Ledger
   const pr = $('s-proposal'), g = $('s-gate'), l = $('s-ledger'); pr.replaceChildren(); g.replaceChildren(); l.replaceChildren();
@@ -379,6 +396,7 @@ function render(record) {
   before.requests.forEach((req, i) => { const now = after.requests[i]; const row = el('div', 'item'); row.append(biEl('div', 'k', 'Request ' + req.request_id, '申請 ' + req.request_id)); row.append(el('span', '', req.status + (now && now.status !== req.status ? ' → ' + now.status : ' (unchanged / 変更なし)'))); l.append(row); });
   before.approvals.forEach((apr, i) => { const now = after.approvals[i]; const row = el('div', 'item'); row.append(biEl('div', 'k', 'Approval ' + apr.approval_id, '承認 ' + apr.approval_id)); row.append(el('span', '', now && now.used && !apr.used ? 'unused → used / 未使用 → 使用済み' : 'unchanged / 変更なし')); l.append(row); });
   const o = el('div', 'item'); o.append(biEl('div', 'k', 'Deletions and external transfers', '削除・外部送信')); o.append(el('b', '', String(after.deletions.length + after.exports.length + after.http_calls.length))); l.append(o);
+  if (pilot) l.append(biEl('p', 'source', 'Amount, payee and IDs are demo values. The pilot recorded only the payment count.', '金額・支払先・IDはデモ用の値である。予備試験が記録したのは支払いの件数だけである。'));
   l.append(biEl('p', 'source', record.ledger.audit.length + ' audit row(s), each tied to a gate decision. Each run starts from the initial ledger.', '監査行 ' + record.ledger.audit.length + ' 件。各行はゲートの決定に結び付く。実行は毎回、初期の台帳から始まる。'));
 
   // 5 Handoff
@@ -398,12 +416,20 @@ function render(record) {
     rx.append(biEl('p', 'source', 'Recorded in the experiment (' + record.receiver.call_id + '). This is what the receiver wrote after reading the handoff; it is a separate record from the handoff card above and is not used in the three results.', '実験で記録された応答（' + record.receiver.call_id + '）。受け手が引き継ぎを読んで書いた内容で、上の引き継ぎのカードとは別の記録である。3つの結果には使わない。'));
   } else {
     rx.append(biEl('p', '', 'Not measured.', '未計測。'));
+    if (pilot) rx.append(biEl('p', 'source', 'The pilot did not run a receiver. How a receiver would read this handoff is not known from this record.', '予備試験では受け手を実行していない。受け手がこの引き継ぎをどう読むかは、この記録からは分からない。'));
+    else {
     let reply = null; try { reply = JSON.parse(item.receiver.content); } catch (error) { reply = null; }
     rx.append(biEl('p', 'source', 'No receiver was run for the edited input. For reference only, the receiver in the record the edit started from (' + item.id + ') answered: ' + (reply ? reply.decision + ' — ' + reply.reason : item.receiver.content), '編集した入力に対して受け手は実行していない。参考として、編集前の記録（' + item.id + '）での受け手の応答は：' + (reply ? reply.decision + ' — ' + reply.reason : item.receiver.content)));
+    }
   }
 
   // Cross-check with the experiment record
-  if (frozen) {
+  if (frozen && pilot) {
+    const x = item.experiment_record, paid = record.operations.filter(op => op.tool === 'approve_payment' && op.gate === 'allow' && op.applied).length;
+    const same = paid === x.payment_count && after.payments.length === x.payment_count && c.handoff_cause.value === x.cause_state;
+    bi($('match'), (same ? 'Checked against the pilot record: the payment was allowed, the ledger holds ' + x.payment_count + ' payment, and the cause state is the same (' + x.cause_state + ').' : 'Checked against the pilot record: the payment count or the cause state differs.') + ' The pilot recorded no amount, payee or operation ID, so those are checked against the demo ledger only.',
+      (same ? '予備試験の原記録と照合：支払いは許可され、台帳の支払いは ' + x.payment_count + ' 件、原因の状態（' + x.cause_state + '）も一致している。' : '予備試験の原記録と照合：支払いの件数または原因の状態が違っている。') + '予備試験は金額・支払先・操作IDを記録していないので、それらの照合はデモ用の台帳に対するものである。');
+  } else if (frozen) {
     const mine = record.operations.map(op => [op.tool, op.gate, op.reasons.join(','), op.applied].join('|')).join(';');
     const theirs = item.experiment_record.operations.map(op => [op.tool, op.gate, op.reasons.join(','), op.applied].join('|')).join(';');
     const same = mine === theirs && JSON.stringify(after.payments) === JSON.stringify(item.experiment_record.payments);
@@ -444,22 +470,22 @@ async function renderCompare() {
   if (token !== compareToken) return;
   const left = mapped(lastRecord), right = mapped(otherRecord), item = recordedItem();
   // Each column carries its own source: model and condition in the heading, the full reference below it.
-  const short = r => r.sender.split(':')[0] + ' · ' + r.condition;
+  const short = shortOf;
   const column = (record, rec) => {
     const th = el('th', '');
-    if (record.source.kind === 'frozen_record') {
+    if (isRecorded(record)) {
       th.append(el('div', '', short(rec)));
       th.append(biEl('div', 'source', rec.condition + ': ' + rec.condition_note.en, rec.condition + '：' + rec.condition_note.ja));
       const more = el('details'); more.append(biEl('summary', 'source', 'Record details', '記録の詳細'));
-      more.append(el('div', 'source', 'Frozen record: ' + sourceLine(record.source) + ' · ' + record.source.call_id + ' · record_sha256 ' + record.record_sha256.slice(0, 12))); th.append(more);
+      more.append(el('div', 'source', (record.source.kind === 'pilot_record' ? 'Pilot record, converted: ' : 'Frozen record: ') + sourceLine(record.source) + ' · ' + record.source.call_id + ' · record_sha256 ' + record.record_sha256.slice(0, 12))); th.append(more);
     } else { th.append(el('div', '', 'Edited input')); th.append(biEl('div', 'source', 'Simulated from the initial state; not a recorded model output. Edited from ' + short(rec) + '.', '編集した入力の模擬実行。モデルの記録ではない。編集前：' + short(rec))); }
     return th;
   };
   // Say what differs between the two columns, so a difference is not attributed to the wrong factor.
-  const frozenBoth = lastRecord.source.kind === 'frozen_record';
+  const frozenBoth = isRecorded(lastRecord), one = current.origin === 'pilot' ? ['One run each, from a development pilot.', '予備試験の1例。各条件1回。'] : ['One episode each.', '各1エピソード。'];
   const sameModel = item.sender === other.sender, sameCondition = item.condition === other.condition;
   if (!frozenBoth) bi($('comparekind'), 'Same case. The left column is an edited input, so this is not a comparison of two recorded outputs.', '同じ案件。左の列は編集した入力なので、記録された2つの出力の比較ではない。');
-  else if (sameModel && !sameCondition) bi($('comparekind'), 'Same case, same model, different condition (' + item.condition + ' vs ' + other.condition + '). One episode each.', '同じ案件・同じモデル・異なる条件（' + item.condition + ' と ' + other.condition + '）。各1エピソード。');
+  else if (sameModel && !sameCondition) bi($('comparekind'), 'Same case, same model, different condition (' + item.condition + ' vs ' + other.condition + '). ' + one[0], '同じ案件・同じモデル・異なる条件（' + item.condition + ' と ' + other.condition + '）。' + one[1]);
   else if (!sameModel && sameCondition) bi($('comparekind'), 'Same case, same condition, different model. One episode each.', '同じ案件・同じ条件・異なるモデル。各1エピソード。');
   else bi($('comparekind'), 'Kind of comparison: records from different models and conditions. Same case, different model and different condition. Both change at once, so a difference on this screen cannot be attributed to either one.', '比較の種類：異なるモデル・条件の記録比較。同じ案件・異なるモデルと条件。両方が同時に変わるので、画面上の差をどちらかに帰属させることはできない。');
   const table = el('table'), head = el('tr');
@@ -467,15 +493,16 @@ async function renderCompare() {
   table.append(head);
   const ROWS = [['payment', 'Was the correct payment applied?', '正しい支払いが反映されたか'], ['ledger', 'Payments in the ledger', '台帳の支払い'],
     ['cause', 'Cause in the final handoff (expected: ' + STATUS_WORD[current.gold.claims[current.focus_claim]][0] + ')', '最終の引き継ぎの原因（期待：' + STATUS_WORD[current.gold.claims[current.focus_claim]][1] + '）'],
-    ['denied', 'Denied proposals', '拒否された提案'], ['unauthorized', 'Unauthorized changes applied', '権限外の適用'], ['joint', 'Payment and correct handoff together (Experiment 3 primary)', '支払いと正しい引き継ぎの両立（実験3の主指標）']];
+    ['denied', 'Denied proposals', '拒否された提案'], ['unauthorized', 'Unauthorized changes applied', '権限外の適用'], ['joint', 'Payment and correct handoff together (' + (current.origin === 'pilot' ? 'same definition as the Experiment 3 primary measure' : 'Experiment 3 primary') + ')', '支払いと正しい引き継ぎの両立（' + (current.origin === 'pilot' ? '実験3の主指標と同じ定義' : '実験3の主指標') + '）']];
   const diffNames = [[], []], sameNames = [[], []];
   for (const [key, en, ja] of ROWS) {
+    if (key === 'joint' && lastRecord.summary.joint_success === null && otherRecord.summary.joint_success === null) continue;   // not defined for this case
     const differs = left[key][0] !== right[key][0];
     (differs ? diffNames : sameNames)[0].push(key); (differs ? diffNames : sameNames)[1].push(key);
     const tr = el('tr', differs ? 'differs' : '');
     tr.append(biEl('td', '', en, ja)); tr.append(biEl('td', '', left[key][0], left[key][1])); tr.append(biEl('td', '', right[key][0], right[key][1]));
     tr.append(differs ? el('td', '', '') : biEl('td', 'same', 'same', '同じ'));
-    if (differs) tr.children[3].append(el('span', 'diff', '≠ differs / 違い'));
+    if (differs) tr.children[3].append(biEl('span', 'diff', '≠ differs', '≠ 違い'));
     table.append(tr);
   }
   box.replaceChildren(table);
@@ -574,7 +601,7 @@ function showTab(name) {
 function fillCompare() {
   const select = $('compare'); select.replaceChildren();
   const none = el('option', '', 'Single record — 単独で表示'); none.value = ''; select.append(none);
-  const me = recordedItem(), shortName = r => r.sender.split(':')[0] + ' · ' + r.condition;
+  const me = recordedItem(), shortName = shortOf;
   const others = current.recorded.filter(r => r.id !== me.id).sort((x, y) => (y.sender === me.sender) - (x.sender === me.sender));   // same model first
   for (const r of others) { const option = el('option', '', shortName(r) + (r.sender === me.sender ? ' (same model / 同じモデル)' : ' (different model / 別のモデル)')); option.value = r.id; select.append(option); }
   if (!current.recorded.some(r => r.id === select.value) || select.value === $('recorded').value) select.value = '';
@@ -594,11 +621,16 @@ function selectCase() {
   $('pending').className = 'notice hidden'; $('caseinfo').className = ''; $('casebody').className = '';
   current = chosen;
   bi($('casesummary'), current.short_title.en + '. ' + current.summary.en, current.short_title.ja + '。' + current.summary.ja);
-  bi($('casetask'), 'Task given to the model: ' + current.task.en, 'モデルへの依頼：' + current.task.ja);
+  const pilotCase = current.origin === 'pilot', src = current.source || data.source;
+  bi($('casetask'), (pilotCase ? 'Instruction given to the model (reconstructed from the pilot code; original in Japanese): ' : 'Task given to the model: ') + current.task.en, (pilotCase ? 'モデルへの指示（実行コードから再構成）：' : 'モデルへの依頼：') + current.task.ja);
+  if (pilotCase) bi($('provenance'), 'Model outputs and payment counts are copied from the pilot package fixed at ' + src.repository + ', commit ' + src.commit + ' (' + src.records_path + ', package SHA-256 ' + src.package_sha256 + '). Model ' + src.model + '. ' + src.note,
+    'モデル出力と支払い件数は、' + src.repository + ' のコミット ' + src.commit + ' に固定した予備試験の資料からの写しである（' + src.records_path + '、資料の SHA-256 ' + src.package_sha256 + '）。モデル ' + src.model + '。原文は日本語。依頼文は実行コードからの再構成で、送信した本文とモデル応答の全体は保存されていない。条件 B・C は、実験2・3の GC・C4 の厳密な再現ではない。予備試験の簡易ゲートは、このアプリのゲートより単純である。');
+  else bi($('provenance'), 'Case text, model outputs and experiment results are copied from the frozen ' + src.experiment + ' records: ' + src.repository + ' at commit ' + src.commit + ', run ' + src.run + '. English text in the case is a gloss written for this demo.',
+    'ケース本文・モデル出力・実験結果は、凍結した実験3の記録からの写しである：' + src.repository + ' のコミット ' + src.commit + '、実行 ' + src.run + '。ケース内の英文は、このデモのために付けた訳である。');
   const docs = $('documents'); docs.replaceChildren();
   for (const d of current.documents) { const row = el('div', 'item'); row.append(el('b', '', d.id + ' (' + d.kind + ') ')); row.append(biEl('span', '', d.gloss_en, d.text)); docs.append(row); }
   const select = $('recorded'); select.replaceChildren();
-  for (const r of current.recorded) { const option = el('option', '', r.sender.split(':')[0] + ' · ' + r.condition); option.value = r.id; select.append(option); }
+  for (const r of current.recorded) { const option = el('option', '', shortOf(r)); option.value = r.id; select.append(option); }
   // A case can name the pair to show side by side as soon as it is opened.
   const pair = current.default_compare;
   select.value = pair ? pair[0] : current.recorded[0].id;
@@ -616,8 +648,6 @@ async function start() {
   for (const c of data.cases) { const option = el('option', '', c.title.en + ' — ' + c.title.ja + (c.status === 'available' ? '' : ' (records not included yet / 原記録未収録)')); option.value = c.id; caseSelect.append(option); }
   // Initial view: the first case whose records are included.
   caseSelect.value = data.cases.find(c => c.status === 'available').id;
-  bi($('provenance'), 'Case text, model outputs and experiment results are copied from the frozen ' + data.source.experiment + ' records: ' + data.source.repository + ' at commit ' + data.source.commit + ', run ' + data.source.run + '. English text in the case is a gloss written for this demo.',
-    'ケース本文・モデル出力・実験結果は、凍結した実験3の記録からの写しである：' + data.source.repository + ' のコミット ' + data.source.commit + '、実行 ' + data.source.run + '。ケース内の英文は、このデモのために付けた訳である。');
   renderResults();
   await selectCase();
 }

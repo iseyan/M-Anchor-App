@@ -7,7 +7,9 @@
 - Workflow demo: add a case selector and a side-by-side comparison of two records of the same case. Difference marks follow mapped states and payment content, not wording or order.
 - The second card is now "How was the cause handed off?" and shows the state expected for the case next to the state the handoff states.
 - Add a "Read the benchmark" view. Until the run is complete it shows "not run yet" and no numbers.
-- Case A (pilot) is listed as "original records not included yet". No record or result is shown for it until the original records are fixed and replayed. The initial view is Case B (Experiment 3).
+- Case A (pilot, `gpt-oss:20b`) is included. Its two records, ordinary caution and the M-Anchor method, open side by side. Replayed through this app's gate and simulated ledger, the payment is applied once in both conditions, and the cause is handed off as "confirmed" and "unconfirmed". It is a development example with one run per condition and is not counted in any benchmark. The receiver was not measured.
+- A control for Case A (a signed investigation report exists) is added. The expected state is "confirmed", and both conditions handed it off as confirmed. The Experiment 3 joint measure is not computed for this case.
+- The pilot output has two fields (payment proposal, cause state). The replayed input is converted from it, and amount, payee and IDs are demo values. The original output stays on the screen and in the record.
 - Results and hashes of the four Case B records are unchanged from the 1.1.0 candidate. The 1.1.0 candidate was not released.
 
 ## 1.1.0 release candidate: workflow demo — 2026-11-22 (Japan time)

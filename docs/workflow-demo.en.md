@@ -6,7 +6,7 @@ A local demo that accompanies Report II: the records of a simulated payment work
 
 It is part of the 1.2.0 release candidate.
 
-The 1.2.0 candidate adds a case selector, a side-by-side comparison of two records of the same case, and a "Read the benchmark" view (showing "not run yet" before the run). Case A (pilot) is listed as "original records not included yet" and shows no result until its original records are fixed and replayed. The second card is now "How was the cause handed off?" and shows the expected state next to the stated one.
+The 1.2.0 candidate adds a case selector, a side-by-side comparison of two records of the same case, and a "Read the benchmark" view (showing "not run yet" before the run). Case A (pilot, `gpt-oss:20b`) opens with its two records side by side: ordinary caution and the M-Anchor method. The payment is applied once in both; only the handoff of the cause differs (confirmed / unconfirmed). It is a development example with one run per condition, the receiver was not measured, and it is not counted in any benchmark. In the M-Anchor condition the cause state from the previous step is given to the model as an input field; the record shows that the state stayed in the handoff, not that the model judged it from the documents. The pilot output has two fields; the replayed input is converted from it, and amount, payee and IDs are demo values. A control with a signed investigation report (expected state "confirmed") can also be selected. The second card is now "How was the cause handed off?" and shows the expected state next to the stated one.
 
 ## How to open it
 

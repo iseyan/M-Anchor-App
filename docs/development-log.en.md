@@ -142,3 +142,17 @@ A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing th
 **What changed.** Above the comparison table: a one-sentence reading of the two records and the kind of comparison (same model or not, same condition or not). Column headings now show model, condition and the meaning of the condition symmetrically, with source details folded. The "4 of 6 items differ" count was replaced by a sentence naming what differs and what is the same. The joint row is named "Payment and correct handoff together (Experiment 3 primary)" and its condition is stated once under the table. The interface language can be switched between Japanese, English and both; original record text is not affected.
 
 **Checks.** On Linux: 59 app tests, the UI logic checks and the checksum verification passed. The Japanese-interface comparison was inspected in Chrome. Checked by Claude. Launch on Windows and a first-time reader check remain open.
+
+## November 22: Case A (pilot) included
+
+**What changed.** The GPT pilot package (SHA-256 `fe946a01…e844`) was fixed unchanged in the experiment repository (M-Anchor-challenge, branch `exp4-pilot-case-a`, commit `b2a346a`). S2 was imported as Case A and S3 as its control, and Case A is now the initial view. It opens with ordinary caution (B) and the M-Anchor method (C) side by side.
+
+**Conversion.** The pilot output has two fields, `payment` and `cause_state`, and its ledger record is a payment count only. To run it through the app's gate, `pay` becomes one payment matching the approval in a demo ledger, and `cause_state` becomes the cause field of the handoff. Amount, payee, request ID and approval ID are values supplied for this demo. The original output is kept in the case file, on the screen and in the source of each record.
+
+**A1 check (automated, by Claude; not a human check).** Replayed through the app's gate and simulated ledger: in both B and C the payment is allowed (all 14 checks pass), ledger payments go 0 → 1, nothing is denied and no unauthorized change is applied. The cause is handed off as "confirmed" in B and "unconfirmed" in C. This matches the pilot record (payment count 1, cause state, joint flag). Amount and payee are checked against the demo ledger only.
+
+**Rules.** The hashes of the four Case B records are unchanged from the 1.1.0 candidate (pinned by a test). The rules version stays `workflow-rules/1`. The Experiment 3 joint measure is defined for a cause handed off as unconfirmed, so it is not computed for the control case, whose expected state is "confirmed"; agreement with the expected state is shown instead. The two S3 outputs are the same text, so the source of the record follows the selected record.
+
+**Reading notes.** In condition C the cause state (`unconfirmed`) is given to the model as an input field. This one example shows that a state passed in a field stayed in the handoff. One run per condition; variation was not measured. Request text is reconstructed from the pilot code; the request as sent and the full model response were not saved. Arms B and C are not exact replications of GC and C4 of Experiments 2 and 3. The receiver was not measured.
+
+**Checks.** On Linux: app tests, release tests, both UI logic checks and the checksum verification passed. Checked by Claude. Rendering in a real browser on Windows and a first-time reader check remain open.

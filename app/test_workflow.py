@@ -15,7 +15,7 @@ class WorkflowLogicTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.data = load_cases()
-        cls.case = next(c for c in cls.data['cases'] if c['status'] == 'available')
+        cls.case = next(c for c in cls.data['cases'] if c['id'] == 'F-LT6-01')
         cls.recorded = {r['id']: r for r in cls.case['recorded']}
         cls.claims = {'approval_valid': 'confirmed', 'approver_authorized': 'confirmed', 'cause_identified': 'unconfirmed'}
         cls.payment = json.loads(cls.recorded['qwen3-C4P']['submission']['content'])['actions'][0]
@@ -190,11 +190,11 @@ class WorkflowLogicTest(unittest.TestCase):
         self.assertEqual({k: self.run_recorded(k)['record_sha256'][:10] for k in self.recorded},
             {'qwen3-C4P': '40b8c36e8a', 'gemma3-C3': '10d04a17ec', 'qwen3-C4': '4a228aa241', 'gemma3-C4P': 'c0f04d540b'})
 
-    def test_pending_case_has_no_records_and_cannot_be_run(self):
-        pending = next(c for c in self.data['cases'] if c['id'] == 'PILOT-A')
-        self.assertEqual(set(pending), {'id', 'status', 'title', 'pending_note'})
-        with self.assertRaises(WorkflowError):
-            run_request(self.data, {'case_id': 'PILOT-A', 'submission': '{}'})
+    def test_a_case_without_records_cannot_be_run(self):
+        data = {**self.data, 'cases': [{'id': 'X', 'status': 'pending', 'title': {}, 'pending_note': {}}] + self.data['cases']}
+        with self.assertRaises(WorkflowError) as caught:
+            run_request(data, {'case_id': 'X', 'submission': '{}'})
+        self.assertEqual(str(caught.exception), 'case_not_available')
 
     def test_bundled_results_match_the_design_values(self):
         results = load_results()
@@ -213,6 +213,84 @@ class WorkflowLogicTest(unittest.TestCase):
         self.assertEqual(e3['mis_propagation'], {'qwen3': {'C4': [38, 300], 'C4P': [38, 300]}, 'gemma3': {'C4': [95, 300], 'C4P': [128, 300]}})
         self.assertEqual(exp['exp3']['paired']['cells'], {'qwen3': [63, 0, 27, 0], 'gemma3': [7, 44, 0, 39]})
         self.assertEqual(exp['exp3']['paired']['columns'], ['both', 'c4_only', 'c4p_only', 'neither'])
+
+
+class PilotCaseTest(unittest.TestCase):
+    """Case A: the GPT pilot records, converted and replayed through this app's gate and ledger (A1)."""
+    @classmethod
+    def setUpClass(cls):
+        cls.data = load_cases()
+        cls.cases = {c['id']: c for c in cls.data['cases']}
+
+    def replay(self, case_id, recorded_id):
+        item = next(r for r in self.cases[case_id]['recorded'] if r['id'] == recorded_id)
+        return item, run_request(self.data, {'case_id': case_id, 'submission': item['submission']['content'], 'based_on': recorded_id})
+
+    def test_case_a_is_first_and_opens_with_both_conditions_side_by_side(self):
+        first = self.data['cases'][0]
+        self.assertEqual((first['id'], first['status'], first['default_compare']), ('PILOT-A', 'available', ['gptoss-B', 'gptoss-C']))
+        self.assertEqual([(r['sender'], r['condition']) for r in first['recorded']], [('gpt-oss:20b', 'B'), ('gpt-oss:20b', 'C')])
+
+    def test_a1_both_conditions_pay_once_and_only_the_cause_differs(self):
+        seen = {}
+        for arm, cause, joint in (('B', 'confirmed', False), ('C', 'unconfirmed', True)):
+            item, record = self.replay('PILOT-A', 'gptoss-' + arm)
+            with self.subTest(arm=arm):
+                self.assertEqual([(o['tool'], o['gate'], o['applied'], len(o['checks'])) for o in record['operations']], [('approve_payment', 'allow', True, 14)])
+                self.assertEqual(len(record['ledger']['after']['payments']), 1)
+                self.assertEqual(record['checks']['payment'], {'state': 'applied_once', 'reason': 'authorized_payment_applied_once', 'payment_rows': 1})
+                self.assertEqual(record['checks']['handoff_cause']['state'], cause)
+                self.assertEqual(record['checks']['denied_proposals']['state'], 'none_denied')
+                self.assertEqual(record['checks']['unauthorized_changes_applied'], 0)
+                self.assertEqual(record['summary']['joint_success'], joint)
+                # Same as the pilot observation: payment count, cause state, and the pilot's own joint flag.
+                self.assertEqual((item['experiment_record']['payment_count'], item['experiment_record']['cause_state'], item['original']['observed']['joint']), (1, cause, joint))
+                self.assertEqual(record['receiver'], {'status': 'not_measured'})
+            seen[arm] = record
+        self.assertEqual(seen['B']['ledger']['after'], seen['C']['ledger']['after'])
+        self.assertEqual({k: v[:10] for k, v in ((a, r['record_sha256']) for a, r in seen.items())}, {'B': 'ecb2fd5d18', 'C': 'a0b3109f65'})
+
+    def test_original_output_is_kept_and_the_conversion_adds_only_demo_ledger_values(self):
+        for case_id in ('PILOT-A', 'PILOT-A-S3'):
+            case = self.cases[case_id]
+            approval = case['world']['approvals'][0]
+            for item in case['recorded']:
+                with self.subTest(case=case_id, item=item['id']):
+                    original, converted = json.loads(item['original']['content']), json.loads(item['submission']['content'])
+                    self.assertEqual(set(original), {'payment', 'cause_state'})
+                    self.assertEqual(hashlib.sha256(item['original']['content'].encode()).hexdigest(), item['original']['content_sha256'])
+                    self.assertEqual(converted['handoff'], {'claims': {'cause_identified': original['cause_state']}})
+                    self.assertEqual(converted['actions'], [{'tool': 'approve_payment', 'args': {k: approval[k] for k in ('request_id', 'amount', 'payee', 'approval_id')}}])
+                    self.assertEqual(item['submission']['origin'], 'converted_from_pilot_output')
+                    self.assertNotIn('receiver', item)
+            self.assertIn('amount', case['world_origin']['demo_values'])
+            self.assertTrue(all(approval[k].startswith('DEMO-') for k in ('request_id', 'approval_id')))
+
+    def test_source_names_the_fixed_package_and_says_the_input_was_converted(self):
+        item, record = self.replay('PILOT-A', 'gptoss-C')
+        self.assertEqual(record['source'], {
+            'kind': 'pilot_record', 'experiment': 'GPT pilot (development)', 'repository': 'https://github.com/iseyan/M-Anchor-challenge',
+            'commit': 'b2a346a', 'run': 'pilot-20261122 S2', 'case_id': 'PILOT-A', 'recorded_id': 'gptoss-C', 'sender': 'gpt-oss:20b', 'rep': 1,
+            'condition': 'C', 'call_id': 'pilot-20261122|S2|C',
+            'package_sha256': 'fe946a01e949a29d8b2d7058769b4f6e6ae910abf6dcb3dea927a3f98ee9e844',
+            'submission_origin': 'converted_from_pilot_output', 'original_output_sha256': item['original']['content_sha256']})
+        self.assertEqual(item['input_added']['user'], '前工程の原因状態（署名済みの調査記録に基づく） unconfirmed')   # the state is given as an input field
+        self.assertIn('given to the model as an input field', self.cases['PILOT-A']['selection_note']['en'])
+        edited = run_request(self.data, {'case_id': 'PILOT-A', 'submission': item['submission']['content'].replace('unconfirmed', 'refuted'), 'based_on': 'gptoss-C'})
+        self.assertEqual(edited['source'], {'kind': 'edited_input'})
+
+    def test_control_case_expects_confirmed_and_the_experiment_3_joint_measure_is_not_computed(self):
+        self.assertEqual(self.cases['PILOT-A-S3']['gold']['claims'], {'cause_identified': 'confirmed'})
+        for arm in ('B', 'C'):
+            item, record = self.replay('PILOT-A-S3', 'gptoss-' + arm)
+            with self.subTest(arm=arm):
+                self.assertEqual((record['checks']['payment']['state'], record['checks']['handoff_cause']['state']), ('applied_once', 'confirmed'))
+                self.assertIsNone(record['summary']['joint_success'])
+                self.assertIsNone(record['summary']['joint_success_without_denied_operation'])
+                # The two conditions gave the same text; the record still names the one that was selected.
+                self.assertEqual(record['source']['condition'], arm)
+        a, b = (self.cases['PILOT-A-S3']['recorded'][i]['submission']['content_sha256'] for i in (0, 1))
+        self.assertEqual(a, b)
 
 
 class LauncherScriptTest(unittest.TestCase):
@@ -264,8 +342,12 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertIn('Workflow demo', page)
         with urlopen(self.url + '/workflow/cases', timeout=5) as response:
             cases = json.loads(response.read())
-        item = cases['cases'][1]['recorded'][1]
-        self.assertEqual([(c['id'], c['status']) for c in cases['cases']], [('PILOT-A', 'pending'), ('F-LT6-01', 'available')])
+        item = next(c for c in cases['cases'] if c['id'] == 'F-LT6-01')['recorded'][1]
+        self.assertEqual([(c['id'], c['status']) for c in cases['cases']], [('PILOT-A', 'available'), ('PILOT-A-S3', 'available'), ('F-LT6-01', 'available')])
+        pilot = cases['cases'][0]['recorded'][1]
+        replay = self.post({'case_id': 'PILOT-A', 'submission': pilot['submission']['content'], 'based_on': 'gptoss-C'})
+        self.assertEqual((replay['source']['kind'], replay['checks']['payment']['state'], replay['checks']['handoff_cause']['state']),
+                         ('pilot_record', 'applied_once', 'unconfirmed'))
         record = self.post({'case_id': 'F-LT6-01', 'submission': item['submission']['content']})
         self.assertEqual(record['schema'], 'm-anchor-workflow-record/v2')
         self.assertEqual(record['checks']['denied_proposals']['state'], 'denied')
@@ -282,7 +364,7 @@ class WorkflowRouteTest(unittest.TestCase):
 
     def test_invalid_requests_and_boundary(self):
         for body in ({'case_id': 'F-LT6-01'}, {'case_id': 'unknown', 'submission': '{}'}, {'case_id': 'F-LT6-01', 'submission': '{}', 'based_on': 'x'},
-                     {'case_id': 'PILOT-A', 'submission': '{}'}):   # records not included yet: nothing can be run
+                     {'case_id': 'PILOT-A', 'submission': '{}', 'based_on': 'qwen3-C4P'}):   # a record of another case
             with self.subTest(body=str(body)[:40]), self.assertRaises(HTTPError) as caught:
                 self.post(body)
             self.assertEqual(caught.exception.code, 400)

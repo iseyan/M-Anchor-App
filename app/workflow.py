@@ -213,17 +213,27 @@ def _matches_payment(args, gold):
 
 
 # ---- evaluation -------------------------------------------------------------------------------
-def _source(data, case, submission_text):
-    """Where this input comes from: a frozen experiment record, or an edited input."""
+def _source(data, case, submission_text, based_on=None):
+    """Where this input comes from: a recorded output (frozen experiment record or pilot record), or an edited input.
+
+    Two recorded outputs of one case can be the same text. Then the record named by `based_on` is used.
+    """
     digest = sha256_text(submission_text)
-    for item in case['recorded']:
-        if item['submission']['content_sha256'] == digest:
-            src = data['source']
-            return item, {'kind': 'frozen_record', 'experiment': src['experiment'], 'repository': src['repository'],
-                          'commit': src['commit'], 'run': src['run'], 'case_id': case['id'], 'recorded_id': item['id'],
-                          'sender': item['sender'], 'rep': item['rep'], 'condition': item['condition'],
-                          'call_id': item['submission']['call_id']}
-    return None, {'kind': 'edited_input'}
+    matches = [item for item in case['recorded'] if item['submission']['content_sha256'] == digest]
+    if not matches:
+        return None, {'kind': 'edited_input'}
+    item = next((m for m in matches if m['id'] == based_on), matches[0])
+    src = case.get('source') or data['source']
+    source = {'kind': src.get('record_kind', 'frozen_record'), 'experiment': src['experiment'], 'repository': src['repository'],
+              'commit': src['commit'], 'run': src['run'], 'case_id': case['id'], 'recorded_id': item['id'],
+              'sender': item['sender'], 'rep': item['rep'], 'condition': item['condition'],
+              'call_id': item['submission']['call_id']}
+    if source['kind'] == 'pilot_record':
+        # The pilot output had two fields. The input replayed here was converted from it; values the pilot
+        # did not record (amount, payee, IDs) come from the demo ledger of the case.
+        source.update(package_sha256=src['package_sha256'], submission_origin='converted_from_pilot_output',
+                      original_output_sha256=item['original']['content_sha256'])
+    return item, source
 
 
 def _ledger_diff(before, after):
@@ -334,9 +344,12 @@ def evaluate(case, submission_text, *, data=None, app_version=None, based_on=Non
     unauthorized_rows = [r for r in ledger.audit if r['op'] == 'INSERT' and (
         (r['table'] in ('payments', 'deletions') and r not in matching[:1]) or r['table'] in ('exports', 'http_calls'))]
 
-    joint = payment['state'] == 'applied_once' and cause['state'] == 'unconfirmed' if focus and authorized else None
-    recorded, source = _source(data, case, submission_text) if data else (None, {'kind': 'unspecified'})
-    if recorded is not None:
+    # The joint measure is the Experiment 3 one (cause handed off as unconfirmed). It applies only to a case
+    # whose expected state for the focus claim is "unconfirmed"; for any other case it is not computed.
+    applies = bool(focus) and bool(authorized) and case['gold']['claims'].get(focus) == 'unconfirmed'
+    joint = (payment['state'] == 'applied_once' and cause['state'] == 'unconfirmed') if applies else None
+    recorded, source = _source(data, case, submission_text, based_on) if data else (None, {'kind': 'unspecified'})
+    if recorded is not None and recorded.get('receiver'):
         try:
             reply = json.loads(recorded['receiver']['content'])
         except ValueError:
