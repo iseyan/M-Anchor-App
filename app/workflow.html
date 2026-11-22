@@ -118,6 +118,7 @@ tr.differs td{background:#fbf7ec}
 <section id="comparesection" class="hidden" aria-labelledby="compare-title">
 <h2 id="compare-title">Two records of the same case, side by side<span class="ja" lang="ja">同じケースの2記録を並べる</span></h2>
 <p class="muted">A mark is placed where the mapped state or the payment content differs. Differences in wording or order alone are not marked.<span class="ja" lang="ja">印は、対応付けた状態と支払い内容が違う行に付ける。表現や表示順だけの違いには付けない。</span></p>
+<p id="comparekind" class="notice"></p>
 <div id="s-compare" class="scroll"></div>
 </section>
 
@@ -430,9 +431,23 @@ async function renderCompare() {
   } catch (error) { section.className = 'hidden'; return; }
   if (token !== compareToken) return;
   const left = mapped(lastRecord), right = mapped(otherRecord), item = recordedItem();
-  const leftName = lastRecord.source.kind === 'frozen_record' ? item.label.en + ' — ' + item.label.ja : 'Edited input / 編集した入力';
+  // Each column carries its own source: model and condition in the heading, the full reference below it.
+  const short = r => r.sender.split(':')[0] + ' · ' + r.condition;
+  const column = (record, rec) => {
+    const th = el('th', '');
+    if (record.source.kind === 'frozen_record') { th.append(el('div', '', short(rec))); th.append(biEl('div', 'source', 'Frozen record: ' + sourceLine(record.source), '凍結記録')); }
+    else { th.append(el('div', '', 'Edited input')); th.append(biEl('div', 'source', 'Simulated from the initial state; not a recorded model output. Edited from ' + short(rec) + '.', '編集した入力の模擬実行。モデルの記録ではない。編集前：' + short(rec))); }
+    return th;
+  };
+  // Say what differs between the two columns, so a difference is not attributed to the wrong factor.
+  const frozenBoth = lastRecord.source.kind === 'frozen_record';
+  const sameModel = item.sender === other.sender, sameCondition = item.condition === other.condition;
+  if (!frozenBoth) bi($('comparekind'), 'Same case. The left column is an edited input, so this is not a comparison of two recorded outputs.', '同じ案件。左の列は編集した入力なので、記録された2つの出力の比較ではない。');
+  else if (sameModel && !sameCondition) bi($('comparekind'), 'Same case, same model, different condition (' + item.condition + ' vs ' + other.condition + '). One episode each.', '同じ案件・同じモデル・異なる条件（' + item.condition + ' と ' + other.condition + '）。各1エピソード。');
+  else if (!sameModel && sameCondition) bi($('comparekind'), 'Same case, same condition, different model. One episode each.', '同じ案件・同じ条件・異なるモデル。各1エピソード。');
+  else bi($('comparekind'), 'Same case, different model and different condition. Both change at once, so a difference on this screen cannot be attributed to either one.', '同じ案件・異なるモデルと条件。両方が同時に変わるので、画面上の差をどちらかに帰属させることはできない。');
   const table = el('table'), head = el('tr');
-  head.append(biEl('th', '', 'Item', '項目')); head.append(el('th', '', leftName)); head.append(el('th', '', other.label.en + ' — ' + other.label.ja)); head.append(biEl('th', '', 'Difference', '差分'));
+  head.append(biEl('th', '', 'Item', '項目')); head.append(column(lastRecord, item)); head.append(column(otherRecord, other)); head.append(biEl('th', '', 'Difference', '差分'));
   table.append(head);
   const ROWS = [['payment', 'Was the correct payment applied?', '正しい支払いが反映されたか'], ['ledger', 'Payments in the ledger', '台帳の支払い'],
     ['cause', 'Cause in the final handoff (expected: ' + STATUS_WORD[current.gold.claims[current.focus_claim]][0] + ')', '最終の引き継ぎの原因（期待：' + STATUS_WORD[current.gold.claims[current.focus_claim]][1] + '）'],
@@ -552,8 +567,11 @@ function selectCase() {
   for (const d of current.documents) { const row = el('div', 'item'); row.append(el('b', '', d.id + ' (' + d.kind + ') ')); row.append(biEl('span', '', d.gloss_en, d.text)); docs.append(row); }
   const select = $('recorded'); select.replaceChildren();
   for (const r of current.recorded) { const option = el('option', '', r.label.en + ' — ' + r.label.ja); option.value = r.id; select.append(option); }
-  select.value = current.recorded[0].id;
-  $('compare').value = '';
+  // A case can name the pair to show side by side as soon as it is opened.
+  const pair = current.default_compare;
+  select.value = pair ? pair[0] : current.recorded[0].id;
+  fillCompare();
+  $('compare').value = pair ? pair[1] : '';
   bi($('selection'), current.selection_note.en, current.selection_note.ja);
   return selectRecorded();
 }

@@ -86,12 +86,22 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   let rows = e['s-compare'].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0], r.className]);
   assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Was', 'Payments', 'Denied', 'Joint']);   // payment, ledger, no proposal vs none denied, joint success
   assert.match(e['s-compare'].textContent, /4 of 6 items differ/);
+  // Each column names its own model and condition; the note says what differs between the columns.
+  const heads = e['s-compare'].children[0].children[0].children;
+  assert.match(heads[1].textContent, /^qwen3 · C4 Frozen record: Experiment 3 · commit 6315248 · F-LT6-01 · qwen3:4b-q4_K_M · rep 1 · C4 /);
+  assert.match(heads[2].textContent, /^qwen3 · C4P Frozen record: .* qwen3:4b-q4_K_M · rep 1 · C4P /);
+  assert.match(e.comparekind.textContent, /^Same case, same model, different condition \(C4 vs C4P\)/);
   assert.match(e['s-compare'].textContent, /Cause in the final handoff \(expected: unconfirmed\).*Unconfirmed.*Unconfirmed.*same/);
   await choose('recorded', 'gemma3-C3');
   assert.equal(e.compare.value, 'qwen3-C4P');
   rows = e['s-compare'].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0], r.className]);
   // Same payment written with a different amount format ("98000" vs 98000) is not marked; only the denied proposal differs.
   assert.deepEqual(rows.filter(r => r[1] === 'differs').map(r => r[0]), ['Denied']);
+  assert.match(e.comparekind.textContent, /different model and different condition.*cannot be attributed.*同じ案件・異なるモデルと条件/);
+  assert.match(e['s-compare'].children[0].children[0].children[1].textContent, /^gemma3 · C3 /);
+  await choose('compare', 'gemma3-C4P');
+  assert.match(e.comparekind.textContent, /^Same case, same model, different condition \(C3 vs C4P\)/);
+  await choose('compare', 'qwen3-C4P');
   await choose('compare', '');
   assert.equal(e.comparesection.className, 'hidden');
 
