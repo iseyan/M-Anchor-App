@@ -367,6 +367,11 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertEqual(rows['payment_not_proposed']['M'][0] + rows['payment_denied']['M'][0], rows['payment_unmet']['M'][0])
         self.assertEqual(bench['review']['ja'], 'Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。')
         self.assertIn('0/12', bench['e7']['note']['en'])
+        # Post-hoc table: the flaw (no current date) and where the extra unmet payments are.
+        approval = {r['id']: (r['trials'], r['cells']['A'][0], r['cells']['M'][0]) for r in bench['approval']['rows']}
+        self.assertEqual(approval, {'approval_confirmed': (235, 227, 207), 'approval_unconfirmed': (95, 76, 8), 'approval_refuted': (30, 6, 0)})
+        self.assertEqual(sum(a - m for _, a, m in approval.values()), rows['payment_unmet']['M'][0] - rows['payment_unmet']['A'][0])
+        self.assertIn('the model was not given the current date', bench['approval']['note']['en'])
         notes = {n['id']: n for n in bench['notes']}
         self.assertIn('Post-hoc count, not in the plan', notes['posthoc']['en'])
         self.assertIn('155/300', notes['posthoc']['en'])

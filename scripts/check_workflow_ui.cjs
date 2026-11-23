@@ -267,6 +267,11 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.benchmarkgnote.textContent, /今回の140件の非信頼資料で Prompt Guard 2 の検出が0件だったため、G の全試行は A と同じ要求になり、A の応答と結果を共用した。/);
   assert.deepEqual(cells('benchmarkdetail').map(r => r.slice(1)), [['129/300', '0/300', '129/300'], ['14/60', '12/60', '14/60'], ['45/360', '139/360', '45/360'], ['6/360', '6/360', '6/360'], ['0/420', '0/420', '0/420'], ['0/60', '0/60', '0/60'], ['22/60', '16/60', '22/60']]);
   assert.deepEqual(cells('benchmarkpaired').map(r => r.slice(1)), [['12', '131', '0', '217'], ['67', '32', '75', '126'], ['43', '8', '102', '207']]);
+  // Flaw found after the run: no current date was given. Shown as a post-hoc table with its own notice, apart from the main table.
+  assert.match(e.benchmarkapprovaltitle.textContent, /^Post-hoc count: what the first assessment said about the approval/);
+  assert.deepEqual(cells('benchmarkapproval').map(r => r.slice(-3)), [['235', '227/235', '207/235'], ['95', '76/95', '8/95'], ['30', '6/30', '0/30']]);
+  assert.match(html, /<p id="benchmarkapprovalnote" class="notice"><\/p>/);
+  assert.match(e.benchmarkapprovalnote.textContent, /^A flaw in the cases, found after the run: the model was not given the current date\..*Of the net increase of 94 payments not reached under M, 74 are in those 125 trials.*What happens when the date is given was not measured\./);
   // The post-hoc count is a note, not a table row, and it is labelled as post-hoc.
   const notes = e.benchmarknotes.children.map(c => c.textContent);
   assert.equal(notes.length, 3);
@@ -276,8 +281,8 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(notes[0], /net increase of 94 payments not reached appears entirely at the proposal step/);
   assert.match(notes[2], /A person has read the English text of 4 of the 140 cases\./);
   assert.match(e.benchmarksource.textContent, /Review status 確認の状況 Recount and cross-check by Claude are complete\. Human review has been done on sampled trials/);
-  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/review\/review-20261123\.md @ c6ea56b/);
-  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/runs\/main-20261122-01\/episodes\.jsonl @ c6ea56b +· SHA-256 b22c779bf475acff91e5ed13257e0427541d14fb5a90f96052d7201769ef608c/);
+  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/review\/review-20261123\.md @ e0b5f5b/);
+  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/runs\/main-20261122-01\/episodes\.jsonl @ e0b5f5b +· SHA-256 b22c779bf475acff91e5ed13257e0427541d14fb5a90f96052d7201769ef608c/);
   assert.match(e.benchmarksource.textContent, /python scripts\/verify_workflow_results\.py --exp4-run/);
   assert.doesNotMatch(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /Not run yet|\d+\s*\/\s*\d+/);      // numbers come from the bundled data file, not from the page
 

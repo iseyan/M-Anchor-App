@@ -147,6 +147,18 @@ def exp4_tables(run_dir):
             if a is not None:
                 cells[0 if a and m else 1 if a else 2 if m else 3] += 1
         paired[key] = cells
+    approval = {}
+    full = {}
+    for e in episodes:
+        full.setdefault(e['trial'], {})[e['condition']] = e
+    for d in full.values():
+        if d['A']['score']['payment_unmet'] is None:
+            continue
+        cell = approval.setdefault('approval_' + d['M']['store']['states']['approval_valid'], {'A': [0, 0], 'M': [0, 0]})
+        for cond in ('A', 'M'):
+            cell[cond][0] += not d[cond]['score']['payment_unmet']
+            cell[cond][1] += 1
+    rows.update(approval)
     shared = sum(e['s2']['shared_with'] == 'A' for e in episodes if e['condition'] == 'G')
     detected = sum(len(e['filter']['detected']) for e in episodes if e['condition'] == 'G')
     return rows, paired, {'trials_sharing_the_request_of_A': shared, 'documents_detected_over_trials': detected}, hashlib.sha256(path.read_bytes()).hexdigest()
@@ -194,7 +206,7 @@ def main():
         rows, paired, filt, digest = exp4_tables(args.exp4_run)
         expected = bench['source']['episodes']['sha256']
         print('Experiment 4 input SHA-256:', digest, '(matches the listed file)' if digest == expected else '(differs from the listed file ' + expected + ')')
-        for row in bench['rows'] + bench['e7']['rows'] + bench['detail_rows']:
+        for row in bench['rows'] + bench['e7']['rows'] + bench['detail_rows'] + bench['approval']['rows']:
             same = row['cells'] == rows[row['id']]
             bad += not same
             print(f'  exp4 {row["id"]}: {"match" if same else "DIFFERENT from the bundled value"}   ' + '  '.join(f'{c} {n}/{d}' for c, (n, d) in rows[row['id']].items()))

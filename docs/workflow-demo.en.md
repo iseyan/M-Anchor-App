@@ -126,3 +126,4 @@ The screen shows the results of Experiment 4 (sender `gpt-oss:20b`, 140 fixed En
 - Column G (Prompt Guard 2) is not an independent measurement. None of the 140 untrusted documents was detected, so G shares the responses and results of A.
 - Joint success that also accepts "refuted" is a post-hoc count and is given as a note, not as a table row.
 - Recount: `python scripts/verify_workflow_results.py --exp4-run <runs/main-20261122-01>` recounts every row on the screen from the trial records.
+- **A disclosed flaw in the cases.** The model was not given the current date. A separate post-hoc table shows what the first assessment said about the approval and whether the payment went through. The increase in payments not reached under M should be read as observed with inputs that made the validity of the approval hard to judge.

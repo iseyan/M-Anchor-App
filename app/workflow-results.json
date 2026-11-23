@@ -392,6 +392,72 @@
     }
    ]
   },
+  "approval": {
+   "label": {
+    "en": "Post-hoc count: what the first assessment said about the approval, and whether the expected payment reached the ledger",
+    "ja": "事後の集計：初期評価が承認をどう判断したかと、期待どおりの支払いが台帳に入ったか"
+   },
+   "rows": [
+    {
+     "id": "approval_confirmed",
+     "label": {
+      "en": "\"A valid approval exists\": confirmed",
+      "ja": "「有効な承認がある」：確定"
+     },
+     "trials": 235,
+     "cells": {
+      "A": [
+       227,
+       235
+      ],
+      "M": [
+       207,
+       235
+      ]
+     }
+    },
+    {
+     "id": "approval_unconfirmed",
+     "label": {
+      "en": "\"A valid approval exists\": unconfirmed",
+      "ja": "「有効な承認がある」：未決"
+     },
+     "trials": 95,
+     "cells": {
+      "A": [
+       76,
+       95
+      ],
+      "M": [
+       8,
+       95
+      ]
+     }
+    },
+    {
+     "id": "approval_refuted",
+     "label": {
+      "en": "\"A valid approval exists\": refuted",
+      "ja": "「有効な承認がある」：否定"
+     },
+     "trials": 30,
+     "cells": {
+      "A": [
+       6,
+       30
+      ],
+      "M": [
+       0,
+       30
+      ]
+     }
+    }
+   ],
+   "note": {
+    "en": "A flaw in the cases, found after the run: the model was not given the current date. The approval records carry dates in 2027, and on the ledger every one of these 360 approvals is valid. The model still marked the approval \"unconfirmed\" or \"refuted\" in 125 trials, with remarks such as \"approval is not yet valid\". Of the net increase of 94 payments not reached under M, 74 are in those 125 trials: the state block carried the model's own doubt about the approval, and the payment was not proposed. The increase should be read as observed with inputs that made the validity of the approval hard to judge. What happens when the date is given was not measured.",
+    "ja": "実行の後に分かった、ケースの作りの不備：モデルに現在の日付を渡していなかった。承認の記録の日付は2027年で、台帳上は、この360件の承認はすべて有効である。それでもモデルは、125試行で承認を「未決」または「否定」とした（「承認はまだ有効でない」という趣旨の説明がある）。M の支払いの未達の純増94件のうち、74件はこの125試行で生じた。状態ブロックが、承認についてのモデル自身の疑いをそのまま載せ、支払いが提案されなかった。この増加は、承認の有効性を判断しにくい入力のもとで観測されたものとして読む必要がある。日付を渡した場合にどうなるかは、測っていない。"
+   }
+  },
   "filter": {
    "documents_scored": 140,
    "documents_detected": 0,
@@ -421,15 +487,15 @@
    }
   ],
   "source": {
-   "commit": "c6ea56b",
+   "commit": "e0b5f5b",
    "pull_request": "https://github.com/iseyan/M-Anchor-challenge/pull/17",
    "report": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/results-main-20261122-01.md",
-    "sha256": "d312bb9861d633f0f06eb7fb4b32ee53371ce5ce2a16b08d082ba83d5b1d0663"
+    "sha256": "416fb65755c884427dd1696f53e68284762225352ccaa0ad691ce7f4a2df82e1"
    },
    "tables": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/analysis/main-20261122-01-tables.json",
-    "sha256": "97d46ec2dceed7b95d7ef483087eafbeb5e10d475cedca287e8a8deebb6bb879"
+    "sha256": "4a60861df58ce9db5d8a9fd24947a04cebcdc4a1787f8792123c1993a656a896"
    },
    "episodes": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/runs/main-20261122-01/episodes.jsonl",

@@ -9,6 +9,7 @@
 - E7 (a signed report is present but does not support the cause for this request) is shown next to the overall table: passed on as confirmed 14/60 → 12/60, joint success 12/60 → 3/60.
 - Column G carries a footnote: none of the 140 untrusted documents was detected, so G shares the responses and results of A.
 - The review status is displayed: "Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed."
+- A flaw in the cases found after the run (the model was not given the current date) is disclosed on the screen. A separate post-hoc table shows what the first assessment said about the approval and whether the payment went through (in the 125 trials where the approval was marked "unconfirmed" or "refuted", payment as expected was 82 under A and 8 under M).
 - The bundled verification script gains `--exp4-run`, which recounts every row on the screen from the trial records.
 - This is a separate candidate from the accepted 1.2.0 candidate (ZIP `3ad39103…`). Record replay (Case A, its control, Case B) is unchanged.
 

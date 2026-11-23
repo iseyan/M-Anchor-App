@@ -20,7 +20,7 @@ E2 = EXP + '/full-study/checks/main-run-20261119-01/report-final.json'
 E3 = EXP + '/exp3-permit/checks/main-run-20261121-01/report3.json'
 SENDERS = {'qwen3': 'qwen3:4b-q4_K_M', 'gemma3': 'gemma3:4b'}
 E4 = EXP + '/exp4-benchmark'
-E4_COMMIT = 'c6ea56b'
+E4_COMMIT = 'e0b5f5b'
 E4_RUN = E4 + '/runs/main-20261122-01'
 
 
@@ -75,6 +75,17 @@ def benchmark(base, sha):
                    'rows': [{'id': k, 'label': lab, 'cells': [t['paired'][k + ':A_vs_M'].get(x, 0) for x in ('both', 'A_only', 'M_only', 'neither')]}
                             for k, lab in (('mispropagation', {'en': 'Passed on as confirmed (360)', 'ja': '誤伝播（360）'}), ('joint_success', {'en': 'Joint success (300)', 'ja': '同時成功（300）'}),
                                            ('payment_unmet', {'en': 'Payment not reached (360)', 'ja': '支払いの未達（360）'}))]},
+        'approval': {
+            'label': {'en': 'Post-hoc count: what the first assessment said about the approval, and whether the expected payment reached the ledger', 'ja': '事後の集計：初期評価が承認をどう判断したかと、期待どおりの支払いが台帳に入ったか'},
+            'rows': [{'id': 'approval_' + k, 'label': lab, 'trials': t['posthoc_approval_state_and_payment'][k]['trials'],
+                      'cells': {'A': [t['posthoc_approval_state_and_payment'][k]['A'], t['posthoc_approval_state_and_payment'][k]['trials']],
+                                'M': [t['posthoc_approval_state_and_payment'][k]['M'], t['posthoc_approval_state_and_payment'][k]['trials']]}}
+                     for k, lab in (('confirmed', {'en': '"A valid approval exists": confirmed', 'ja': '「有効な承認がある」：確定'}),
+                                    ('unconfirmed', {'en': '"A valid approval exists": unconfirmed', 'ja': '「有効な承認がある」：未決'}),
+                                    ('refuted', {'en': '"A valid approval exists": refuted', 'ja': '「有効な承認がある」：否定'}))],
+            'note': {'en': 'A flaw in the cases, found after the run: the model was not given the current date. The approval records carry dates in 2027, and on the ledger every one of these 360 approvals is valid. The model still marked the approval "unconfirmed" or "refuted" in 125 trials, with remarks such as "approval is not yet valid". Of the net increase of 94 payments not reached under M, 74 are in those 125 trials: the state block carried the model\'s own doubt about the approval, and the payment was not proposed. The increase should be read as observed with inputs that made the validity of the approval hard to judge. What happens when the date is given was not measured.',
+                     'ja': '実行の後に分かった、ケースの作りの不備：モデルに現在の日付を渡していなかった。承認の記録の日付は2027年で、台帳上は、この360件の承認はすべて有効である。それでもモデルは、125試行で承認を「未決」または「否定」とした（「承認はまだ有効でない」という趣旨の説明がある）。M の支払いの未達の純増94件のうち、74件はこの125試行で生じた。状態ブロックが、承認についてのモデル自身の疑いをそのまま載せ、支払いが提案されなかった。この増加は、承認の有効性を判断しにくい入力のもとで観測されたものとして読む必要がある。日付を渡した場合にどうなるかは、測っていない。'},
+        },
         'filter': {'documents_scored': t['filter']['documents_scored'], 'documents_detected': t['filter']['documents_detected'], 'trials_with_input_changed': t['filter']['trials_with_input_changed'],
                    'trials_sharing_the_request_of_A': t['filter']['trials_sharing_the_request_of_A']},
         'notes': [

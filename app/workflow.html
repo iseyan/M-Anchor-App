@@ -206,6 +206,9 @@ tr.differs td{background:#fbf7ec}
 <div class="scroll" id="benchmarkdetail"></div>
 <h3><span class="en">The same trial under A and under M</span><span class="ja" lang="ja">同じ試行の A と M</span></h3>
 <div class="scroll" id="benchmarkpaired"></div>
+<h3 id="benchmarkapprovaltitle"></h3>
+<div class="scroll" id="benchmarkapproval"></div>
+<p id="benchmarkapprovalnote" class="notice"></p>
 <h3><span class="en">Notes</span><span class="ja" lang="ja">注記</span></h3>
 <div id="benchmarknotes"></div>
 <h3><span class="en">Sources and recount</span><span class="ja" lang="ja">出典と検算</span></h3>
@@ -629,6 +632,14 @@ function renderBenchmark() {
   pt.append(ph);
   for (const row of b.paired.rows) { const tr = el('tr'); tr.append(biEl('td', '', row.label.en, row.label.ja)); for (const v of row.cells) tr.append(el('td', 'num', String(v))); pt.append(tr); }
   $('benchmarkpaired').replaceChildren(pt);
+  bi($('benchmarkapprovaltitle'), b.approval.label.en, b.approval.label.ja);
+  const at = el('table'), ah = el('tr');
+  ah.append(biEl('th', '', 'State after the first assessment (payment expected, 360 trials)', '初期評価の後の状態（支払いが期待される360試行）'));
+  ah.append(biEl('th', 'num', 'Trials', '試行数')); ah.append(biEl('th', 'num', 'Payment as expected, A', '期待どおりの支払い A')); ah.append(biEl('th', 'num', 'Payment as expected, M', '期待どおりの支払い M'));
+  at.append(ah);
+  for (const row of b.approval.rows) { const tr = el('tr'); tr.append(biEl('td', '', row.label.en, row.label.ja)); tr.append(el('td', 'num', String(row.trials))); tr.append(el('td', 'num', row.cells.A[0] + '/' + row.cells.A[1])); tr.append(el('td', 'num', row.cells.M[0] + '/' + row.cells.M[1])); at.append(tr); }
+  $('benchmarkapproval').replaceChildren(at);
+  bi($('benchmarkapprovalnote'), b.approval.note.en, b.approval.note.ja);
   const notes = $('benchmarknotes'); notes.replaceChildren();
   for (const id of ['stage', 'posthoc', 'scope']) notes.append(biEl('p', id === 'posthoc' ? 'notice' : 'muted', note(id).en, note(id).ja));
   const src = $('benchmarksource'); src.replaceChildren();
