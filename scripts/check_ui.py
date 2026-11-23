@@ -36,6 +36,9 @@ with tempfile.TemporaryDirectory() as directory:
         with patch('server.run_model',side_effect=fake_run):
             result=subprocess.run(['node',str(Path(__file__).with_suffix('.cjs')),
                 f'http://127.0.0.1:{server.server_port}'],check=False,timeout=30)
+            if result.returncode==0:
+                result=subprocess.run(['node',str(Path(__file__).with_name('check_workflow_ui.cjs')),
+                    f'http://127.0.0.1:{server.server_port}'],check=False,timeout=30)
     finally:
         server.shutdown();server.server_close();thread.join()
     sys.exit(result.returncode)

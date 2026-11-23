@@ -2,6 +2,37 @@
 
 [日本語](CHANGELOG.ja.md)
 
+## 1.3.0 release candidate: results of Experiment 4 (robustness benchmark) — 2026-11-23 (Japan time)
+
+- "Read the benchmark" now shows the results of Experiment 4. Passing the cause on as confirmed, approved payments that did not go through, and joint success sit in one table, as counts over planned trials (A ordinary caution, M M-Anchor, G Prompt Guard 2).
+- Joint success is shown as defined in advance (99/300 → 142/300). The post-hoc count that also accepts "refuted" (155/300 → 161/300) is a note, not a table row.
+- E7 (a signed report is present but does not support the cause for this request) is shown next to the overall table: passed on as confirmed 14/60 → 12/60, joint success 12/60 → 3/60.
+- Column G carries a footnote: none of the 140 untrusted documents was detected, so G shares the responses and results of A.
+- The review status is displayed: "Recount and cross-check by Claude are complete. A person has read all 140 case texts and reviewed sampled trials; the trial records have not all been reviewed by a person."
+- A flaw in the cases found after the run (the model was not given the current date) is disclosed on the screen. A separate post-hoc table shows what the first assessment said about the approval and whether the payment went through (in the 125 trials where the approval was marked "unconfirmed" or "refuted", payment as expected was 82 under A and 8 under M).
+- The bundled verification script gains `--exp4-run`, which recounts every row on the screen from the trial records.
+- This is a separate candidate from the accepted 1.2.0 candidate (ZIP `3ad39103…`). Record replay (Case A, its control, Case B) is unchanged.
+
+## 1.2.0 release candidate: case selector and side-by-side comparison — 2026-11-22 (Japan time)
+
+- Workflow demo: add a case selector and a side-by-side comparison of two records of the same case. Difference marks follow mapped states and payment content, not wording or order.
+- The second card is now "How was the cause handed off?" and shows the state expected for the case next to the state the handoff states.
+- Add a "Read the benchmark" view. Until the run is complete it shows "not run yet" and no numbers.
+- Case A (pilot, `gpt-oss:20b`) is included. Its two records, ordinary caution and the M-Anchor method, open side by side. Replayed through this app's gate and simulated ledger, the payment is applied once in both conditions, and the cause is handed off as "confirmed" and "unconfirmed". It is a development example with one run per condition and is not counted in any benchmark. The receiver was not measured.
+- A control for Case A (a signed investigation report exists) is added. The expected state is "confirmed", and both conditions handed it off as confirmed. The Experiment 3 joint measure is not computed for this case.
+- The pilot output has two fields (payment proposal, cause state). The replayed input is converted from it, and amount, payee and IDs are demo values. The original output stays on the screen and in the record.
+- Results and hashes of the four Case B records are unchanged from the 1.1.0 candidate. The 1.1.0 candidate was not released.
+
+## 1.1.0 release candidate: workflow demo — 2026-11-22 (Japan time)
+
+- Add a screen (`/workflow`) that judges an unresolved cause and an authorized payment separately. Two views: "Replay a record" and "Read the experiment results".
+- Replay: four submissions for case `F-LT6-01`, repetition 1, copied from the frozen Experiment 3 records of M-Anchor-challenge. Assessment, proposal, gate decision, ledger and handoff are shown side by side, with three results from the same record: was the correct payment applied, did the handoff keep the cause unresolved, was any proposal denied. The receiver's decision is shown in its own box.
+- Frozen records, the field display example, and simulated runs of edited input are told apart on screen and in the saved record. The two-choice versus three-value comparison is a display example and changes neither the record, the results nor the hash.
+- Results: frozen aggregates of Experiment 2 (C3/C4) and Experiment 3 (C4/C4P), bundled as fixed values with source commits and SHA-256. `scripts/verify_workflow_results.py` recomputes them from episode data and compares.
+- `start.cmd` and `start-fresh-demo.cmd` first check whether `py -3` gives Python 3.10 or later, then fall back to `python`; if neither is available they print the required version.
+- The screen uses no key, calls no model, and does not read or write the authoritative store. Existing gate rules, storage format and integration interface are unchanged.
+- See the [workflow demo guide](docs/workflow-demo.en.md).
+
 ## Documentation language editions — 2026-10-01 (Japan time)
 
 - Separate non-app documentation into English and Japanese files, with language-specific navigation. Add English translations of historical Japanese plans and review notes.

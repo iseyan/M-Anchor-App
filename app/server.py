@@ -17,10 +17,11 @@ from client import AnchorClient
 from model_bridge import run_model, ModelError, validate_job
 from records import ExecutionTickets, history, utc_now
 from scenarios import SCENARIOS, scenario, exercise_record, fixed_proposal
+from workflow import WorkflowError, load_cases, load_results, run_request
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '1.0.0'
+APP_VERSION = '1.3.0'
 
 
 class LaunchTicket:
@@ -60,6 +61,8 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
     model_lock = threading.Lock()
     ticket = LaunchTicket(launch_ticket)
     execution_tickets = ExecutionTickets()
+    workflow_cases = load_cases()  # Read-only fixtures for the stateless workflow demo.
+    workflow_results = load_results()
     # Fail before listening if the core or trusted store cannot be verified.
     with Store(database) as store:
         store.authority_snapshot()
@@ -105,6 +108,17 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
             path = urlsplit(self.path).path
             if path == '/':
                 self.reply(200, (ROOT / 'ui.html').read_text(encoding='utf-8'), html=True)
+                return
+            # Workflow demo: fixed public fixtures and a stateless evaluator. It never opens the
+            # authoritative store, so it needs no key; the loopback Host/Origin boundary still applies.
+            if path == '/workflow':
+                self.reply(200, (ROOT / 'workflow.html').read_text(encoding='utf-8'), html=True)
+                return
+            if path == '/workflow/cases':
+                self.reply(200, {**workflow_cases, 'app_version': APP_VERSION})
+                return
+            if path == '/workflow/results':
+                self.reply(200, workflow_results)
                 return
             role = 'admin' if path.startswith('/admin/') else 'agent'
             if not self.authorized(role):
@@ -163,14 +177,15 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
             demo_job = path == '/admin/demo-run'
             scenario_job = path == '/admin/scenario-run'
             session_job = path == '/launch-session'
+            workflow_job = path == '/workflow/run'
             parts = path.split('/')
             manual_job = (len(parts) == 5 and parts[:3] == ['', 'admin', 'cases'] and parts[4] == 'proposals')
             if session_job and self.headers.get('Origin') != f'http://127.0.0.1:{self.server.server_port}':
                 self.reply(403, {'error': 'invalid_origin'})
                 return
-            if not session_job and not self.authorized('admin' if model_job or demo_job or scenario_job or manual_job else 'agent'):
+            if not session_job and not workflow_job and not self.authorized('admin' if model_job or demo_job or scenario_job or manual_job else 'agent'):
                 return
-            if not (model_job or session_job or demo_job or scenario_job or manual_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
+            if not (model_job or session_job or demo_job or scenario_job or manual_job or workflow_job) and (len(parts) != 5 or parts[:3] != ['', 'v1', 'cases'] or parts[4] != 'proposals'):
                 self.reply(404, {'error': 'unknown_route'})
                 return
             if self.headers.get('Transfer-Encoding'):
@@ -193,6 +208,12 @@ def make_server(directory: Path, port: int, *, launch_ticket=None):
                 raw = self.rfile.read(length)
                 if len(raw) != length:
                     self.reply(400, {'error': 'incomplete_body'})
+                    return
+                if workflow_job:
+                    try:
+                        self.reply(200, run_request(workflow_cases, json.loads(raw.decode('utf-8')), app_version=APP_VERSION))
+                    except (WorkflowError, ValueError, UnicodeError, TypeError):
+                        self.reply(400, {'error': 'invalid_workflow_request'})
                     return
                 if session_job:
                     if raw != b'{}':

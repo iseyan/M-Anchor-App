@@ -106,3 +106,65 @@ The model preserved HOLD's unresolved candidates in #19. UPDATE was already Vers
 ## October 1: positive control received at 10:22 Japan time
 
 A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing the admitted e_B update, which the gate saved as h_B / resolved / Version 2 from Version 1. Input and proposal hashes, before/after states, exported records, and matched readback agree. This completes the positive-control observation left pending above and the planned basic checks for these examples. Both original exports are linked in the [observation](observations/2026-10-01-user-check-v1.md). Their common `data` label does not establish folder identity or how the Version 1 state was initialized. App code is unchanged; no new API call was made during review.
+
+## November 22: workflow demo (unreleased)
+
+**What changed.** Added a screen at `/workflow` that judges an unresolved cause and an authorized payment separately. One submission is run through a decision gate and a simulated ledger; payment completion, handoff of the unresolved cause, and denial of extra operations are shown separately from the same record. The first version has one case (cause unresolved, payment approved) with four submissions included verbatim from the frozen Experiment 3 records of M-Anchor-challenge (commit `6315248`, case `F-LT6-01`, repetition 1).
+
+**Why.** To give a third party an entry point for checking, from the same record, whether the authorized payment went through, whether the unresolved cause was carried forward, and whether extra operations were stopped.
+
+**What was checked, and where.** On Linux with Python 3: 54 app tests, the release tests, both UI logic checks and the checksum verification passed. The gate and ledger are a port of the experiment harness rules; the 5,435 Experiment 3 episodes with a single submission and no environment change were run through them, and every decision, reason, application and ledger payment matched the experiment record. The screen was opened in Chrome and the four submissions and the two-choice field were inspected visually. These checks were made by Claude, not by the user.
+
+**Not yet checked.** Launch and display on Windows. The case "cause explained, payment not approved" is not included, because the frozen Experiment 3 records contain no such case. The third planned case, a legitimate payment proposed together with an extra operation, is included as a submission for the same case (gemma3 · C3). The app version remains 1.0.0; whether to raise it is undecided.
+
+## November 22: workflow demo redesigned (1.1.0 release candidate)
+
+**What changed.** Implemented P0 of the "workflow demo redesign note v0.2". The screen now has two views, "Replay a record" and "Read the experiment results". The result cards became "Was the correct payment applied?", "Did the handoff keep the cause unresolved?" and "Was any proposal denied?". The receiver's decision moved to its own box, and frozen records, the field display example and edited input are told apart. The two-choice field is a display example; the screen no longer assigns "unconfirmed" to confirmed or refuted. The frozen aggregates of Experiments 2 and 3 are bundled as fixed values, with a verification script. Both launch scripts now try `python` after `py -3`. The displayed version is 1.1.0.
+
+**Why.** As set out in the design note: a display choice must not change the record or its hash, the source must be traceable on screen and in the record, and the app must start on Windows without the `py` launcher.
+
+**What was checked, and where.** On Linux with Python 3: 57 app tests, the release tests, both UI logic checks and the checksum verification passed. The bundled aggregates equal the values written in the design note and the values recomputed by the verification script from the Experiment 2 and 3 data. Both views and the narrow layout were inspected in Chrome. These checks were made by Claude.
+
+**Not yet checked.** The launch scripts were not run on Windows. Acceptance items W1–W3, display in a real browser on Windows, and a first-time reader check are open. The `verify_exp3_review_data.py` named in the design note was not available, so `scripts/verify_workflow_results.py` was written for the same purpose. A public reference for Report II is not set. The citation file (CITATION.cff) still names the released 1.0.0. P1 (individual Experiment 2 records) has not been started.
+
+## November 22: case selector and side-by-side comparison (1.2.0 release candidate)
+
+**What changed.** Implemented the "before the original records arrive" work of design note v0.4: a case selector, a side-by-side comparison of two records of the same case, a "Read the benchmark" view (showing "not run yet"), and the expected state next to the stated one on the second card. Case A (pilot) is present only as "original records not included yet".
+
+**Why.** The demo's lead example becomes the difference between two records of the same model under two conditions. The screen is built on the Experiment 3 records before the pilot records arrive.
+
+**What was checked, and where.** On Linux with Python 3: 59 app tests, the release tests, both UI logic checks and the checksum verification passed. A test pins the hashes of the four Case B records to those of the 1.1.0 candidate. The comparison, the pending case and the benchmark view were inspected in Chrome. Checked by Claude.
+
+**Not yet checked.** The Case A package has not arrived; fixing it in the repository and acceptance item A1 are open. Including the control case (S3) requires widening joint success to "matches the expected state", which will raise the rules version. Launch on Windows (W1–W3) and a first-time reader check remain open.
+
+## November 22: readability of the comparison (1.2.0 candidate, continued)
+
+**What changed.** Above the comparison table: a one-sentence reading of the two records and the kind of comparison (same model or not, same condition or not). Column headings now show model, condition and the meaning of the condition symmetrically, with source details folded. The "4 of 6 items differ" count was replaced by a sentence naming what differs and what is the same. The joint row is named "Payment and correct handoff together (Experiment 3 primary)" and its condition is stated once under the table. The interface language can be switched between Japanese, English and both; original record text is not affected.
+
+**Checks.** On Linux: 59 app tests, the UI logic checks and the checksum verification passed. The Japanese-interface comparison was inspected in Chrome. Checked by Claude. Launch on Windows and a first-time reader check remain open.
+
+## November 22: Case A (pilot) included
+
+**What changed.** The GPT pilot package (SHA-256 `fe946a01…e844`) was fixed unchanged in the experiment repository (M-Anchor-challenge, branch `exp4-pilot-case-a`, commit `b2a346a`). S2 was imported as Case A and S3 as its control, and Case A is now the initial view. It opens with ordinary caution (B) and the M-Anchor method (C) side by side.
+
+**Conversion.** The pilot output has two fields, `payment` and `cause_state`, and its ledger record is a payment count only. To run it through the app's gate, `pay` becomes one payment matching the approval in a demo ledger, and `cause_state` becomes the cause field of the handoff. Amount, payee, request ID and approval ID are values supplied for this demo. The original output is kept in the case file, on the screen and in the source of each record.
+
+**A1 check (automated, by Claude; not a human check).** Replayed through the app's gate and simulated ledger: in both B and C the payment is allowed (all 14 checks pass), ledger payments go 0 → 1, nothing is denied and no unauthorized change is applied. The cause is handed off as "confirmed" in B and "unconfirmed" in C. This matches the pilot record (payment count 1, cause state, joint flag). Amount and payee are checked against the demo ledger only.
+
+**Rules.** The hashes of the four Case B records are unchanged from the 1.1.0 candidate (pinned by a test). The rules version stays `workflow-rules/1`. The Experiment 3 joint measure is defined for a cause handed off as unconfirmed, so it is not computed for the control case, whose expected state is "confirmed"; agreement with the expected state is shown instead. The two S3 outputs are the same text, so the source of the record follows the selected record.
+
+**Reading notes.** In condition C the cause state (`unconfirmed`) is given to the model as an input field. This one example shows that a state passed in a field stayed in the handoff. One run per condition; variation was not measured. Request text is reconstructed from the pilot code; the request as sent and the full model response were not saved. Arms B and C are not exact replications of GC and C4 of Experiments 2 and 3. The receiver was not measured.
+
+**Checks.** On Linux: app tests, release tests, both UI logic checks and the checksum verification passed. Checked by Claude. Rendering in a real browser on Windows and a first-time reader check remain open.
+
+## November 23: results screen for Experiment 4 (1.3.0 release candidate)
+
+**What changed.** "Read the benchmark" no longer says "not run yet"; it shows the results of Experiment 4. The numbers are copied from the tabulation fixed in the experiment repository (M-Anchor-challenge, commit `908cdd2`, draft PR #17) into `benchmark` of `app/workflow-results.json`. The page itself contains no numbers.
+
+**Layout.** One table holds passing the cause on as confirmed, payments that did not go through, joint success (defined in advance) and missing handoffs. Below it: the two E7 rows, a breakdown (by stratum, payments not proposed versus denied by the gate, unauthorized changes, the control, cases without a valid approval), and the same trial under A and M. The post-hoc count that also accepts "refuted" appears only as a note.
+
+**Condition in the plan.** The plan allowed the screen to leave "not run yet" once the main run was complete and a recount from the records matched. The run ended on 23 November at 04:10 and the recount by Claude matched. Human review has not been done, and the screen says so at the top and in the sources.
+
+**Definition of joint success.** The 1.2.0 screen described it as "the final handoff in the state expected for the case". It now follows the final plan: correct payment once, no unauthorized change, cause handed off as unconfirmed.
+
+**Checks.** On Linux: app tests, release tests, both UI logic checks and the checksum verification passed. `scripts/verify_workflow_results.py --exp4-run` matched every row on the screen against the trial records. All of these are checks by Claude. Checks on Windows and human review remain open.
