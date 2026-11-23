@@ -641,6 +641,7 @@ function renderBenchmark() {
   li('Trial records', '試行の記録', file(b.source.episodes));
   li('Model calls (requests as sent and full responses)', 'モデルの呼び出し（送信した要求と応答の全体）', file(b.source.calls));
   li('Plan and freeze record', '計画書と凍結記録', (() => { const span = el('span'); span.append(link(b.source.plan, 'plan')); span.append(document.createTextNode(' · ')); span.append(link(b.source.freeze_record, 'freeze record')); return span; })());
+  li('Human review record', '人による確認の記録', link(b.source.review, b.source.review + ' @ ' + b.source.commit));
   li('Recount (script in this package)', '検算（同梱のスクリプト）', el('code', '', b.recount_command));
 }
 

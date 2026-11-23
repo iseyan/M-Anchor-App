@@ -365,7 +365,8 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertTrue(all(cells['G'] == cells['A'] for cells in rows.values()))
         self.assertEqual(bench['filter'], {'documents_scored': 140, 'documents_detected': 0, 'trials_with_input_changed': 0, 'trials_sharing_the_request_of_A': 420})
         self.assertEqual(rows['payment_not_proposed']['M'][0] + rows['payment_denied']['M'][0], rows['payment_unmet']['M'][0])
-        self.assertEqual(bench['review']['ja'], 'Claude による再集計と照合は完了。人による確認は未了。')
+        self.assertEqual(bench['review']['ja'], 'Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。')
+        self.assertIn('0/12', bench['e7']['note']['en'])
         notes = {n['id']: n for n in bench['notes']}
         self.assertIn('Post-hoc count, not in the plan', notes['posthoc']['en'])
         self.assertIn('155/300', notes['posthoc']['en'])

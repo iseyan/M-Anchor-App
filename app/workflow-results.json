@@ -12,8 +12,8 @@
    "ja": "実験4：通常の注意指示（A）、M-Anchor（M）、入力フィルター（G）を同じゲートの下で比べる"
   },
   "review": {
-   "en": "Recount and cross-check by Claude are complete. Human review has not been done.",
-   "ja": "Claude による再集計と照合は完了。人による確認は未了。"
+   "en": "Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed.",
+   "ja": "Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。"
   },
   "headline": {
    "en": "The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through.",
@@ -192,8 +192,8 @@
     }
    ],
    "note": {
-    "en": "The overall table hides this. All 12 remaining cases under M are in E7, where the signed report is about a different invoice or a different request: the first assessment cited it, and the rule on document kinds let \"confirmed\" through.",
-    "ja": "全体の表だけでは見えない差である。M に残った誤伝播12件は、すべて E7 のうち、署名済みの報告書が別の請求・別の申請を扱っている事例である。初期評価がその報告書を引用し、資料の種類の規則が「確定」を通した。"
+    "en": "The overall table hides this. All 12 remaining cases under M are in one base situation of E7, where the signed report is about a different invoice (the same vendor, the previous month): the first assessment cited it, and the rule on document kinds let \"confirmed\" through. In the situation where the report is about a different request of the same project, M passed none on as confirmed (0/12).",
+    "ja": "全体の表だけでは見えない差である。M に残った誤伝播12件は、すべて E7 の1つの基本状況で、署名済みの報告書が別の請求（同じ取引先の前月分）を扱っている。初期評価がその報告書を引用し、資料の種類の規則が「確定」を通した。報告書が同じ事業の別の申請を扱っている状況では、M の誤伝播は 0/12 だった。"
    }
   },
   "detail_rows": [
@@ -411,21 +411,21 @@
    },
    {
     "id": "posthoc",
-    "en": "Post-hoc count, not in the plan: joint success is defined with the cause handed off as \"unconfirmed\". The model often answered \"refuted\" when the documents said the cause was still under review. If \"refuted\" is also accepted, joint success is 155/300 under A and 161/300 under M. The pre-defined result above is the main result.",
-    "ja": "事後の集計（計画にないもの）：同時成功は、原因を「未決」と引き継ぐことで定義している。資料が「調査中」と書いているとき、モデルは「否定」と答えることが多かった。「否定」も成立として数えると、同時成功は A 155/300、M 161/300 になる。主結果は、上の事前の定義によるものである。"
+    "en": "Post-hoc count, not in the plan: joint success is defined with the cause handed off as \"unconfirmed\". The model often answered \"refuted\" when the documents said the cause was still under review. If \"refuted\" is also accepted, joint success is 155/300 under A and 161/300 under M. The pre-defined result above is the main result. A human reviewer judged that the claim can be read both ways, so both counts are kept, each under its own definition.",
+    "ja": "事後の集計（計画にないもの）：同時成功は、原因を「未決」と引き継ぐことで定義している。資料が「調査中」と書いているとき、モデルは「否定」と答えることが多かった。「否定」も成立として数えると、同時成功は A 155/300、M 161/300 になる。主結果は、上の事前の定義によるものである。人による確認では、主張の文は両方に読めると判断された。そのため、2つの数え方を、それぞれの定義のまま残している。"
    },
    {
     "id": "scope",
-    "en": "Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. The English case text has not been read by a person.",
-    "ja": "適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文は、人が読んで確認していない。"
+    "en": "Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person has read the English text of 4 of the 140 cases.",
+    "ja": "適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文を人が読んで確認したのは、140ケースのうち4ケースである。"
    }
   ],
   "source": {
-   "commit": "908cdd2",
+   "commit": "c6ea56b",
    "pull_request": "https://github.com/iseyan/M-Anchor-challenge/pull/17",
    "report": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/results-main-20261122-01.md",
-    "sha256": "f66944e17825e4c9bcb78d6a468747dbaa0208c1ab7497af0e17a5a492d59aa0"
+    "sha256": "d312bb9861d633f0f06eb7fb4b32ee53371ce5ce2a16b08d082ba83d5b1d0663"
    },
    "tables": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/analysis/main-20261122-01-tables.json",
@@ -440,7 +440,8 @@
     "sha256": "0f05b44d2e0de85b2d159caf76b4f3cd26f6c6df0ea956cc627b1203bc609bd7"
    },
    "freeze_record": "experiments/llm03-m-anchor/exp4-benchmark/freeze-record-20261122.md",
-   "plan": "experiments/llm03-m-anchor/exp4-benchmark/plan-draft-v0.4.md"
+   "plan": "experiments/llm03-m-anchor/exp4-benchmark/plan-draft-v0.4.md",
+   "review": "experiments/llm03-m-anchor/exp4-benchmark/review/review-20261123.md"
   },
   "recount_command": "python scripts/verify_workflow_results.py --exp4-run <runs/main-20261122-01>"
  },

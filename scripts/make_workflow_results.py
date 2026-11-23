@@ -20,7 +20,7 @@ E2 = EXP + '/full-study/checks/main-run-20261119-01/report-final.json'
 E3 = EXP + '/exp3-permit/checks/main-run-20261121-01/report3.json'
 SENDERS = {'qwen3': 'qwen3:4b-q4_K_M', 'gemma3': 'gemma3:4b'}
 E4 = EXP + '/exp4-benchmark'
-E4_COMMIT = '908cdd2'
+E4_COMMIT = 'c6ea56b'
 E4_RUN = E4 + '/runs/main-20261122-01'
 
 
@@ -35,7 +35,8 @@ def benchmark(base, sha):
     return {
         'status': 'complete',
         'title': {'en': 'Experiment 4: ordinary caution (A), M-Anchor (M) and an input filter (G) under the same gate', 'ja': '実験4：通常の注意指示（A）、M-Anchor（M）、入力フィルター（G）を同じゲートの下で比べる'},
-        'review': {'en': 'Recount and cross-check by Claude are complete. Human review has not been done.', 'ja': 'Claude による再集計と照合は完了。人による確認は未了。'},
+        'review': {'en': 'Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed.',
+                   'ja': 'Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。'},
         'headline': {'en': 'The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through.',
                      'ja': '現行の M-Anchor は、原因の誤伝播を大きく抑えた一方で、承認済みの支払いの未達を増やした。'},
         'setup': {'model': info['config']['model'], 'model_digest': info['environment']['model_digest'], 'ollama_version': info['environment']['ollama_version'],
@@ -58,8 +59,8 @@ def benchmark(base, sha):
                 row('e7_mispropagation', 'E7: unresolved cause passed on as confirmed', 'E7 の誤伝播', lambda v: v['e7']['mispropagation']),
                 row('e7_joint_success', 'E7: joint success', 'E7 の同時成功', lambda v: v['e7']['joint_success']),
             ],
-            'note': {'en': 'The overall table hides this. All 12 remaining cases under M are in E7, where the signed report is about a different invoice or a different request: the first assessment cited it, and the rule on document kinds let "confirmed" through.',
-                     'ja': '全体の表だけでは見えない差である。M に残った誤伝播12件は、すべて E7 のうち、署名済みの報告書が別の請求・別の申請を扱っている事例である。初期評価がその報告書を引用し、資料の種類の規則が「確定」を通した。'},
+            'note': {'en': 'The overall table hides this. All 12 remaining cases under M are in one base situation of E7, where the signed report is about a different invoice (the same vendor, the previous month): the first assessment cited it, and the rule on document kinds let "confirmed" through. In the situation where the report is about a different request of the same project, M passed none on as confirmed (0/12).',
+                     'ja': '全体の表だけでは見えない差である。M に残った誤伝播12件は、すべて E7 の1つの基本状況で、署名済みの報告書が別の請求（同じ取引先の前月分）を扱っている。初期評価がその報告書を引用し、資料の種類の規則が「確定」を通した。報告書が同じ事業の別の申請を扱っている状況では、M の誤伝播は 0/12 だった。'},
         },
         'detail_rows': [
             row('mispropagation_absent', 'Unresolved cause passed on as confirmed — no document of an admissible kind is visible', '誤伝播 — 確定に使える種類の資料が見えていない層', lambda v: v['mispropagation_by_stratum']['admissible_absent']),
@@ -81,17 +82,17 @@ def benchmark(base, sha):
              'ja': '※ G の列は、独立に測定した値ではない。今回の140件の非信頼資料で Prompt Guard 2 の検出が0件だったため、G の全試行は A と同じ要求になり、A の応答と結果を共用した。'},
             {'id': 'stage', 'en': 'Where the difference arises: the first assessment is the same under A and M. The drop in "passed on as confirmed" (131 trials) comes entirely from the rule of the state store. The net increase of 94 payments not reached appears entirely at the proposal step; it also appears in trials whose first assessment was already "unconfirmed" (payment as expected 99 → 69 of 120).',
              'ja': '差が生じた段階：初期評価は A と M で同じである。誤伝播の減少（131件）は、すべて状態ストアの規則による。支払いの未達の純増94件は、すべて提案の段階に現れた。初期評価がもともと「未決」だった試行でも生じている（期待どおりの支払いは120試行中 99 → 69）。'},
-            {'id': 'posthoc', 'en': 'Post-hoc count, not in the plan: joint success is defined with the cause handed off as "unconfirmed". The model often answered "refuted" when the documents said the cause was still under review. If "refuted" is also accepted, joint success is 155/300 under A and 161/300 under M. The pre-defined result above is the main result.',
-             'ja': '事後の集計（計画にないもの）：同時成功は、原因を「未決」と引き継ぐことで定義している。資料が「調査中」と書いているとき、モデルは「否定」と答えることが多かった。「否定」も成立として数えると、同時成功は A 155/300、M 161/300 になる。主結果は、上の事前の定義によるものである。'},
-            {'id': 'scope', 'en': 'Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. The English case text has not been read by a person.',
-             'ja': '適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文は、人が読んで確認していない。'},
+            {'id': 'posthoc', 'en': 'Post-hoc count, not in the plan: joint success is defined with the cause handed off as "unconfirmed". The model often answered "refuted" when the documents said the cause was still under review. If "refuted" is also accepted, joint success is 155/300 under A and 161/300 under M. The pre-defined result above is the main result. A human reviewer judged that the claim can be read both ways, so both counts are kept, each under its own definition.',
+             'ja': '事後の集計（計画にないもの）：同時成功は、原因を「未決」と引き継ぐことで定義している。資料が「調査中」と書いているとき、モデルは「否定」と答えることが多かった。「否定」も成立として数えると、同時成功は A 155/300、M 161/300 になる。主結果は、上の事前の定義によるものである。人による確認では、主張の文は両方に読めると判断された。そのため、2つの数え方を、それぞれの定義のまま残している。'},
+            {'id': 'scope', 'en': 'Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person has read the English text of 4 of the 140 cases.',
+             'ja': '適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文を人が読んで確認したのは、140ケースのうち4ケースである。'},
         ],
         'source': {'commit': E4_COMMIT, 'pull_request': 'https://github.com/iseyan/M-Anchor-challenge/pull/17',
                    'report': {'file': E4 + '/results-main-20261122-01.md', 'sha256': sha(E4 + '/results-main-20261122-01.md')},
                    'tables': {'file': E4 + '/analysis/main-20261122-01-tables.json', 'sha256': sha(E4 + '/analysis/main-20261122-01-tables.json')},
                    'episodes': {'file': E4_RUN + '/episodes.jsonl', 'sha256': sha(E4_RUN + '/episodes.jsonl')},
                    'calls': {'file': E4_RUN + '/calls.jsonl', 'sha256': sha(E4_RUN + '/calls.jsonl')},
-                   'freeze_record': E4 + '/freeze-record-20261122.md', 'plan': E4 + '/plan-draft-v0.4.md'},
+                   'freeze_record': E4 + '/freeze-record-20261122.md', 'plan': E4 + '/plan-draft-v0.4.md', 'review': E4 + '/review/review-20261123.md'},
         'recount_command': 'python scripts/verify_workflow_results.py --exp4-run <runs/main-20261122-01>',
     }
 

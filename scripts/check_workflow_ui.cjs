@@ -249,7 +249,7 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.equal(e['panel-benchmark'].className, '');
   assert.equal(e['panel-replay'].className, 'hidden');
   assert.equal(e['tab-benchmark'].attributes['aria-selected'], 'true');
-  assert.equal(e.benchmarkstatus.textContent, 'Recount and cross-check by Claude are complete. Human review has not been done. Claude による再集計と照合は完了。人による確認は未了。');
+  assert.equal(e.benchmarkstatus.textContent, 'Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed. Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。');
   assert.match(e.benchmarkheadline.textContent, /^The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through\./);
   assert.match(e.benchmarksetup.textContent, /Sender gpt-oss:20b, English, 140 cases from 35 base situations, 3 repetitions, 420 trials per condition\. 1,260 model calls, 0 failed\./);
   const cells = id => e[id].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0]].concat(r.children.slice(1).map(c => c.textContent)));
@@ -260,7 +260,7 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.benchmarkmain.children[0].children[3].children[0].textContent, /^Joint success \(defined in advance\)/);
   // E7 is shown next to the overall table, because the overall table hides it.
   assert.deepEqual(cells('benchmarke7'), [['E7:', '14/60', '12/60', '14/60'], ['E7:', '12/60', '3/60', '12/60']]);
-  assert.match(e.benchmarke7note.textContent, /All 12 remaining cases under M are in E7, where the signed report is about a different invoice or a different request/);
+  assert.match(e.benchmarke7note.textContent, /All 12 remaining cases under M are in one base situation of E7, where the signed report is about a different invoice \(the same vendor, the previous month\).* M passed none on as confirmed \(0\/12\)/);
   // Column G is marked, and the footnote says why it equals A.
   assert.match(e.benchmarkmain.children[0].children[0].children[3].textContent, /Prompt Guard 2 \+ common gate \*/);
   assert.match(e.benchmarkgnote.textContent, /^\* Column G is not an independent measurement\. Prompt Guard 2 detected none of the 140 untrusted documents in this study, so every G trial sent the same request as A, and G shares the responses and results of A\./);
@@ -270,13 +270,14 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   // The post-hoc count is a note, not a table row, and it is labelled as post-hoc.
   const notes = e.benchmarknotes.children.map(c => c.textContent);
   assert.equal(notes.length, 3);
-  assert.match(notes[1], /^Post-hoc count, not in the plan: .*155\/300 under A and 161\/300 under M\. The pre-defined result above is the main result\./);
+  assert.match(notes[1], /^Post-hoc count, not in the plan: .*155\/300 under A and 161\/300 under M\. The pre-defined result above is the main result\. A human reviewer judged that the claim can be read both ways, so both counts are kept/);
   assert.equal(e.benchmarknotes.children[1].className, 'notice');
   assert.doesNotMatch(JSON.stringify(cells('benchmarkmain')), /155|161/);
   assert.match(notes[0], /net increase of 94 payments not reached appears entirely at the proposal step/);
-  assert.match(notes[2], /The English case text has not been read by a person\./);
-  assert.match(e.benchmarksource.textContent, /Review status 確認の状況 Recount and cross-check by Claude are complete\. Human review has not been done\./);
-  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/runs\/main-20261122-01\/episodes\.jsonl @ 908cdd2 +· SHA-256 b22c779bf475acff91e5ed13257e0427541d14fb5a90f96052d7201769ef608c/);
+  assert.match(notes[2], /A person has read the English text of 4 of the 140 cases\./);
+  assert.match(e.benchmarksource.textContent, /Review status 確認の状況 Recount and cross-check by Claude are complete\. Human review has been done on sampled trials/);
+  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/review\/review-20261123\.md @ c6ea56b/);
+  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/runs\/main-20261122-01\/episodes\.jsonl @ c6ea56b +· SHA-256 b22c779bf475acff91e5ed13257e0427541d14fb5a90f96052d7201769ef608c/);
   assert.match(e.benchmarksource.textContent, /python scripts\/verify_workflow_results\.py --exp4-run/);
   assert.doesNotMatch(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /Not run yet|\d+\s*\/\s*\d+/);      // numbers come from the bundled data file, not from the page
 
