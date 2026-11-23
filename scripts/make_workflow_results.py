@@ -20,7 +20,7 @@ E2 = EXP + '/full-study/checks/main-run-20261119-01/report-final.json'
 E3 = EXP + '/exp3-permit/checks/main-run-20261121-01/report3.json'
 SENDERS = {'qwen3': 'qwen3:4b-q4_K_M', 'gemma3': 'gemma3:4b'}
 E4 = EXP + '/exp4-benchmark'
-E4_COMMIT = 'e0b5f5b'
+E4_COMMIT = 'ff6ea9b'
 E4_RUN = E4 + '/runs/main-20261122-01'
 
 
@@ -35,8 +35,8 @@ def benchmark(base, sha):
     return {
         'status': 'complete',
         'title': {'en': 'Experiment 4: ordinary caution (A), M-Anchor (M) and an input filter (G) under the same gate', 'ja': '実験4：通常の注意指示（A）、M-Anchor（M）、入力フィルター（G）を同じゲートの下で比べる'},
-        'review': {'en': 'Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed.',
-                   'ja': 'Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。'},
+        'review': {'en': 'Recount and cross-check by Claude are complete. A person has read all 140 case texts and reviewed sampled trials; the trial records have not all been reviewed by a person.',
+                   'ja': 'Claude による再集計と照合は完了。人による確認は、ケース本文の通読（全140ケース）と、抽出した試行について実施。試行の記録の全件は、人が確認していない。'},
         'headline': {'en': 'The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through.',
                      'ja': '現行の M-Anchor は、原因の誤伝播を大きく抑えた一方で、承認済みの支払いの未達を増やした。'},
         'setup': {'model': info['config']['model'], 'model_digest': info['environment']['model_digest'], 'ollama_version': info['environment']['ollama_version'],
@@ -95,8 +95,8 @@ def benchmark(base, sha):
              'ja': '差が生じた段階：初期評価は A と M で同じである。誤伝播の減少（131件）は、すべて状態ストアの規則による。支払いの未達の純増94件は、すべて提案の段階に現れた。初期評価がもともと「未決」だった試行でも生じている（期待どおりの支払いは120試行中 99 → 69）。'},
             {'id': 'posthoc', 'en': 'Post-hoc count, not in the plan: joint success is defined with the cause handed off as "unconfirmed". The model often answered "refuted" when the documents said the cause was still under review. If "refuted" is also accepted, joint success is 155/300 under A and 161/300 under M. The pre-defined result above is the main result. A human reviewer judged that the claim can be read both ways, so both counts are kept, each under its own definition.',
              'ja': '事後の集計（計画にないもの）：同時成功は、原因を「未決」と引き継ぐことで定義している。資料が「調査中」と書いているとき、モデルは「否定」と答えることが多かった。「否定」も成立として数えると、同時成功は A 155/300、M 161/300 になる。主結果は、上の事前の定義によるものである。人による確認では、主張の文は両方に読めると判断された。そのため、2つの数え方を、それぞれの定義のまま残している。'},
-            {'id': 'scope', 'en': 'Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person has read the English text of 4 of the 140 cases.',
-             'ja': '適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文を人が読んで確認したのは、140ケースのうち4ケースである。'},
+            {'id': 'scope', 'en': 'Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person read the English text of all 140 cases after the run, not before it.',
+             'ja': '適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文は、本番の後に人が通読した（本番の前には読まれていない）。'},
         ],
         'source': {'commit': E4_COMMIT, 'pull_request': 'https://github.com/iseyan/M-Anchor-challenge/pull/17',
                    'report': {'file': E4 + '/results-main-20261122-01.md', 'sha256': sha(E4 + '/results-main-20261122-01.md')},

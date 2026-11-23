@@ -12,8 +12,8 @@
    "ja": "実験4：通常の注意指示（A）、M-Anchor（M）、入力フィルター（G）を同じゲートの下で比べる"
   },
   "review": {
-   "en": "Recount and cross-check by Claude are complete. Human review has been done on sampled trials and on the four variants of one base situation; the full set has not been reviewed.",
-   "ja": "Claude による再集計と照合は完了。人による確認は、抽出した試行と、1つの基本状況の4形式について実施。全件は未了。"
+   "en": "Recount and cross-check by Claude are complete. A person has read all 140 case texts and reviewed sampled trials; the trial records have not all been reviewed by a person.",
+   "ja": "Claude による再集計と照合は完了。人による確認は、ケース本文の通読（全140ケース）と、抽出した試行について実施。試行の記録の全件は、人が確認していない。"
   },
   "headline": {
    "en": "The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through.",
@@ -482,16 +482,16 @@
    },
    {
     "id": "scope",
-    "en": "Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person has read the English text of 4 of the 140 cases.",
-    "ja": "適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文を人が読んで確認したのは、140ケースのうち4ケースである。"
+    "en": "Scope: one sender model, English, a simulated workflow, 140 newly written cases from 35 base situations, three repetitions. Counts over planned trials; failed outputs stay in the denominator. Descriptive only: no intervals or tests. A person read the English text of all 140 cases after the run, not before it.",
+    "ja": "適用範囲：送り手1モデル、英語、模擬業務、基本状況35から新しく作った140ケース、3反復。分母は予定試行数で、失敗した出力も分母に残る。件数の記述だけで、区間や検定はない。ケースの英語の本文は、本番の後に人が通読した（本番の前には読まれていない）。"
    }
   ],
   "source": {
-   "commit": "e0b5f5b",
+   "commit": "ff6ea9b",
    "pull_request": "https://github.com/iseyan/M-Anchor-challenge/pull/17",
    "report": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/results-main-20261122-01.md",
-    "sha256": "416fb65755c884427dd1696f53e68284762225352ccaa0ad691ce7f4a2df82e1"
+    "sha256": "05c8dcb9df1a617859297e0cddd3a705e006f79bbf5901c414105d5087b64d18"
    },
    "tables": {
     "file": "experiments/llm03-m-anchor/exp4-benchmark/analysis/main-20261122-01-tables.json",

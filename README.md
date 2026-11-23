@@ -14,7 +14,7 @@ The [publication package](docs/publication/README.md) includes a technical note,
 
 ## Current version
 
-**1.3.0 release candidate — adds the results of Experiment 4 (robustness benchmark).** Passing the cause on as confirmed, payments that did not go through, and joint success can be read on one screen. Recount and cross-check by Claude are complete; human review has been done on sampled trials, not on the full set.
+**1.3.0 release candidate — adds the results of Experiment 4 (robustness benchmark).** Passing the cause on as confirmed, payments that did not go through, and joint success can be read on one screen. Recount and cross-check by Claude are complete; a person has read all case texts and reviewed sampled trials.
 
 **1.2.0 release candidate — adds the workflow demo.** A screen that replays recorded submissions through a decision gate and a simulated ledger, and shows the frozen results of Experiments 2 and 3 of M-Anchor-challenge. See the [workflow demo guide](docs/workflow-demo.en.md). The record-protection gate, storage format and integration interface are unchanged from 1.0.0, described below. The citation file still names the released 1.0.0.
 
