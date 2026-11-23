@@ -354,7 +354,22 @@ class WorkflowRouteTest(unittest.TestCase):
         self.assertEqual(record['context']['app_version'], APP_VERSION)
         self.assertEqual(cases['app_version'], APP_VERSION)
         with urlopen(self.url + '/workflow/results', timeout=5) as response:
-            self.assertEqual(json.loads(response.read())['schema'], 'm-anchor-workflow-results/v1')
+            served = json.loads(response.read())
+        self.assertEqual(served['schema'], 'm-anchor-workflow-results/v1')
+        bench = served['benchmark']
+        rows = {r['id']: r['cells'] for r in bench['rows'] + bench['e7']['rows'] + bench['detail_rows']}
+        # Experiment 4: gain and cost together, the E7 rows, and column G equal to A because nothing was detected.
+        self.assertEqual((rows['mispropagation'], rows['payment_unmet'], rows['joint_success']),
+                         ({'A': [143, 360], 'M': [12, 360], 'G': [143, 360]}, {'A': [51, 360], 'M': [145, 360], 'G': [51, 360]}, {'A': [99, 300], 'M': [142, 300], 'G': [99, 300]}))
+        self.assertEqual((rows['e7_mispropagation']['A'], rows['e7_mispropagation']['M'], rows['e7_joint_success']['A'], rows['e7_joint_success']['M']), ([14, 60], [12, 60], [12, 60], [3, 60]))
+        self.assertTrue(all(cells['G'] == cells['A'] for cells in rows.values()))
+        self.assertEqual(bench['filter'], {'documents_scored': 140, 'documents_detected': 0, 'trials_with_input_changed': 0, 'trials_sharing_the_request_of_A': 420})
+        self.assertEqual(rows['payment_not_proposed']['M'][0] + rows['payment_denied']['M'][0], rows['payment_unmet']['M'][0])
+        self.assertEqual(bench['review']['ja'], 'Claude による再集計と照合は完了。人による確認は未了。')
+        notes = {n['id']: n for n in bench['notes']}
+        self.assertIn('Post-hoc count, not in the plan', notes['posthoc']['en'])
+        self.assertIn('155/300', notes['posthoc']['en'])
+        self.assertNotIn('155', json.dumps(bench['rows']))        # the post-hoc count is a note, never a table row
         self.assertEqual(record, self.post({'case_id': 'F-LT6-01', 'submission': item['submission']['content']}))
         self.assertEqual(self.admin('/admin/history'), [])
         self.assertEqual((self.dir / 'state.sqlite3').read_bytes(), store_before)

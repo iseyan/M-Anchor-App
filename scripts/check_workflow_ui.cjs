@@ -35,7 +35,7 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   const choose = async (id, value) => { e[id].value = value; await e[id].onchange(); };
 
   // Initial view: Case A (pilot), both conditions side by side.
-  assert.match(e.appversion.textContent, /^M-Anchor App 1\.2\.0$/);
+  assert.match(e.appversion.textContent, /^M-Anchor App 1\.3\.0$/);
   assert.deepEqual(e.caseselect.children.map(c => c.value), ['PILOT-A', 'PILOT-A-S3', 'F-LT6-01']);
   assert.equal(e.caseselect.value, 'PILOT-A');
   assert.equal(e.pending.className, 'notice hidden');
@@ -227,7 +227,7 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(firstHash, new RegExp('^record_sha256: ' + saved.record.record_sha256));
   assert.equal(saved.record.source.kind, 'edited_input');
   assert.equal(saved.record.context.based_on, 'qwen3-C4P');
-  assert.equal(saved.record.context.app_version, '1.2.0');
+  assert.equal(saved.record.context.app_version, '1.3.0');
   assert.equal(saved.record.receiver.status, 'not_measured');
   assert.equal(saved.record.ledger.after.exports.length, 0);
   assert.equal(saved.record.ledger.diff.length, 3);
@@ -244,13 +244,41 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.status.textContent, /^Frozen record/);
   assert.equal(e.hash.textContent, frozenHash);
 
-  // Benchmark tab: "not run yet", and no numbers.
+  // Benchmark tab: Experiment 4. Gain and cost on one screen, counts over planned trials, and the review status.
   e['tab-benchmark'].onclick();
   assert.equal(e['panel-benchmark'].className, '');
   assert.equal(e['panel-replay'].className, 'hidden');
   assert.equal(e['tab-benchmark'].attributes['aria-selected'], 'true');
-  assert.match(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /Not run yet\./);
-  assert.doesNotMatch(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /\d+\s*\/\s*\d+|\d+%/);
+  assert.equal(e.benchmarkstatus.textContent, 'Recount and cross-check by Claude are complete. Human review has not been done. Claude による再集計と照合は完了。人による確認は未了。');
+  assert.match(e.benchmarkheadline.textContent, /^The current M-Anchor sharply reduced the cause being passed on as confirmed, and it increased the number of approved payments that did not go through\./);
+  assert.match(e.benchmarksetup.textContent, /Sender gpt-oss:20b, English, 140 cases from 35 base situations, 3 repetitions, 420 trials per condition\. 1,260 model calls, 0 failed\./);
+  const cells = id => e[id].children[0].children.slice(1).map(r => [r.children[0].textContent.split(' ')[0]].concat(r.children.slice(1).map(c => c.textContent)));
+  const head = e.benchmarkmain.children[0].children[0].children.map(c => c.textContent.split(' ')[0]);
+  assert.deepEqual(head, ['Measure', 'A:', 'M:', 'G:']);
+  // The three measures sit in one table: mis-propagation, payment not reached, joint success (pre-defined), then missing handoffs.
+  assert.deepEqual(cells('benchmarkmain'), [['Unresolved', '143/360', '12/360', '143/360'], ['Approved', '51/360', '145/360', '51/360'], ['Joint', '99/300', '142/300', '99/300'], ['Handoff', '0/420', '0/420', '0/420']]);
+  assert.match(e.benchmarkmain.children[0].children[3].children[0].textContent, /^Joint success \(defined in advance\)/);
+  // E7 is shown next to the overall table, because the overall table hides it.
+  assert.deepEqual(cells('benchmarke7'), [['E7:', '14/60', '12/60', '14/60'], ['E7:', '12/60', '3/60', '12/60']]);
+  assert.match(e.benchmarke7note.textContent, /All 12 remaining cases under M are in E7, where the signed report is about a different invoice or a different request/);
+  // Column G is marked, and the footnote says why it equals A.
+  assert.match(e.benchmarkmain.children[0].children[0].children[3].textContent, /Prompt Guard 2 \+ common gate \*/);
+  assert.match(e.benchmarkgnote.textContent, /^\* Column G is not an independent measurement\. Prompt Guard 2 detected none of the 140 untrusted documents in this study, so every G trial sent the same request as A, and G shares the responses and results of A\./);
+  assert.match(e.benchmarkgnote.textContent, /今回の140件の非信頼資料で Prompt Guard 2 の検出が0件だったため、G の全試行は A と同じ要求になり、A の応答と結果を共用した。/);
+  assert.deepEqual(cells('benchmarkdetail').map(r => r.slice(1)), [['129/300', '0/300', '129/300'], ['14/60', '12/60', '14/60'], ['45/360', '139/360', '45/360'], ['6/360', '6/360', '6/360'], ['0/420', '0/420', '0/420'], ['0/60', '0/60', '0/60'], ['22/60', '16/60', '22/60']]);
+  assert.deepEqual(cells('benchmarkpaired').map(r => r.slice(1)), [['12', '131', '0', '217'], ['67', '32', '75', '126'], ['43', '8', '102', '207']]);
+  // The post-hoc count is a note, not a table row, and it is labelled as post-hoc.
+  const notes = e.benchmarknotes.children.map(c => c.textContent);
+  assert.equal(notes.length, 3);
+  assert.match(notes[1], /^Post-hoc count, not in the plan: .*155\/300 under A and 161\/300 under M\. The pre-defined result above is the main result\./);
+  assert.equal(e.benchmarknotes.children[1].className, 'notice');
+  assert.doesNotMatch(JSON.stringify(cells('benchmarkmain')), /155|161/);
+  assert.match(notes[0], /net increase of 94 payments not reached appears entirely at the proposal step/);
+  assert.match(notes[2], /The English case text has not been read by a person\./);
+  assert.match(e.benchmarksource.textContent, /Review status 確認の状況 Recount and cross-check by Claude are complete\. Human review has not been done\./);
+  assert.match(e.benchmarksource.textContent, /exp4-benchmark\/runs\/main-20261122-01\/episodes\.jsonl @ 908cdd2 +· SHA-256 b22c779bf475acff91e5ed13257e0427541d14fb5a90f96052d7201769ef608c/);
+  assert.match(e.benchmarksource.textContent, /python scripts\/verify_workflow_results\.py --exp4-run/);
+  assert.doesNotMatch(html.match(/id="panel-benchmark"[\s\S]*?<\/section>/)[0], /Not run yet|\d+\s*\/\s*\d+/);      // numbers come from the bundled data file, not from the page
 
   // Results tab: fixed values with sources, and the recount entry.
   e['tab-results'].onclick();
@@ -267,5 +295,5 @@ const settle = () => new Promise(resolve => setTimeout(resolve, 150));
   assert.match(e.recount.textContent, /exp3_review_data_v2\.zip @ e2aeb9f/);
   e['tab-replay'].onclick();
   assert.equal(e['panel-replay'].className, '');
-  console.log('PASS: workflow demo — Case A (pilot) side by side on open, control case, Case B with four frozen records, side-by-side comparison, benchmark not run, field example leaves record and hash unchanged, edited input (receiver not measured, no carry-over, stable hash), unreadable input, results tables and recount entry');
+  console.log('PASS: workflow demo — Case A (pilot) side by side on open, control case, Case B with four frozen records, side-by-side comparison, Experiment 4 benchmark tables with review status and notes, field example leaves record and hash unchanged, edited input (receiver not measured, no carry-over, stable hash), unreadable input, results tables and recount entry');
 })().catch(error => { console.error(error); process.exitCode = 1; });

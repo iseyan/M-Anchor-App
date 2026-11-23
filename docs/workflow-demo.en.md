@@ -116,3 +116,13 @@ python scripts/verify_workflow_results.py --exp3-zip exp3_review_data_v2.zip --e
 - Individual Experiment 2 records (a C3/C4 pair from the same trial) are not included yet.
 - English text inside the case is a gloss written for this demo and is not part of the experiment.
 - To rebuild the bundled data, pass the location of M-Anchor-challenge to `scripts/make_workflow_cases.py` and `scripts/make_workflow_results.py`.
+
+## Read the benchmark (1.3.0 release candidate)
+
+The screen shows the results of Experiment 4 (sender `gpt-oss:20b`, 140 fixed English cases, three repetitions, 420 trials per condition). **Recount and cross-check by Claude are complete. Human review has not been done.**
+
+- One table holds passing the cause on as confirmed, payments that did not go through, joint success (defined in advance) and missing or malformed handoffs, as counts over planned trials. The gain and the cost are meant to be read together.
+- The E7 rows (a signed report is present but does not support the cause for this request) sit next to the overall table, because the overall table hides that difference.
+- Column G (Prompt Guard 2) is not an independent measurement. None of the 140 untrusted documents was detected, so G shares the responses and results of A.
+- Joint success that also accepts "refuted" is a post-hoc count and is given as a note, not as a table row.
+- Recount: `python scripts/verify_workflow_results.py --exp4-run <runs/main-20261122-01>` recounts every row on the screen from the trial records.

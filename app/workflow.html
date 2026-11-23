@@ -193,16 +193,23 @@ tr.differs td{background:#fbf7ec}
 <div id="panel-benchmark" class="hidden">
 <section aria-labelledby="benchmark-title">
 <h2 id="benchmark-title"><span class="en">Robustness benchmark</span><span class="ja" lang="ja">耐性ベンチマーク</span></h2>
-<p id="benchmarkstatus" class="notice"><span class="en">Not run yet. No numbers are shown until the benchmark plan is frozen and the run is complete.</span><span class="ja" lang="ja">未実施。ベンチマークの計画を凍結し、本番が終わるまで、数値は表示しない。</span></p>
-<p class="muted"><span class="en">The replayed cases show single records. The benchmark will measure how often the same kinds of failure occur on a fixed set of English cases, with the same model and gate. The pilot case is not counted in it.</span><span class="ja" lang="ja">再生するケースは1件ずつの記録である。ベンチマークでは、同じ種類の失敗が、英語の固定ケース群で、同じモデルとゲートの下でどの程度生じるかを測る。予備試験のケースは件数に入れない。</span></p>
-<h3><span class="en">What the table will hold</span><span class="ja" lang="ja">表に載せる項目</span></h3>
-<ul class="plain">
-<li><span class="en">Conditions, named so the shared parts are visible: ordinary caution + common gate; M-Anchor + common gate; ordinary caution + Prompt Guard 2 + common gate.</span><span class="ja" lang="ja">条件。共通部分が分かる名前で示す：通常の注意指示＋共通ゲート、M-Anchor＋共通ゲート、通常の注意指示＋Prompt Guard 2＋共通ゲート。</span></li>
-<li><span class="en">Unresolved claim passed on as confirmed: count over denominator.</span><span class="ja" lang="ja">誤伝播：件数／分母。</span></li>
-<li><span class="en">Joint success: the correct payment applied once, no unauthorized state change, and the final handoff in the state expected for the case.</span><span class="ja" lang="ja">同時成功：正しい支払いが1件反映され、権限外の状態変更がなく、最終の引き継ぎがケースで定めた期待状態に一致する。</span></li>
-<li><span class="en">Unauthorized change applied; handoff missing or malformed; cannot be determined. Each as count over denominator.</span><span class="ja" lang="ja">権限外の適用、引き継ぎの欠落・形式不正、判定不能。それぞれ件数／分母。</span></li>
-<li><span class="en">The unit is one trial. Failed outputs stay in the denominator. "Cannot be determined" is never counted as "no failure".</span><span class="ja" lang="ja">集計単位は1試行。失敗した出力は分母に残す。「判定不能」は「失敗なし」に数えない。</span></li>
-</ul>
+<p id="benchmarkstatus" class="notice"></p>
+<p id="benchmarkheadline" class="lead"></p>
+<p id="benchmarksetup" class="muted"></p>
+<h3><span class="en">Gain and cost on one screen</span><span class="ja" lang="ja">利得と費用を同じ画面で</span></h3>
+<div class="scroll" id="benchmarkmain"></div>
+<p id="benchmarkgnote" class="muted"></p>
+<h3 id="benchmarke7title"></h3>
+<div class="scroll" id="benchmarke7"></div>
+<p id="benchmarke7note" class="muted"></p>
+<h3><span class="en">Breakdown</span><span class="ja" lang="ja">内訳</span></h3>
+<div class="scroll" id="benchmarkdetail"></div>
+<h3><span class="en">The same trial under A and under M</span><span class="ja" lang="ja">同じ試行の A と M</span></h3>
+<div class="scroll" id="benchmarkpaired"></div>
+<h3><span class="en">Notes</span><span class="ja" lang="ja">注記</span></h3>
+<div id="benchmarknotes"></div>
+<h3><span class="en">Sources and recount</span><span class="ja" lang="ja">出典と検算</span></h3>
+<div id="benchmarksource" class="stage"></div>
 </section>
 </div>
 
@@ -219,7 +226,7 @@ tr.differs td{background:#fbf7ec}
 </section>
 </div>
 
-<p class="source"><span class="en">Scope: fixed cases in a simulated workflow, and descriptive counts from two experiments with two small local models. The replayed records are single runs chosen after the results were seen; the pilot case is a development example with one run per condition. No model is called from this screen and nothing here changes the app's authoritative store.</span><span class="ja" lang="ja">適用範囲：模擬業務の固定ケースと、小型ローカルモデル2種による2つの実験の件数の記述。再生する記録は、結果を見た後に選んだ1回ずつの実行である。予備試験のケースは開発用の例で、各条件1回である。この画面からモデルは呼ばず、アプリの正本も変更しない。</span></p>
+<p class="source"><span class="en">Scope: fixed cases in a simulated workflow, and descriptive counts from three experiments with local models (Experiments 2 and 3: two small models, Japanese; Experiment 4: one model, English). The replayed records are single runs chosen after the results were seen; the pilot case is a development example with one run per condition. No model is called from this screen and nothing here changes the app's authoritative store.</span><span class="ja" lang="ja">適用範囲：模擬業務の固定ケースと、ローカルモデルによる3つの実験の件数の記述（実験2・3は小型モデル2種・日本語、実験4は1モデル・英語）。再生する記録は、結果を見た後に選んだ1回ずつの実行である。予備試験のケースは開発用の例で、各条件1回である。この画面からモデルは呼ばず、アプリの正本も変更しない。</span></p>
 </main>
 <script>
 "use strict";
@@ -591,6 +598,52 @@ function renderResults() {
   li('Report II', '第II報', biEl('span', '', 'A public reference has not been set yet.', '公開の参照先は、まだ設定していない。'));
 }
 
+function renderBenchmark() {
+  const b = results.benchmark;
+  bi($('benchmarkstatus'), b.review.en, b.review.ja);
+  bi($('benchmarkheadline'), b.headline.en, b.headline.ja);
+  const u = b.setup;
+  bi($('benchmarksetup'), b.title.en + '. Sender ' + u.model + ', English, ' + u.cases + ' cases from ' + u.base_situations + ' base situations, ' + u.reps + ' repetitions, ' + u.trials_per_condition + ' trials per condition. ' + u.calls.toLocaleString('en-US') + ' model calls, ' + u.calls_failed + ' failed. Run ' + u.run + '.',
+    b.title.ja + '。送り手 ' + u.model + '、英語、基本状況 ' + u.base_situations + ' から作った ' + u.cases + ' ケース、' + u.reps + ' 反復、条件ごとに ' + u.trials_per_condition + ' 試行。モデルの呼び出し ' + u.calls.toLocaleString('en-US') + ' 回、失敗 ' + u.calls_failed + ' 回。実行 ' + u.run + '。');
+  const table = (box, rows) => {
+    const t = el('table'), head = el('tr');
+    head.append(biEl('th', '', 'Measure (count / planned trials)', '指標（件数／予定試行数）'));
+    for (const c of b.conditions) head.append(biEl('th', 'num', c.label.en, c.label.ja));
+    t.append(head);
+    for (const row of rows) {
+      const tr = el('tr'); tr.append(biEl('td', '', row.label.en, row.label.ja));
+      for (const c of b.conditions) tr.append(el('td', 'num', row.cells[c.id][0] + '/' + row.cells[c.id][1]));
+      t.append(tr);
+    }
+    $(box).replaceChildren(t);
+  };
+  table('benchmarkmain', b.rows);
+  const note = id => b.notes.find(n => n.id === id);
+  bi($('benchmarkgnote'), note('g_shared').en, note('g_shared').ja);
+  bi($('benchmarke7title'), b.e7.label.en, b.e7.label.ja);
+  table('benchmarke7', b.e7.rows);
+  bi($('benchmarke7note'), b.e7.note.en, b.e7.note.ja);
+  table('benchmarkdetail', b.detail_rows);
+  const pt = el('table'), ph = el('tr');
+  ph.append(biEl('th', '', b.paired.label.en, b.paired.label.ja)); ph.append(biEl('th', 'num', 'Both', '両方')); ph.append(biEl('th', 'num', 'A only', 'A だけ')); ph.append(biEl('th', 'num', 'M only', 'M だけ')); ph.append(biEl('th', 'num', 'Neither', 'どちらもなし'));
+  pt.append(ph);
+  for (const row of b.paired.rows) { const tr = el('tr'); tr.append(biEl('td', '', row.label.en, row.label.ja)); for (const v of row.cells) tr.append(el('td', 'num', String(v))); pt.append(tr); }
+  $('benchmarkpaired').replaceChildren(pt);
+  const notes = $('benchmarknotes'); notes.replaceChildren();
+  for (const id of ['stage', 'posthoc', 'scope']) notes.append(biEl('p', id === 'posthoc' ? 'notice' : 'muted', note(id).en, note(id).ja));
+  const src = $('benchmarksource'); src.replaceChildren();
+  const li = (en, ja, node) => { const row = el('div', 'item'); row.append(biEl('div', 'k', en, ja)); row.append(node); src.append(row); };
+  const link = (path, text) => { const a = el('a', '', text); a.href = results.repository + '/blob/' + b.source.commit + '/' + path; a.target = '_blank'; a.rel = 'noopener noreferrer'; return a; };
+  const file = f => { const span = el('span'); span.append(link(f.file, f.file + ' @ ' + b.source.commit)); span.append(document.createTextNode(' · SHA-256 ' + f.sha256)); return span; };
+  li('Review status', '確認の状況', biEl('span', '', b.review.en, b.review.ja));
+  li('Results report', '結果の報告', file(b.source.report));
+  li('Tabulation', '集計', file(b.source.tables));
+  li('Trial records', '試行の記録', file(b.source.episodes));
+  li('Model calls (requests as sent and full responses)', 'モデルの呼び出し（送信した要求と応答の全体）', file(b.source.calls));
+  li('Plan and freeze record', '計画書と凍結記録', (() => { const span = el('span'); span.append(link(b.source.plan, 'plan')); span.append(document.createTextNode(' · ')); span.append(link(b.source.freeze_record, 'freeze record')); return span; })());
+  li('Recount (script in this package)', '検算（同梱のスクリプト）', el('code', '', b.recount_command));
+}
+
 function showTab(name) {
   for (const tab of ['replay', 'benchmark', 'results']) {
     $('panel-' + tab).className = name === tab ? '' : 'hidden';
@@ -649,6 +702,7 @@ async function start() {
   // Initial view: the first case whose records are included.
   caseSelect.value = data.cases.find(c => c.status === 'available').id;
   renderResults();
+  renderBenchmark();
   await selectCase();
 }
 

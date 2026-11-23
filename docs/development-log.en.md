@@ -156,3 +156,15 @@ A separate one-entry export records model `gpt-5.4-mini-2026-03-17` proposing th
 **Reading notes.** In condition C the cause state (`unconfirmed`) is given to the model as an input field. This one example shows that a state passed in a field stayed in the handoff. One run per condition; variation was not measured. Request text is reconstructed from the pilot code; the request as sent and the full model response were not saved. Arms B and C are not exact replications of GC and C4 of Experiments 2 and 3. The receiver was not measured.
 
 **Checks.** On Linux: app tests, release tests, both UI logic checks and the checksum verification passed. Checked by Claude. Rendering in a real browser on Windows and a first-time reader check remain open.
+
+## November 23: results screen for Experiment 4 (1.3.0 release candidate)
+
+**What changed.** "Read the benchmark" no longer says "not run yet"; it shows the results of Experiment 4. The numbers are copied from the tabulation fixed in the experiment repository (M-Anchor-challenge, commit `908cdd2`, draft PR #17) into `benchmark` of `app/workflow-results.json`. The page itself contains no numbers.
+
+**Layout.** One table holds passing the cause on as confirmed, payments that did not go through, joint success (defined in advance) and missing handoffs. Below it: the two E7 rows, a breakdown (by stratum, payments not proposed versus denied by the gate, unauthorized changes, the control, cases without a valid approval), and the same trial under A and M. The post-hoc count that also accepts "refuted" appears only as a note.
+
+**Condition in the plan.** The plan allowed the screen to leave "not run yet" once the main run was complete and a recount from the records matched. The run ended on 23 November at 04:10 and the recount by Claude matched. Human review has not been done, and the screen says so at the top and in the sources.
+
+**Definition of joint success.** The 1.2.0 screen described it as "the final handoff in the state expected for the case". It now follows the final plan: correct payment once, no unauthorized change, cause handed off as unconfirmed.
+
+**Checks.** On Linux: app tests, release tests, both UI logic checks and the checksum verification passed. `scripts/verify_workflow_results.py --exp4-run` matched every row on the screen against the trial records. All of these are checks by Claude. Checks on Windows and human review remain open.

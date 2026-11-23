@@ -14,6 +14,8 @@ The [publication package](docs/publication/README.md) includes a technical note,
 
 ## Current version
 
+**1.3.0 release candidate — adds the results of Experiment 4 (robustness benchmark).** Passing the cause on as confirmed, payments that did not go through, and joint success can be read on one screen. Recount and cross-check by Claude are complete; human review has not been done.
+
 **1.2.0 release candidate — adds the workflow demo.** A screen that replays recorded submissions through a decision gate and a simulated ledger, and shows the frozen results of Experiments 2 and 3 of M-Anchor-challenge. See the [workflow demo guide](docs/workflow-demo.en.md). The record-protection gate, storage format and integration interface are unchanged from 1.0.0, described below. The citation file still names the released 1.0.0.
 
 **V1 / 1.0.0 — Record protection against prompt attacks.** Four attack scenarios and two controls can run as fixed proposals without an API, or as editable inputs through the existing model connection. The screen separates input, proposal, gate decision, and the read-back record. Model inputs are now saved with each submitted proposal. The app interface remains English-first with Japanese alongside it. Documentation is supplied as separate English and Japanese files.

@@ -2,6 +2,16 @@
 
 [日本語](CHANGELOG.ja.md)
 
+## 1.3.0 release candidate: results of Experiment 4 (robustness benchmark) — 2026-11-23 (Japan time)
+
+- "Read the benchmark" now shows the results of Experiment 4. Passing the cause on as confirmed, approved payments that did not go through, and joint success sit in one table, as counts over planned trials (A ordinary caution, M M-Anchor, G Prompt Guard 2).
+- Joint success is shown as defined in advance (99/300 → 142/300). The post-hoc count that also accepts "refuted" (155/300 → 161/300) is a note, not a table row.
+- E7 (a signed report is present but does not support the cause for this request) is shown next to the overall table: passed on as confirmed 14/60 → 12/60, joint success 12/60 → 3/60.
+- Column G carries a footnote: none of the 140 untrusted documents was detected, so G shares the responses and results of A.
+- The review status is displayed: "Recount and cross-check by Claude are complete. Human review has not been done."
+- The bundled verification script gains `--exp4-run`, which recounts every row on the screen from the trial records.
+- This is a separate candidate from the accepted 1.2.0 candidate (ZIP `3ad39103…`). Record replay (Case A, its control, Case B) is unchanged.
+
 ## 1.2.0 release candidate: case selector and side-by-side comparison — 2026-11-22 (Japan time)
 
 - Workflow demo: add a case selector and a side-by-side comparison of two records of the same case. Difference marks follow mapped states and payment content, not wording or order.

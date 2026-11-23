@@ -21,7 +21,7 @@ from workflow import WorkflowError, load_cases, load_results, run_request
 
 ROOT = Path(__file__).resolve().parent
 MAX_BODY = 65536
-APP_VERSION = '1.2.0'
+APP_VERSION = '1.3.0'
 
 
 class LaunchTicket:

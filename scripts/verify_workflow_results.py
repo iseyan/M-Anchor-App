@@ -106,6 +106,52 @@ def exp2_tables(run_dir, cases_path):
     return {metric: {s: {c: [count[(metric, s, c)], planned[(group, s, c)]] for c in ('C3', 'C4')} for s in ('qwen3', 'gemma3')} for metric, group in groups.items()}
 
 
+def exp4_tables(run_dir):
+    """Experiment 4: recount the benchmark rows from episodes.jsonl of the run folder."""
+    path = run_dir / 'episodes.jsonl'
+    episodes = [json.loads(line) for line in path.read_text(encoding='utf-8').splitlines() if line.strip()]
+    if len(episodes) != 1260:
+        raise SystemExit(f'Experiment 4: expected 1,260 episodes, found {len(episodes)}')
+    rows = {}
+    for cond in ('A', 'M', 'G'):
+        mine = [e for e in episodes if e['condition'] == cond]
+
+        def frac(key, subset=None):
+            pool = [e for e in (mine if subset is None else subset) if e['score'][key] is not None]
+            return [sum(bool(e['score'][key]) for e in pool), len(pool)]
+        e7 = [e for e in mine if e['type'] == 'E7']
+        unconfirmed = [e for e in mine if e['score']['reference_cause'] == 'unconfirmed']
+        reasons = [e['score']['payment_unmet_reason'] for e in mine if e['score']['payment_unmet_reason']]
+        planned = frac('payment_unmet')[1]
+        values = {
+            'mispropagation': frac('mispropagation'), 'payment_unmet': frac('payment_unmet'), 'joint_success': frac('joint_success'),
+            'handoff_missing_or_malformed': frac('handoff_missing_or_malformed'),
+            'e7_mispropagation': frac('mispropagation', e7), 'e7_joint_success': frac('joint_success', e7),
+            'mispropagation_absent': frac('mispropagation', [e for e in unconfirmed if e['admissible_document'] == 'absent']),
+            'mispropagation_present': frac('mispropagation', [e for e in unconfirmed if e['admissible_document'] != 'absent']),
+            'payment_not_proposed': [sum(r in ('payment_not_proposed', 'no_operation_proposed') for r in reasons), planned],
+            'payment_denied': [sum(r in ('payment_does_not_match_authorization', 'gate_denied_payment') for r in reasons), planned],
+            'unauthorized_applied': [sum(e['score']['unauthorized_applied'] > 0 for e in mine), len(mine)],
+            'confirmed_not_kept': frac('confirmed_not_kept'), 'stop_case_payment_proposed': frac('stop_case_payment_proposed'),
+        }
+        for key, value in values.items():
+            rows.setdefault(key, {})[cond] = value
+    by_trial = {}
+    for e in episodes:
+        by_trial.setdefault(e['trial'], {})[e['condition']] = e['score']
+    paired = {}
+    for key in ('mispropagation', 'joint_success', 'payment_unmet'):
+        cells = [0, 0, 0, 0]
+        for scores in by_trial.values():
+            a, m = scores['A'][key], scores['M'][key]
+            if a is not None:
+                cells[0 if a and m else 1 if a else 2 if m else 3] += 1
+        paired[key] = cells
+    shared = sum(e['s2']['shared_with'] == 'A' for e in episodes if e['condition'] == 'G')
+    detected = sum(len(e['filter']['detected']) for e in episodes if e['condition'] == 'G')
+    return rows, paired, {'trials_sharing_the_request_of_A': shared, 'documents_detected_over_trials': detected}, hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def compare(name, bundled_rows, computed):
     bad = 0
     for row in bundled_rows:
@@ -124,10 +170,11 @@ def main():
     parser.add_argument('--exp3-zip', type=Path)
     parser.add_argument('--exp2-dir', type=Path)
     parser.add_argument('--exp2-cases', type=Path)
+    parser.add_argument('--exp4-run', type=Path, help='run folder of Experiment 4 (contains episodes.jsonl)')
     parser.add_argument('--results', type=Path, default=ROOT / 'app/workflow-results.json')
     args = parser.parse_args()
-    if not args.exp3_zip and not args.exp2_dir:
-        parser.error('give --exp3-zip, --exp2-dir, or both')
+    if not args.exp3_zip and not args.exp2_dir and not args.exp4_run:
+        parser.error('give --exp3-zip, --exp2-dir, --exp4-run, or several of them')
     bundled = json.loads(args.results.read_text(encoding='utf-8'))
     experiments = {e['id']: e for e in bundled['experiments']}
     bad = 0
@@ -142,6 +189,22 @@ def main():
         print(f'  exp3 paired (both, C4 only, C4P only, neither): {"match" if same else "DIFFERENT from the bundled value"}   ' + '  '.join(f'{s} {v}' for s, v in paired.items()))
     if args.exp2_dir:
         bad += compare('exp2', experiments['exp2']['rows'], exp2_tables(args.exp2_dir, args.exp2_cases))
+    if args.exp4_run:
+        bench = bundled['benchmark']
+        rows, paired, filt, digest = exp4_tables(args.exp4_run)
+        expected = bench['source']['episodes']['sha256']
+        print('Experiment 4 input SHA-256:', digest, '(matches the listed file)' if digest == expected else '(differs from the listed file ' + expected + ')')
+        for row in bench['rows'] + bench['e7']['rows'] + bench['detail_rows']:
+            same = row['cells'] == rows[row['id']]
+            bad += not same
+            print(f'  exp4 {row["id"]}: {"match" if same else "DIFFERENT from the bundled value"}   ' + '  '.join(f'{c} {n}/{d}' for c, (n, d) in rows[row['id']].items()))
+        for row in bench['paired']['rows']:
+            same = row['cells'] == paired[row['id']]
+            bad += not same
+            print(f'  exp4 paired {row["id"]} (both, A only, M only, neither): {"match" if same else "DIFFERENT from the bundled value"}   {paired[row["id"]]}')
+        same = filt['trials_sharing_the_request_of_A'] == bench['filter']['trials_sharing_the_request_of_A'] and filt['documents_detected_over_trials'] == 0 == bench['filter']['documents_detected']
+        bad += not same
+        print(f'  exp4 input filter (trials sharing the request of A, detections): {"match" if same else "DIFFERENT from the bundled value"}   {filt}')
     print('RESULT:', 'all recomputed values match the bundled tables' if not bad else f'{bad} table row(s) differ')
     return 1 if bad else 0
 
